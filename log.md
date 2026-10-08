@@ -121,3 +121,13 @@ Alt som gjøres i prosjektet loggføres her med tidsstempel (Europe/Oslo).
 - 08:40 src/icons.js og src/invui.js: inventarskjermen. Egen liten WebGL-renderer lager 3D-ikoner (tonemapping og sRGB riktig), og gjenstanden du velger snurrer i detaljfeltet. Kameraet går inn i nærbilde av rollpersonen, som snur seg mot deg. Dra og slipp mellom sekk, kropp, belte og bakken, dobbeltklikk gjør det vanligste, sammenligning med det du har på. I eller SEKK-knappen åpner. Sekk-teller i HUD-en blinker rødt ved överlast.
 - 08:44 src/save.js og src/saveui.js: lagre og laste med autolagring og tre plasser, med bilde av skjermen. Nivået bygges på nytt fra frøet, og bare endringene lagres: hvilke fiender som lever og hvor, åpne kister, knuste tønner, gjemmesteder, ting på bakken, kartet du har sett og butikken. Fortsett og Last spill i tittelmenyen, Lagre og Last i pausemenyen. Ikke midt i en kamp. Autolagring slettes når løpet er over.
 - 08:47 Test: inventar med dra og slipp, lagre i byen og på nivå 2, laste begge, Fortsett i tittelen. Stresstest tjuv og krigare gjennom fem nivåer uten feil.
+
+## 2026-10-08: kampeffekter (ChatGPT)
+
+- 08:24 (ChatGPT) Leste AGENTS.md, README.md, memory.md, todo.md og log.md. Avgrenset eget kampeffektlag mot Claudes reserverte vær-, shader- og regelarbeid.
+- 08:31 (ChatGPT) Reserverte oppgaven i todo.md på chatgpt/kampeffekter og åpnet PR #1 som utkast for å gjøre arbeidsfordelingen synlig.
+- 08:40 (ChatGPT) Lagde combatfx.js og combatfx-pool.js: instansierte våpenhugg, sjokkbølger, runesirkler, gnister og fjær/beinfliser. Fast kapasitet og gjenbrukte materialer, geometri og poster.
+- 08:44 (ChatGPT) Fire regresjonstester bestått. Stresstest tjuv gjennom fem nivåer uten spill- eller konsollfeil. WebGL tegnet de nye shaderne. Åtte umiddelbare oppryddinger ga null gjenværende effekter.
+- 08:48 (ChatGPT) Hentet inn Claudes inventar og lagring fra 26cddf7. Gjentok spilltesten med oppdatert kode uten feil. fx.js er uendret i dette bidraget; main.js har én ny importlinje.
+- 08:50 (ChatGPT) GitHub Actions bygget den selvstendige HTML-fila og besto de fire regresjonstestene. La til overlevering i docs/kampeffekter.md; nettlesertest og artefaktkontroll kjøres før PR-en klargjøres.
+- 08:52 (ChatGPT) Hele CI-jobben på b1520fa besto: bygg, fire regresjonstester, fem nivåer, shaderkontroll og åtte oppryddinger. Skjermbilder og resultat.json er lagret som GitHub Actions-artefakt. PR #1 klargjøres for gjennomgang.

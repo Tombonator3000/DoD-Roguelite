@@ -8,7 +8,7 @@ import { SharedAssets, decodeDuck, cutawayUniforms, buildRat } from './assets.js
 import { Dungeon, FLOORS } from './dungeon.js';
 import { Player } from './player.js';
 import { World } from './world.js';
-import { FX } from './fx.js';
+import { CombatFX as FX } from './combatfx.js';
 import { UI } from './ui.js';
 import { Sound } from './audio.js';
 import { Input } from './input.js';
