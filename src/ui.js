@@ -6,6 +6,7 @@ import { RARITY, SRC_COLOR, isRanged } from './loot.js';
 import { WALL, FLOOR, WATER, PILLAR } from './dungeon.js';
 import { tStr } from './rules.js';
 import { HOUSE, FENCE, GR } from './townmap.js';
+import { bagCap } from './inventory.js';
 
 const $ = s => document.querySelector(s);
 const tmp = new THREE.Vector3();
@@ -31,6 +32,8 @@ const ICON = {
 };
 const KIND_ICON = { fist: 'fist', knife: 'blade', sword: 'blade', great: 'blade', axe: 'axe', hammer: 'hammer', spear: 'spear', staff: 'staff', bow: 'bow', xbow: 'bow', sling: 'bow' };
 const svg = k => `<svg viewBox="0 0 24 24"><path d="${ICON[k] || ICON.star}"/></svg>`;
+
+const CONS_KIND = { potion: 'Drikk', potionvp: 'Drikk', saffron: 'Krydder' };
 
 export class UI {
   constructor() {
@@ -188,6 +191,13 @@ export class UI {
     $('.orb.vp .fill').style.height = `${(P.vp / P.maxVP) * 100}%`;
     $('.orb.kp').classList.toggle('low', P.kp / P.maxKP < 0.3);
     $('#silver').textContent = P.silver;
+    const bk = `${P.bag?.length || 0}/${bagCap(P)}/${P.overloaded ? 1 : 0}`;
+    if (this._bagKey !== bk) {
+      this._bagKey = bk;
+      $('#bagn').textContent = P.bag?.length || 0;
+      $('#bagc').textContent = bagCap(P);
+      $('#bagchip').classList.toggle('over', !!P.overloaded);
+    }
     if (G.run?.clock != null) this.setClock(G.run.clock);
     for (const c of CONDITIONS) this.condEls[c.id].classList.toggle('on', P.hasCond(c.id));
     const cdv = (k, max) => Math.min(1, (P.cd[k] || 0) / max);
@@ -227,13 +237,14 @@ export class UI {
     // spørsmål om samhandling
     const W = G.world;
     let txt = null;
-    if (W.nearItem) txt = `<kbd>E</kbd> Ta ${W.nearItem.item.name}`;
+    if (W.nearItem?.kind === 'entry') txt = `<kbd>E</kbd> Ta ${W.nearItem.entry.name}${W.nearItem.entry.qty > 1 ? ' x' + W.nearItem.entry.qty : ''}`;
+    else if (W.nearItem) txt = `<kbd>E</kbd> Ta opp <kbd>X</kbd> Ta på`;
     else if (W.nearInteract) txt = `<kbd>E</kbd> ${W.nearInteract.label}`;
     this.prompt.hidden = !txt;
     if (txt && this.prompt.innerHTML !== txt) this.prompt.innerHTML = txt;
     const tb = $('#tbtn-use');
     if (tb) tb.classList.toggle('ready', !!txt);
-    this.updateTooltip(W.nearItem?.item || null);
+    this.updateTooltip(W.nearItem ? W.nearItem.item || W.nearItem.entry : null);
     if (this.boss) $('#bossbar .fill').style.width = `${Math.max(0, (this.boss.kp / this.boss.maxKP) * 100)}%`;
     // kort vila
     const rb = $('#restbar');
@@ -248,20 +259,31 @@ export class UI {
     }
   }
 
-  itemHTML(item, label) {
+  itemHTML(item, label, o = {}) {
+    if (!item.slot) return this.entryHTML(item, label, o);
     const r = RARITY[item.rarity];
     const slotName = { vapen: 'våpen', vapen2: 'skjold', rustning: 'rustning', hjalm: 'hjelm', amulett: 'amulett' }[item.slot] || item.slot;
     return `<div class="it"><div class="lbl">${label}</div><div class="nm" style="color:${r.color}">${item.name}</div>
       <div class="rar">${r.name} ${slotName}</div>
       ${item.lines.map(l => `<div class="ln">${l}</div>`).join('')}
-      ${item.flavor ? `<div class="fl">${item.flavor}</div>` : ''}</div>`;
+      ${item.flavor ? `<div class="fl">${item.flavor}</div>` : ''}${o.price != null ? `<div class="val">Verdi ${o.price} silver</div>` : ''}</div>`;
+  }
+
+  // Mat, drikk og verdisaker
+  entryHTML(e, label, o = {}) {
+    const r = RARITY[e.rarity || 'vanlig'];
+    const kind = e.type === 'val' ? 'Verdisak' : CONS_KIND[e.icon] || 'Mat';
+    return `<div class="it"><div class="lbl">${label}</div><div class="nm" style="color:${r.color}">${e.name}${e.qty > 1 ? ` <span class="q">x${e.qty}</span>` : ''}</div>
+      <div class="rar">${kind}</div><div class="ln">${e.desc || ''}</div>
+      <div class="val">Verdi ${o.price ?? e.value * (e.qty || 1)} silver</div></div>`;
   }
 
   updateTooltip(item) {
     if (item === this.lastTip) return;
     this.lastTip = item;
     if (!item) { this.tooltip.hidden = true; return; }
-    const cur = G.player.equip[item.slot];
+    if (!item.slot) { this.tooltip.innerHTML = this.entryHTML(item, 'På bakken'); this.tooltip.hidden = false; return; }
+    const cur = G.player.equip[item.slot === 'vapen2' && !G.player.equip.vapen2 ? 'vapen2' : item.slot];
     this.tooltip.innerHTML = this.itemHTML(item, 'På bakken') + (cur ? this.itemHTML(cur, 'Har på') : '<div class="it"><div class="lbl">Har på</div><div class="ln">Ingenting</div></div>');
     this.tooltip.hidden = false;
   }

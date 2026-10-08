@@ -17,6 +17,7 @@ Ting som er lurt å huske neste gang noen (menneske eller AI) jobber med prosjek
 - Google Drive har "ereb_altor_hjaltar_fran_kopparhavet.pdf" (id 1QKI2XwSbfsRLdwJL8mb4C5qZWWOO2e_F), men ikke grunnboka for DoD 2023. Teksten ligger uttrukket i /home/claude/rules/hjaltar.txt (forsvinner med sandkassen).
 - Resten kommer fra nettet (oktober 2026): Free Leagues offisielle Foundry-modul via den italienske oversettelsen (github.com/LuckyFrico/dragonbane-translation-ita), Foundry-systemet pafvel/dragonbane, Roll20-arket (svenske navn), offisielle pregens, forumet til Fria Ligan. Ingen piratkopier.
 - Verdier som ikke er sjekket mot boka er merket `uv: true` i src/dod.js. Har Tom boka, bør disse sjekkes: WP-kostnad og krav for de fleste hjälteförmågor, svenske navn på Anpasslig, Hal som en ål, Inre frid, Livvakt (Guardian), Sjöben, Skattjägare, intervallene i tabellen for svåra skador, STY-krav for tvåhandssvärd, skaden til stridsklubba og treudd, besvärjelsenes svenske navn (Eldklot, Vindstöt, Blixtsken, Långsteg, Lyfta, Snärjande rötter).
+- Tom har pekt på https://kingafw.no/Drakar/index.html (oktober 2026): bibliotek med eldre utgaver (DoD 1.0 til 5.0, Expert, Chronopia), svensk tekst. Bra for lore og monstre (Ereb Altor, Monsterboken, Svartfolk, Tjuvar och lönnmördare, Kopparhavets Kapare), men ikke for tallene i 2023-reglene.
 - Funn: Ill-Tempered heter Vresig på svensk (ikke Lättretad), Webbed Feet heter Simfötter.
 
 ## Tekniske beslutninger

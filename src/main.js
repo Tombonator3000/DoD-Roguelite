@@ -8,7 +8,7 @@ import { SharedAssets, decodeDuck, cutawayUniforms, buildRat } from './assets.js
 import { Dungeon, FLOORS } from './dungeon.js';
 import { Player } from './player.js';
 import { World } from './world.js';
-import { FX } from './fx.js';
+import { CombatFX as FX } from './combatfx.js';
 import { UI } from './ui.js';
 import { Sound } from './audio.js';
 import { Input } from './input.js';
@@ -24,11 +24,19 @@ import { Companion } from './companion.js';
 import { Enemy } from './enemies.js';
 import { Town, skyAt } from './town.js';
 import { hourOf, QUEST_TITLES } from './townfolk.js';
+import * as INV from './inventory.js';
+import { giveItem, makeCons, renderSellList, canCarry, bagCap } from './inventory.js';
+import { Icons } from './icons.js';
+import { InvUI } from './invui.js';
+import { saveGame, readSave, latestSave, deleteSave, describe as describeSave } from './save.js';
+import { SaveUI } from './saveui.js';
 
 const $ = s => document.querySelector(s);
 const CAM_OFF = new THREE.Vector3(10.4, 15.6, 10.4);
 const tmp = new THREE.Vector3();
 const tmp2 = new THREE.Vector3();
+const tmp3 = new THREE.Vector3();
+const CLOSE_OFF = new THREE.Vector3(3.3, 1.75, 3.3);
 
 const UPGRADES = [
   { id: 'trening', name: 'Hard trening', desc: '+1 på den beste tränade vapenfärdigheten i alle fremtidige løp.', cost: 15, max: 3 },
@@ -129,7 +137,7 @@ class Game {
   constructor() {
     G.game = this;
     window.G = G; // praktisk for feilsøking i konsollen
-    G.dev = { randomChoices, buildSheet };
+    G.dev = { randomChoices, buildSheet, inv: INV, makeItem };
     this.upgrades = UPGRADES;
     this.sky = {};
   }
@@ -221,6 +229,9 @@ class Game {
     G.fx = new FX(scene);
     G.ambient = new Ambient(scene);
     G.ui = new UI();
+    G.icons = new Icons();
+    G.inv = new InvUI();
+    G.saveui = new SaveUI();
     G.audio = new Sound();
     G.input = new Input(renderer.domElement);
     G.world = new World();
@@ -403,6 +414,10 @@ class Game {
     G.ui.renderDojo(G.meta, UPGRADES, u => this.buyUpgrade(u));
     $('#title-stats').textContent = G.meta.runs ? `${G.meta.runs} forsøk, ${G.meta.wins} seire, beste nivå ${G.meta.best || 1}` : 'Første gang ned i mørket';
     $('#mi-feathers').textContent = `${G.meta.feathers} fjær`;
+    const last = latestSave();
+    $('#mi-continue').hidden = !last;
+    $('#mi-quick').classList.toggle('primary', !last);
+    if (last) { const d = describeSave(last.data); $('#mi-cont-hint').textContent = `${d.title}${d.place ? ', ' + d.place : ''}`; }
     const S = this.selectedSheet();
     $('#mi-char').textContent = S.name;
     $('#statline').innerHTML = ['STY', 'FYS', 'SMI', 'INT', 'PSY', 'KAR'].map(k => `<div><b>${S.attrs[k]}</b><span>${k}</span></div>`).join('');
@@ -421,7 +436,7 @@ class Game {
   }
 
   menuItems() {
-    return [...document.querySelectorAll('#menu .mi')];
+    return [...document.querySelectorAll('#menu .mi')].filter(m => !m.hidden);
   }
 
   selectMenu(i, silent, focus = true) {
@@ -437,6 +452,8 @@ class Game {
     G.audio.menuSelect?.();
     if (act === 'start') { this.refreshPick(); this.showView('tv-pick'); }
     else if (act === 'quick') this.startWith(this.selectedSheet());
+    else if (act === 'continue') { const l = latestSave(); if (l) this.loadSave(l.slot); }
+    else if (act === 'load') { this.showView('tv-saves'); G.saveui.render($('#title-saves'), 'load', { onLoad: slot => this.loadSave(slot) }); }
     else if (act === 'dojo') { this.refreshTitleInfo(); this.showView('dojo'); }
     else if (act === 'help') this.showView('help');
     else if (act === 'settings') { this.syncSettingsUI(); this.showView('settings'); }
@@ -587,6 +604,11 @@ class Game {
     $('#btn-dr-roll').onclick = () => this.deathRollSequence();
     $('#btn-dr-rally').onclick = () => this.rallySelf();
     $('#tbtn-pause').addEventListener('touchstart', e => { e.preventDefault(); this.pause(); }, { passive: false });
+    $('#tbtn-inv').addEventListener('touchstart', e => { e.preventDefault(); if (G.state === 'play') G.inv.open(); }, { passive: false });
+    $('#bagchip').onclick = () => { if (G.state === 'play') G.inv.open(); };
+    $('#btn-save').onclick = () => this.openSaves('save');
+    $('#btn-load').onclick = () => this.openSaves('load');
+    $('#btn-saves-back').onclick = () => this.closeSaves();
     $('#tbtn-use').addEventListener('touchstart', e => { e.preventDefault(); if (G.state === 'play') G.world.interact(); }, { passive: false });
   }
 
@@ -700,7 +722,73 @@ class Game {
       if (!town) G.run.depthReached = Math.max(G.run.depthReached, depth);
       G.ui.setDepth(depth, info.name);
       G.ui.log(FLOOR_INTRO[depth]);
+      if (!this.loadingSave) setTimeout(() => { if (G.state === 'play' && !G.player.dead) saveGame('auto', true); }, 400);
     }
+  }
+
+  // --- lagre og laste ------------------------------------------------------------------
+
+  openSaves(mode) {
+    if (G.state !== 'pause') return;
+    $('#saves-eye').textContent = mode === 'save' ? 'Lagre' : 'Last';
+    $('#saves-h').textContent = mode === 'save' ? 'Lagre spillet' : 'Last et lagret spill';
+    G.ui.show('saves');
+    G.saveui.render($('#saves-list'), mode, { onLoad: slot => this.loadSave(slot) });
+  }
+
+  closeSaves() {
+    if ($('#saves').hidden) return;
+    if (G.state === 'pause') G.ui.show('pause');
+    else G.ui.hideScreens();
+  }
+
+  loadSave(slot) {
+    const r = readSave(slot);
+    if (!r.ok) { G.saveui.msg?.(r.why); return; }
+    if (this.wiping) return;
+    const d = r.data;
+    document.activeElement?.blur?.();
+    G.audio.init();
+    G.audio.ui();
+    const fromTitle = G.state === 'title';
+    if (fromTitle) this.title.leaving = true;
+    this.wipe(() => {
+      this.endRunCleanup();
+      this.loadingSave = true;
+      G.run = { ...this.freshRun(), ...d.run, known: new Set(d.run.known || []), t0: performance.now() };
+      const P = G.player;
+      if (d.player.sheet?.id) { try { this.selectedId = d.player.sheet.id; localStorage.setItem('svartnebb.lastchar', d.player.sheet.id); } catch (e) { /* valgfritt */ } }
+      P.deserialize(d.player);
+      G.ui.hideScreens();
+      G.ui.hideBoss();
+      this.hideDying();
+      G.ui.logEl.innerHTML = '';
+      G.ui.hud.hidden = false;
+      $('#touch').hidden = !G.touch;
+      G.state = 'play';
+      this.view = null;
+      this.applyViewOffset();
+      this.title.leaving = false;
+      $('#title').hidden = true;
+      this.loadFloor(d.depth, d.seed, false, 'start');
+      // onFloor() nullstilte disse, så de settes tilbake etter at nivået er bygd
+      P.floor = JSON.parse(JSON.stringify(d.player.floor || P.floor));
+      P.floorStats = JSON.parse(JSON.stringify(d.player.floorStats || P.floorStats));
+      Object.assign(P.fx, d.player.fx || {});
+      if (d.level) G.world.applyLevel(d.level);
+      P.pos.set(d.pos.x, 0, d.pos.z);
+      P.yaw = d.pos.yaw || 0;
+      P.vel.set(0, 0, 0);
+      if (G.companion) G.companion.pos?.set(P.pos.x - 1.2, 0, P.pos.z - 0.8);
+      G.dungeon.computeFlow(P.pos.x, P.pos.z);
+      if (G.dungeon.isTown) G.dungeon.life?.snapAll?.();
+      this.camTarget.copy(P.pos);
+      G.camera.position.copy(P.pos).add(CAM_OFF);
+      this.loadingSave = false;
+      G.ui.buildBar();
+      G.audio.playMusic(G.dungeon.isTown ? 'town' : 'explore');
+      G.ui.log(`Fortsetter: ${describeSave(d).title}${G.dungeon.isTown ? ', Fristaden' : ''}.`);
+    }, fromTitle ? 0.7 : 0.55);
   }
 
   // Lys for byen (sol og måne) eller for kloakken (lykt)
@@ -1299,6 +1387,7 @@ class Game {
   }
 
   onDeath(instant = false) {
+    deleteSave('auto');
     const P = G.player;
     if (P.dead) return;
     P.dead = true;
@@ -1316,6 +1405,7 @@ class Game {
   }
 
   onVictory() {
+    deleteSave('auto');
     if (G.state === 'dead' || G.state === 'victory' || G.state === 'title') return;
     if (G.state !== 'play') { setTimeout(() => this.onVictory(), 500); return; }
     G.state = 'victory';
@@ -1415,7 +1505,7 @@ class Game {
     const lines = P.isNebb ? DAD : NANSEN;
     const kw = $('#dlg-kw');
     kw.innerHTML = '';
-    const words = ['NAVN', 'JOBB', 'HANDEL', 'SAFRAN', 'FLANSEN', 'KARAD'];
+    const words = ['NAVN', 'JOBB', 'HANDEL', 'SELGE', 'SAFRAN', 'FLANSEN', 'KARAD'];
     if (G.depth >= 2 || G.run.depthReached >= 2) words.push('REVEN');
     if (!D.advance) words.push('FORSKUDD');
     words.push('FARVEL');
@@ -1426,6 +1516,7 @@ class Game {
       b.onclick = () => {
         G.audio.ui();
         if (w === 'HANDEL') { this.startBarter(); return; }
+        if (w === 'SELGE') { this.renderSell(); return; }
         if (w === 'FORSKUDD') { this.askAdvance(); return; }
         if (w === 'FARVEL') { this.dadSay(lines.FARVEL); setTimeout(() => this.closeShop(), 700); return; }
         this.dadSay(lines[w]);
@@ -1454,6 +1545,21 @@ class Game {
       row.querySelector('button').onclick = () => this.buy(s, price);
       wares.appendChild(row);
     }
+  }
+
+  // Herr Nansen kjøper alt: verdisaker, mat og utstyr
+  renderSell() {
+    const D = G.dungeon;
+    const mod = D.barter === 'great' ? 1.25 : D.barter === 'good' ? 1.1 : D.barter === 'bad' ? 0.8 : 1;
+    const P = G.player;
+    if (!P.bag.length) { this.dadSay(P.isNebb ? 'Sekken din er tom. Det er ikke noe å selge der.' : 'Du har ingenting å selge. Kom tilbake med noe.'); return; }
+    renderSellList($('#dlg-wares'), 'nansen', {
+      mod,
+      say: t => this.dadSay(t),
+      line: (e, n) => (e.type === 'val' ? (P.isNebb ? `${n} silver. Jeg sier ikke til sjefen hvor den kom fra.` : `${n} silver. Jeg spør ikke hvor den kom fra.`) : `${n} silver. Det er det den er verdt her.`),
+      back: () => this.renderShop(true),
+    });
+    this.dadSay(P.isNebb ? 'Vis meg hva du har. Og nei, jeg kjøper ikke brød tilbake til full pris.' : 'Legg det på disken. Jeg betaler det sjefen ville betalt, minus det han ikke vet om.');
   }
 
   // Köpslå: ett slag per besøk
@@ -1491,11 +1597,14 @@ class Game {
   buy(s, price) {
     const P = G.player;
     if (P.silver < price) return;
-    if (s.id === 'potion' && P.potions >= 4) { this.dadSay('Du har ikke plass til flere. Drikk opp de du har først.'); return; }
+    if (s.id === 'potion' && P.potions >= 4 && !canCarry(P, makeCons('legedrikk'))) { this.dadSay('Du har ikke plass til flere. Verken i beltet eller i sekken.'); return; }
     P.silver -= price;
     if (price) G.audio.coin();
-    if (s.id === 'bread') { const got = P.heal(3); this.dadSay(got ? 'Tygg ordentlig.' : 'Du er jo mett. Men takk for pengene.'); }
-    else if (s.id === 'potion') { P.potions++; this.dadSay('Ikke drikk den på tom mage.'); }
+    if (s.id === 'bread') {
+      if (P.kp < P.maxKP) { P.heal(3); this.dadSay('Tygg ordentlig.'); }
+      else if (giveItem(makeCons('brod'))) this.dadSay('Til sekken, da. Ikke klem den.');
+      else this.dadSay('Du er jo mett. Men takk for pengene.');
+    } else if (s.id === 'potion') { giveItem(makeCons('legedrikk')); this.dadSay('Ikke drikk den på tom mage.'); }
     else if (s.id === 'stone') { P.metaMods.dmg = (P.metaMods.dmg || 0) + 1; P.recalc(); s.sold = true; this.dadSay('Brynet var bestefars. Ikke si det til sjefen.'); }
     else if (s.id === 'picks') { P.kit.add('dyrkar'); s.sold = true; this.dadSay('Til hva? Nei. Ikke svar.'); }
     else if (s.id === 'repair') {
@@ -1516,7 +1625,7 @@ class Game {
       this.dadSay('Sov du. Jeg passer butikken. Det er jo det jeg gjør.');
       G.ui.log('Lång vila: alle KP, VP og tillstånd er tilbake.');
     } else if (s.item) {
-      G.world.equipItem(s.item);
+      giveItem(s.item);
       s.sold = true;
       this.dadSay('Den der passer deg. Nesten.');
     }
@@ -1582,7 +1691,9 @@ class Game {
     const typing = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName);
     if (G.state === 'title') this.titleKeys(inp);
     else if (inp.wasPressed('Escape')) {
-      if (G.state === 'play') this.pause();
+      if (G.state === 'inventory') G.inv.close();
+      else if (!$('#saves').hidden) this.closeSaves();
+      else if (G.state === 'play') this.pause();
       else if (G.state === 'dialog') this.closeShop();
       else this.resume();
     }
@@ -1590,7 +1701,9 @@ class Game {
     if (G.state === 'play') {
       if (inp.wasPressed('KeyC')) this.openSheet();
       if (inp.wasPressed('Tab')) G.ui.toggleBigMap();
+      if (inp.wasPressed('KeyI') && !typing) G.inv.open();
     } else if (G.state === 'sheet' && inp.wasPressed('KeyC')) this.resume();
+    else if (G.state === 'inventory' && inp.wasPressed('KeyI')) G.inv.close();
 
     if (inTitle) {
       G.time += dt;
@@ -1614,6 +1727,7 @@ class Game {
       G.run.clock += gdt / 120;
       this.updateAim();
       if (inp.wasPressed('KeyE')) G.world.interact();
+      else if (inp.wasPressed('KeyX') && !this.push && G.world.nearItem?.kind === 'item') G.world.interact(true);
       this.flowTimer -= gdt;
       if (this.flowTimer <= 0) { this.flowTimer = 0.25; G.dungeon.computeFlow(P.pos.x, P.pos.z); }
       if (!this.push) P.update(gdt, inp);
@@ -1639,7 +1753,16 @@ class Game {
         P.animate(dt, 0);
         for (const e of G.enemies) e.animate(dt * 0.3);
       }
-      if (G.dungeon?.isTown && (G.state === 'dialog' || G.state === 'transition')) G.dungeon.update(dt, P, this.townLights(dt));
+      if (G.state === 'inventory') {
+        // rollpersonen snur seg mot kameraet og står og puster
+        let dy = Math.atan2(CAM_OFF.x, CAM_OFF.z) - 0.35 - P.yaw;
+        dy = Math.atan2(Math.sin(dy), Math.cos(dy));
+        P.yaw += dy * Math.min(1, dt * 5);
+        P.root.rotation.y = P.yaw;
+        P.animate(dt, 0);
+        G.icons?.tick(dt);
+      }
+      if (G.dungeon?.isTown && (G.state === 'dialog' || G.state === 'transition' || G.state === 'inventory')) G.dungeon.update(dt, P, this.townLights(dt));
       G.world.update(0, G.camera);
       G.fx.update(G.state === 'deathroll' ? dt * 0.2 : dt, G.camera);
     }
@@ -1682,10 +1805,28 @@ class Game {
       if (l > 6) lead.multiplyScalar(6 / l);
       lead.multiplyScalar(0.18);
     }
-    this.camTarget.lerp(tmp.set(P.pos.x + lead.x, 0.6, P.pos.z + lead.z), 1 - Math.exp(-7 * dt));
+    // nærbilde når packningen er åpen
+    const wantClose = G.state === 'inventory' ? 1 : 0;
+    this.closeK = (this.closeK || 0) + (wantClose - (this.closeK || 0)) * (1 - Math.exp(-5 * dt));
+    const ck = this.closeK < 0.002 ? 0 : this.closeK;
+    const ce = ck * ck * (3 - 2 * ck);
+    this.camTarget.lerp(tmp.set(P.pos.x + lead.x, 0.6 + ce * 0.05, P.pos.z + lead.z), 1 - Math.exp(-7 * dt));
     const sh = G.fx.shake * G.fx.shake * (G.shakeMul ?? 1);
-    const off = CAM_OFF;
+    const off = tmp3.copy(CAM_OFF).lerp(CLOSE_OFF, ce);
     cam.position.set(this.camTarget.x + off.x, this.camTarget.y + off.y, this.camTarget.z + off.z);
+    if (ce > 0) {
+      const w = innerWidth, h = innerHeight;
+      const panel = document.querySelector('#inv .inv-panel');
+      const narrow = w <= 820;
+      const pw = panel ? panel.offsetWidth : Math.min(800, w);
+      const ph = panel ? panel.offsetHeight : h * 0.66;
+      const xo = narrow ? 0 : (pw / 2) * ce;
+      const yo = narrow ? (ph / 2) * ce * 0.9 : 0;
+      cam.setViewOffset(w, h, xo, yo, w, h);
+      const el = document.querySelector('#inv');
+      if (el) el.style.setProperty('--sx', `${((w - pw) / 2 / w) * 100}%`);
+      this.viewOff = true;
+    } else if (this.viewOff) { cam.clearViewOffset(); this.viewOff = false; }
     if (sh > 0.001) {
       const t = G.time * 60;
       cam.position.x += (Math.sin(t * 1.3) + Math.sin(t * 2.7)) * sh * 0.35;

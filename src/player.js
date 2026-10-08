@@ -8,6 +8,7 @@ import {
 } from './dod.js';
 import { addRimFlash, makeOutline } from './assets.js';
 import { weaponItem, armorItem, helmetItem, isRanged, refinalize } from './loot.js';
+import { bagCap, makeCons, removeFromBag } from './inventory.js';
 import { buildCharacter, buildWeaponMesh, ghostGeometry, HOLD } from './kinmodels.js';
 
 // Kamera står mot +x,+z. "Opp" på skjermen er verdensretning (-1,0,-1).
@@ -192,6 +193,8 @@ export class Player {
     };
     if (this.isNebb && this.equip.vapen) this.equip.vapen.name = 'Nansens dolk';
     this.kit = new Set(S.gear.g || []);
+    this.bag = [makeCons('brod', 2)];
+    this.overloaded = false;
     this.heroic = [...S.heroic];
     this.spells = [...S.spells];
     this.tricks = new Set(S.tricks || []);
@@ -233,6 +236,50 @@ export class Player {
     this.vp = this.maxVP;
     this.tilt.rotation.set(0, 0, 0);
     this._stealthLook = false;
+    this.buildModel();
+  }
+
+  // --- lagring -----------------------------------------------------------------------
+  // Alt som endrer seg i løpet av et løp. Resten kommer fra formulæret (sheet).
+  serialize() {
+    const fx = {};
+    for (const k of ['utu', 'light', 'sharpened', 'poisonUsed']) if (this.fx[k]) fx[k] = this.fx[k];
+    return {
+      sheet: this.sheet, baseSkills: this.baseSkills, metaMods: this.metaMods,
+      equip: this.equip, bag: this.bag, kit: [...this.kit], potions: this.potions, silver: this.silver,
+      heroic: this.heroic, spells: this.spells, tricks: [...this.tricks], kinAb: this.kinAb,
+      boons: this.boons, cond: this.cond, marks: [...this.marks], injuries: this.injuries, ageShift: this.ageShift,
+      kp: this.kp, vp: this.vp, downs: this.downs, curse: this.curse, floorStats: this.floorStats, floor: this.floor, fx,
+    };
+  }
+
+  deserialize(d) {
+    const clone = v => JSON.parse(JSON.stringify(v));
+    this.setSheet(d.sheet);
+    this.newRun(G.meta);
+    this.baseSkills = clone(d.baseSkills);
+    this.metaMods = clone(d.metaMods || {});
+    this.equip = clone(d.equip);
+    this.bag = clone(d.bag || []);
+    this.kit = new Set(d.kit || []);
+    this.potions = d.potions ?? 0;
+    this.silver = d.silver ?? 0;
+    this.heroic = clone(d.heroic || []);
+    this.spells = clone(d.spells || []);
+    this.tricks = new Set(d.tricks || []);
+    this.kinAb = clone(d.kinAb || []);
+    this.boons = clone(d.boons || []);
+    this.cond = clone(d.cond || {});
+    this.marks = new Set(d.marks || []);
+    this.injuries = clone(d.injuries || []);
+    this.ageShift = d.ageShift || 0;
+    this.downs = d.downs || 0;
+    this.curse = clone(d.curse || {});
+    this.floorStats = clone(d.floorStats || {});
+    this.floor = clone(d.floor || { roundRest: false, stretchRest: false, memento: false });
+    this.recalc();
+    this.kp = Math.min(this.maxKP, d.kp ?? this.maxKP);
+    this.vp = Math.min(this.maxVP, d.vp ?? this.maxVP);
     this.buildModel();
   }
 
@@ -286,6 +333,8 @@ export class Player {
     this.speedBase = 6.2 * (0.62 + 0.38 * this.move / 11);
     if (this.injuries.some(i => i.slow)) this.speedBase *= 0.6;
     this.speedMul = 1 + ((mods.speed || 0) - (mods.slow || 0)) / 100;
+    this.overloaded = !!this.bag && this.bag.length > bagCap(this);
+    if (this.overloaded) this.speedMul *= 0.72;
     this.drakeMax = 1 + (mods.drake || 0);
     this.dmgFlat = mods.dmg || 0;
     this.metalWorn = !!((ar && ar.metal) || (hj && hj.metal));
@@ -365,6 +414,7 @@ export class Player {
       if (w.grip === 2 && this.injuries.some(i => i.noTwoHand)) bane++;
     }
     if (o.melee && this.inWater && !this.waterFree()) bane++;
+    if (this.overloaded && (skill === 'Smyga' || skill === 'Undvika')) bane++;
     if (o.melee && this.fx.barsark > 0) boon++;
     if (o.target && this.prey === o.target && this.vp >= 1 && !o.noArmed) { this.vp -= 1; boon++; o.preyUsed = true; }
     // släktesförmåga som er gjort klar med F
@@ -1484,12 +1534,22 @@ export class Player {
     }
   }
 
+  // Tar en legedrikk fra sekken og henger den i beltet
+  refillBelt() {
+    const e = this.bag?.find(x => x.cid === 'legedrikk');
+    if (!e || this.potions >= 4) return false;
+    removeFromBag(this, e, 1);
+    this.potions++;
+    return true;
+  }
+
   drinkPotion() {
-    if (this.potions <= 0) { G.fx.float('Ingen drikker', this.pos, 'miss'); return; }
+    if (this.potions <= 0 && !this.refillBelt()) { G.fx.float('Ingen drikker', this.pos, 'miss'); return; }
     if (this.cd.potion > 0) return;
     if (this.kp >= this.maxKP && !this.dying) { G.fx.float('Full KP', this.pos, 'miss'); return; }
     this.potions--;
     this.cd.potion = 1;
+    if (this.refillBelt()) G.ui.log('Du henger en ny legedrikk fra sekken i beltet.');
     const amount = rollDice('2D6') + (this.flags.has('lunch') ? 3 : 0);
     this.heal(amount);
     G.ui.log(`Legedrikk: +${amount} KP. Smaker av jern og mynte.`);

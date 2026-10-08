@@ -9,6 +9,7 @@ import { SPELLS, TRICKS } from './dod.js';
 import { SPOTS } from './townmap.js';
 import { PEOPLE, BOARD, RUMORS } from './townpeople.js';
 import { Talk } from './talk.js';
+import { giveItem, makeCons, renderSellList } from './inventory.js';
 
 const U = v => v * T;
 const tmp = new THREE.Vector3();
@@ -608,10 +609,18 @@ export class TownLife {
       }
       const refresh = () => talk.wares(this.visit.smith.map(s => ({
         name: s.it.name, color: RARITY[s.it.rarity].color, desc: s.it.lines.join(', '), price: this.price(id, s.it.value + 8), disabled: s.sold, label: s.sold ? 'Solgt' : null,
-        buy: () => { s.sold = true; G.world.equipItem(s.it); return 'Godt jern. Ikke bruk det på stein.'; },
+        buy: () => { s.sold = true; giveItem(s.it); return 'Godt jern. Ikke bruk det på stein.'; },
       })), { note: this.priceNote(id), refresh, barter: this.barterFn(id, talk, () => refresh()) });
       refresh();
       talk.say('Se deg om. Alt er smidd her, unntatt det som er smidd i Karad Batur. Det er bedre.');
+    } else if (act === 'sellGear') {
+      const ry = G.run.rykte || 0;
+      renderSellList(document.querySelector('#dlg-wares'), 'bataar', {
+        mod: ry <= -2 ? 0.8 : ry >= 3 ? 1.1 : 1,
+        say: t => talk.say(t),
+        line: (e, n) => (e.rarity === 'vanlig' ? `${n} silver. Mest for jernet.` : `${n} silver. Pent arbeid. Ikke dvergearbeid, men pent.`),
+      });
+      talk.say('Jeg kjøper jern, ikke juveler. Juveler kan du ta med til butikken til Nansen.');
     } else if (act === 'repair') {
       const broken = Object.values(P.equip).filter(it => it?.broken);
       if (!broken.length) { talk.say('Det er ingenting trasig på deg. Ikke ennå.'); return; }
@@ -640,17 +649,17 @@ export class TownLife {
       talk.say(`${school}. Det kan jeg. Velg, og betal, og ikke stå så nær kula.`);
     } else if (act === 'potionVP') {
       const refresh = () => talk.wares([
-        { name: 'Trolldrikk', desc: 'Alle VP tilbake med en gang.', price: this.price(id, 10), buy: () => { P.vp = P.maxVP; fx('will', 20); return 'Den smaker fiolett. Det er normalt.'; } },
-        { name: 'Legedrikk', desc: 'Helbreder 2T6 KP når du drikker den (1).', price: this.price(id, 16), disabled: P.potions >= 4, buy: () => { P.potions++; return 'For når det går galt. Det går alltid galt.'; } },
+        { name: 'Trolldrikk', desc: 'Alle VP tilbake. Drikkes nå hvis du mangler VP, ellers i sekken.', price: this.price(id, 10), buy: () => { if (P.vp < P.maxVP) { P.vp = P.maxVP; fx('will', 20); } else giveItem(makeCons('trolldrikk')); return 'Den smaker fiolett. Det er normalt.'; } },
+        { name: 'Legedrikk', desc: 'Helbreder 2T6 KP. Går i beltet, eller i sekken når beltet er fullt.', price: this.price(id, 16), buy: () => { giveItem(makeCons('legedrikk')); return 'For når det går galt. Det går alltid galt.'; } },
       ], { note: this.priceNote(id), refresh, barter: this.barterFn(id, talk, () => refresh()) });
       refresh();
       talk.say('Trolldrikk for viljen, legedrikk for kroppen. Ingen av dem for sjelen.');
     } else if (act === 'spiceShop') {
       const refresh = () => talk.wares([
-        { name: 'Gåseleverpølse', desc: 'Helbreder 4 KP. Det adelen i Kardunien spiser når prestene ikke ser.', price: this.price(id, 3), buy: () => { const got = P.heal(4); return got ? `+${got} KP. Du føler deg litt adelig.` : 'Du er mett. Men den var god.'; } },
-        { name: 'Kanelbolle', desc: 'Helbreder 2 KP og gir 1 VP.', price: this.price(id, 2), buy: () => { P.heal(2); P.vp = Math.min(P.maxVP, P.vp + 1); return 'Kanel. Shamash ville ha grått.'; } },
-        { name: 'Legedrikk', desc: 'Helbreder 2T6 KP når du drikker den.', price: this.price(id, 15), disabled: P.potions >= 4, buy: () => { P.potions++; return 'Fra Ekeborg. Nesten ekte.'; } },
-        { name: 'Nesten ekte safran', desc: 'Gul. Det er det meste man kan si om den. Gaspard blunker.', price: this.price(id, 20), disabled: once('fake'), buy: () => { mark('fake'); G.run.fakeSaffron = true; return 'Ikke vis den til Hvass. Eller vis den til Hvass, og løp.'; } },
+        { name: 'Gåseleverpølse', desc: 'Helbreder 4 KP. Spises nå hvis du er skadet, ellers i sekken.', price: this.price(id, 3), buy: () => { if (P.kp < P.maxKP) { const got = P.heal(4); return `+${got} KP. Du føler deg litt adelig.`; } giveItem(makeCons('polse')); return 'Til senere. Den holder seg. Det er det beste man kan si om den.'; } },
+        { name: 'Kanelbolle', desc: 'Helbreder 2 KP og gir 1 VP. Spises nå eller går i sekken.', price: this.price(id, 2), buy: () => { if (P.kp < P.maxKP || P.vp < P.maxVP) { P.heal(2); P.vp = Math.min(P.maxVP, P.vp + 1); return 'Kanel. Shamash ville ha grått.'; } giveItem(makeCons('kanel')); return 'Pakket inn i papir. Ikke sett deg på den.'; } },
+        { name: 'Legedrikk', desc: 'Helbreder 2T6 KP. Beltet først, så sekken.', price: this.price(id, 15), buy: () => { giveItem(makeCons('legedrikk')); return 'Fra Ekeborg. Nesten ekte.'; } },
+        { name: 'Nesten ekte safran', desc: 'Gul. Det er det meste man kan si om den. Gaspard blunker.', price: this.price(id, 20), disabled: once('fake'), buy: () => { mark('fake'); G.run.fakeSaffron = true; giveItem(makeCons('safran')); return 'Ikke vis den til Hvass. Eller vis den til Hvass, og løp.'; } },
       ], { note: this.priceNote(id), refresh, barter: this.barterFn(id, talk, () => refresh()) });
       refresh();
       talk.say('Smak, min venn, smak! Det er det eneste livet ikke kan ta fra deg. Bortsett fra alt det andre.');
@@ -668,7 +677,7 @@ export class TownLife {
       if (G.run.pimpaStone) { talk.say('Du har allerede lykkesteinen min! Ikke mist den!'); return; }
       G.run.pimpaStone = true;
       const it = questAmulet('pimpa');
-      G.world.equipItem(it);
+      giveItem(it);
       talk.say('Du er den! Nei, vent. Her, du kan få lykkesteinen min. Den er magisk. Den er helt vanlig, men den er magisk.');
     } else if (act === 'perform') {
       this.perform(talk);
@@ -682,7 +691,7 @@ export class TownLife {
       talk.say(songs[Math.floor(Math.random() * songs.length)]);
     } else if (act === 'rewardDead') {
       const it = questAmulet('martyr');
-      G.world.equipItem(it);
+      giveItem(it);
       G.run.rykte = (G.run.rykte || 0) + 1;
       G.ui.log(`<b class="c-mark">Oppdrag fullført:</b> De dødes fred. Du får ${it.name}.`);
       G.audio.drake?.();

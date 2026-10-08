@@ -8,6 +8,8 @@ import { makeItem, RARITY } from './loot.js';
 import { Enemy } from './enemies.js';
 import { WALL, PILLAR } from './dungeon.js';
 import { decorate } from './decor.js';
+import { buildItemModel, rarityBeam, rarityRing } from './itemmodels.js';
+import { giveItem, addToBag, makeValuable, makeCons, canCarry, isGear } from './inventory.js';
 
 const tmp = new THREE.Vector3();
 const LIGHTS = 7;
@@ -124,7 +126,7 @@ export class World {
       m.rotation.y = Math.random() * 6.28;
       m.traverse(o => { if (o.isMesh) o.castShadow = true; });
       this.addObj(m);
-      G.props.push({ type: p.type, mesh: m, pos: m.position, radius: 0.5, breakable: true });
+      G.props.push({ type: p.type, mesh: m, pos: m.position, radius: 0.5, breakable: true, pi: dg.propList.indexOf(p) });
     }
     for (const c of dg.chestList) {
       const m = buildChest();
@@ -138,7 +140,7 @@ export class World {
         m.userData.lock = lock;
       }
       this.addObj(m);
-      G.interactables.push({ kind: 'chest', mesh: m, pos: m.position, radius: 0.7, solid: true, locked: c.locked, label: c.locked ? 'Dyrk opp den låste kisten' : 'Åpne kisten' });
+      G.interactables.push({ kind: 'chest', ci: dg.chestList.indexOf(c), mesh: m, pos: m.position, radius: 0.7, solid: true, locked: c.locked, label: c.locked ? 'Dyrk opp den låste kisten' : 'Åpne kisten' });
     }
     // gjemmesteder: usynlige til du finner dem
     this.caches = dg.cacheList.map(c => ({ ...c, searched: false, found: false, taken: false }));
@@ -154,8 +156,66 @@ export class World {
       G.run.cacheHint = 0;
       G.ui.log(`Tobolt hadde rett. Du vet om ${n === 1 ? 'et gjemmested' : n + ' gjemmesteder'} på dette nivået. Se på kartet.`);
     }
-    for (const s of dg.spawnList) G.enemies.push(new Enemy(s.type, s.x, s.z, dg.depth));
-    if (dg.bossSpawn) G.enemies.push(new Enemy('boss', dg.bossSpawn.x, dg.bossSpawn.z, dg.depth));
+    dg.spawnList.forEach((s, i) => { const e = new Enemy(s.type, s.x, s.z, dg.depth); e.spawnIdx = i; G.enemies.push(e); });
+    if (dg.bossSpawn) { const b = new Enemy('boss', dg.bossSpawn.x, dg.bossSpawn.z, dg.depth); b.spawnIdx = 'boss'; G.enemies.push(b); }
+  }
+
+  // --- lagring av nivået -------------------------------------------------------------
+  // Nivået bygges på nytt fra frøet. Her lagres bare det som har endret seg.
+  serializeLevel() {
+    const D = G.dungeon;
+    const alive = G.enemies.filter(e => !e.dead && e.spawnIdx != null).map(e => ({ i: e.spawnIdx, kp: e.kp, x: +e.pos.x.toFixed(2), z: +e.pos.z.toFixed(2) }));
+    const props = G.props.filter(p => p.breakable && p.pi != null).map(p => p.pi);
+    const chests = G.interactables.filter(it => it.kind === 'chest' && it.opened).map(it => it.ci);
+    const runes = G.interactables.some(it => it.kind === 'rune' && it.read);
+    const caches = this.caches.map(c => (c.taken ? 't' : c.found ? 'f' : c.known ? 'k' : c.searched ? 's' : '-')).join('');
+    const pickups = G.pickups.map(p => ({ k: p.kind, x: +p.pos.x.toFixed(2), z: +p.pos.z.toFixed(2), v: p.value, item: p.item, entry: p.entry }));
+    let explored = '';
+    if (D.explored) { let b = ''; for (let i = 0; i < D.explored.length; i++) b += D.explored[i] ? '1' : '0'; explored = b.replace(/(.)\1*/g, m => m[0] + m.length + ','); }
+    const shop = D.shopStock ? { stock: D.shopStock, barter: D.barter || null, advance: !!D.advance } : null;
+    return { alive, props, chests, runes, caches, pickups, explored, shop, nProps: D.propList?.length || 0 };
+  }
+
+  applyLevel(L) {
+    if (!L) return;
+    const D = G.dungeon;
+    const keep = new Map(L.alive.map(a => [a.i, a]));
+    for (let i = G.enemies.length - 1; i >= 0; i--) {
+      const e = G.enemies[i];
+      if (e.spawnIdx == null) continue;
+      const a = keep.get(e.spawnIdx);
+      if (!a) { e.dispose(); G.enemies.splice(i, 1); continue; }
+      if (a.kp != null) e.kp = Math.min(e.maxKP ?? a.kp, a.kp);
+      e.pos.set(a.x, e.pos.y, a.z);
+    }
+    const props = new Set(L.props);
+    for (const p of [...G.props]) if (p.breakable && p.pi != null && !props.has(p.pi)) { G.props.splice(G.props.indexOf(p), 1); G.scene.remove(p.mesh); }
+    const opened = new Set(L.chests);
+    for (const it of G.interactables) {
+      if (it.kind === 'chest' && opened.has(it.ci)) {
+        it.opened = true; it.label = null;
+        if (it.mesh.userData.lid) it.mesh.userData.lid.rotation.x = -1.9;
+        if (it.mesh.userData.lock) it.mesh.userData.lock.visible = false;
+      }
+      if (it.kind === 'rune' && L.runes) { it.read = true; it.label = null; }
+    }
+    [...(L.caches || '')].forEach((ch, i) => {
+      const c = this.caches[i];
+      if (!c) return;
+      if (ch === 'k') c.known = true;
+      if (ch === 's') c.searched = true;
+      if (ch === 'f') { c.searched = true; this.revealCache(c); }
+      if (ch === 't') { c.searched = c.found = c.taken = true; }
+    });
+    for (const p of L.pickups || []) {
+      const q = this.spawnPickup(p.k, p.x, p.z, { value: p.v, item: p.item, entry: p.entry, noFly: true });
+      q.vel = null;
+    }
+    if (L.explored && D.explored) {
+      let i = 0;
+      for (const m of L.explored.split(',')) { if (!m) continue; const v = m[0] === '1' ? 1 : 0, n = parseInt(m.slice(1)); for (let k = 0; k < n && i < D.explored.length; k++) D.explored[i++] = v; }
+    }
+    if (L.shop?.stock) { D.shopStock = L.shop.stock; D.barter = L.shop.barter; D.advance = L.shop.advance; }
   }
 
   buildRuneStone(s) {
@@ -414,18 +474,20 @@ export class World {
     else if (kind === 'bread') mesh = new THREE.Mesh(this.breadGeo, this.breadMat);
     else if (kind === 'potion') mesh = new THREE.Mesh(this.potionGeo, this.potionMat);
     else if (kind === 'thrown') { mesh = new THREE.Group(); const w = buildWeaponMesh(o.item); w.rotation.z = Math.PI / 2; mesh.add(w); }
+    else if (kind === 'entry') mesh = this.itemMesh(o.entry);
     else mesh = this.itemMesh(o.item);
     mesh.position.set(x, 0.9, z);
-    mesh.castShadow = kind !== 'item';
+    mesh.castShadow = kind !== 'item' && kind !== 'entry';
     G.scene.add(mesh);
     const a = Math.random() * Math.PI * 2, sp = 1 + Math.random() * 2.5;
-    const p = { kind, mesh, pos: mesh.position, vel: o.noFly ? null : new THREE.Vector3(Math.cos(a) * sp, 4 + Math.random() * 2, Math.sin(a) * sp), t: o.noFly ? 0.5 : 0, value: o.value || 1, item: o.item, base: kind === 'item' ? 0.22 : kind === 'thrown' ? 0.08 : 0.12 };
+    const p = { kind, mesh, pos: mesh.position, vel: o.noFly ? null : new THREE.Vector3(Math.cos(a) * sp, 4 + Math.random() * 2, Math.sin(a) * sp), t: o.noFly ? 0.5 : 0, value: o.value || 1, item: o.item, entry: o.entry, base: kind === 'item' ? 0.22 : kind === 'entry' ? 0.2 : kind === 'thrown' ? 0.08 : 0.12 };
     if (o.noFly) mesh.position.y = p.base;
-    if (kind === 'item') {
+    if (kind === 'item' || kind === 'entry') {
+      const it = o.item || o.entry;
       const el = document.createElement('div');
       el.className = 'itemlabel';
-      el.style.color = RARITY[o.item.rarity].color;
-      el.textContent = o.item.name;
+      el.style.color = RARITY[it.rarity || 'vanlig'].color;
+      el.textContent = it.qty > 1 && !isGear(it) ? `${it.name} x${it.qty}` : it.name;
       this.labelRoot.appendChild(el);
       p.label = el;
     }
@@ -434,32 +496,28 @@ export class World {
   }
 
   itemMesh(item) {
-    const col = RARITY[item.rarity].hex;
     const g = new THREE.Group();
-    if (item.slot === 'vapen' || item.slot === 'vapen2') {
-      const w = buildWeaponMesh(item);
+    const model = buildItemModel(item);
+    if (model.userData.weapon) {
+      const w = model.children[0];
       w.rotation.z = Math.PI / 2;
       w.rotation.y = 0.4;
       w.position.x = item.kind === 'staff' || item.kind === 'spear' ? 0 : 0.25;
-      g.add(w);
-    } else if (item.slot === 'rustning') {
-      const b = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.18, 0.4), new THREE.MeshStandardMaterial({ color: item.metal ? 0x9a9ca2 : 0x5a3e28, roughness: item.metal ? 0.4 : 0.8, metalness: item.metal ? 0.9 : 0, emissive: col, emissiveIntensity: 0.25 }));
-      g.add(b);
-    } else if (item.slot === 'hjalm') {
-      const b = new THREE.Mesh(new THREE.SphereGeometry(0.2, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0x9a9ca2, roughness: 0.35, metalness: 1, emissive: col, emissiveIntensity: 0.2 }));
-      g.add(b);
     } else {
-      const m = new THREE.MeshStandardMaterial({ color: 0xc8c8c8, roughness: 0.3, metalness: 0.9, emissive: col, emissiveIntensity: 0.5 });
-      const t = new THREE.Mesh(new THREE.TorusGeometry(0.15, 0.04, 8, 18), m);
-      t.rotation.x = Math.PI / 2;
-      const gem = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 6), new THREE.MeshStandardMaterial({ color: col, emissive: col, emissiveIntensity: 1.5 }));
-      gem.position.z = 0.17;
-      g.add(t, gem);
+      model.scale.setScalar(item.slot ? 1.25 : 1.6);
+      model.position.y = 0.08;
     }
-    const beam = new THREE.Mesh(this.beamGeo, new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: item.rarity === 'vanlig' ? 0.12 : 0.3, blending: THREE.AdditiveBlending, depthWrite: false }));
-    beam.userData.beam = true;
+    g.add(model);
+    model.traverse(o => { if (o.isMesh) o.castShadow = true; });
+    const rar = item.rarity || 'vanlig';
+    const beam = rarityBeam(rar);
     g.add(beam);
     g.userData.beam = beam;
+    const ring = rarityRing(rar);
+    g.add(ring);
+    g.userData.ring = ring;
+    g.userData.model = model;
+    g.userData.sparkle = rar === 'vanlig' ? 0 : rar === 'magisk' ? 1.2 : 3;
     return g;
   }
 
@@ -498,11 +556,13 @@ export class World {
     this.dropSilver(e.pos.x, e.pos.z, s);
     if (Math.random() < 0.1) this.spawnPickup('bread', e.pos.x, e.pos.z);
     if (Math.random() < 0.05) this.spawnPickup('potion', e.pos.x, e.pos.z);
+    if (Math.random() < 0.05 + G.depth * 0.012 + (greed ? 0.05 : 0)) this.spawnPickup('entry', e.pos.x, e.pos.z, { entry: makeValuable(G.depth) });
     const chance = 0.07 + G.depth * 0.02 + (greed ? 0.08 : 0) + (e.type === 'orc' ? 0.12 : 0) + (e.type === 'demon' ? 0.6 : 0);
     if (e.def.boss) {
       this.spawnPickup('item', e.pos.x, e.pos.z, { item: makeItem(5, this.lootOpts({ unique: true })) });
       this.spawnPickup('item', e.pos.x, e.pos.z, { item: makeItem(5, this.lootOpts({ rarity: 'sjelden' })) });
       this.spawnPickup('potion', e.pos.x, e.pos.z);
+      this.spawnPickup('entry', e.pos.x, e.pos.z, { entry: makeValuable(5) });
     } else if (Math.random() < chance) {
       this.spawnPickup('item', e.pos.x, e.pos.z, { item: makeItem(G.depth, this.lootOpts({ luck: greed ? 0.2 : 0 })) });
     }
@@ -521,6 +581,8 @@ export class World {
     if (Math.random() < 0.15) this.spawnPickup('bread', p.pos.x, p.pos.z);
     if (Math.random() < 0.04) this.spawnPickup('potion', p.pos.x, p.pos.z);
     if (Math.random() < 0.04) this.spawnPickup('item', p.pos.x, p.pos.z, { item: makeItem(G.depth, this.lootOpts()) });
+    if (Math.random() < 0.025) this.spawnPickup('entry', p.pos.x, p.pos.z, { entry: makeValuable(G.depth) });
+    if (Math.random() < 0.03 && G.depth <= 2) this.spawnPickup('entry', p.pos.x, p.pos.z, { entry: makeCons(Math.random() < 0.5 ? 'polse' : 'kanel') });
     if (p.type === 'barrel' && Math.random() < 0.12) {
       const e = new Enemy('rat', p.pos.x, p.pos.z, G.depth);
       e.alerted = true;
@@ -600,6 +662,11 @@ export class World {
 
   // --- samhandling --------------------------------------------------------
 
+  wearNow(item) {
+    this.equipItem(item);
+    G.audio.swing?.(2, 0.15);
+  }
+
   equipItem(item) {
     const P = G.player;
     let slot = item.slot;
@@ -618,19 +685,26 @@ export class World {
     P.recalc();
     if (slot === 'rustning' || slot === 'hjalm') P.buildModel();
     else P.refreshWeaponMeshes();
-    if (old) this.spawnPickup('item', P.pos.x, P.pos.z, { item: old });
+    if (old && !addToBag(P, old, true)) this.spawnPickup('item', P.pos.x, P.pos.z, { item: old });
+    else if (old) G.ui.log(`${old.name} går i sekken.`);
     G.ui.log(`${P.name} tar <b style="color:${RARITY[item.rarity].color}">${item.name}</b>.`);
     if (item.str && P.attrs.STY < item.str) G.ui.log(`${item.name} krever STY ${item.str}. Du får nackdel med det.`);
   }
 
-  interact() {
+  // E tar opp (i sekken, eller på hvis plassen er ledig). X tar på med en gang.
+  interact(wear = false) {
     const P = G.player;
     if (P.downed) return;
     if (this.nearItem) {
       const p = this.nearItem;
+      if (p.kind === 'entry') {
+        if (!giveItem(p.entry)) return;
+      } else if (wear) {
+        this.wearNow(p.item);
+      } else if (!giveItem(p.item)) return;
       this.removePickup(p);
-      this.equipItem(p.item);
       G.audio.coin();
+      G.fx.burst('gold', { x: p.pos.x, y: 0.5, z: p.pos.z }, 6);
       this.nearItem = null;
       return;
     }
@@ -682,6 +756,8 @@ export class World {
     this.dropSilver(it.pos.x, it.pos.z, (6 + Math.floor(Math.random() * 10) + (it.locked ? 6 : 0)) * (P.flags.has('greed') ? 2 : 1));
     this.spawnPickup('item', it.pos.x, it.pos.z, { item: makeItem(G.depth, this.lootOpts({ luck: it.locked ? 0.55 : 0.3 })) });
     if (Math.random() < (it.locked ? 0.6 : 0.35)) this.spawnPickup('potion', it.pos.x, it.pos.z);
+    if (Math.random() < (it.locked ? 0.7 : 0.4)) this.spawnPickup('entry', it.pos.x, it.pos.z, { entry: makeValuable(G.depth + (it.locked ? 1 : 0)) });
+    if (Math.random() < 0.12) this.spawnPickup('entry', it.pos.x, it.pos.z, { entry: makeCons('trolldrikk') });
     G.fx.burst('gold', { x: it.pos.x, y: 0.8, z: it.pos.z }, 20);
     G.ui.log(msg);
   }
@@ -732,6 +808,7 @@ export class World {
     this.dropSilver(c.x, c.z, rollDice('2D6') + G.depth * 2);
     if (Math.random() < 0.5) this.spawnPickup('potion', c.x, c.z);
     if (Math.random() < 0.35) this.spawnPickup('item', c.x, c.z, { item: makeItem(G.depth + 1, this.lootOpts({ rarity: 'magisk' })) });
+    this.spawnPickup('entry', c.x, c.z, { entry: makeValuable(G.depth + 1) });
     G.ui.log('Gjemmestedet var verdt det.');
   }
 
@@ -832,11 +909,20 @@ export class World {
           P.floorStats.bread = (P.floorStats.bread || 0) + 1;
           G.ui.log(`Brød! +${got} KP.${P.isDuck ? ' Mester Flansen hadde ristet på hodet.' : ''}`);
           this.removePickup(p);
+        } else if (canCarry(P, makeCons('brod'), true)) {
+          addToBag(P, makeCons('brod'), true);
+          G.fx.float('Brød i sekken', P.pos, 'silver');
+          this.removePickup(p);
         }
       } else if (p.kind === 'potion' && dd < 1.0 && p.t > 0.3) {
         if (P.potions < 4) {
           P.potions++;
           G.fx.float('Legedrikk', P.pos, 'heal');
+          G.audio.coin();
+          this.removePickup(p);
+        } else if (canCarry(P, makeCons('legedrikk'), true)) {
+          addToBag(P, makeCons('legedrikk'), true);
+          G.fx.float('Legedrikk i sekken', P.pos, 'heal');
           G.audio.coin();
           this.removePickup(p);
         }
@@ -849,8 +935,15 @@ export class World {
           G.audio.swing(2, 0.12);
           this.removePickup(p);
         }
-      } else if (p.kind === 'item') {
+      } else if (p.kind === 'item' || p.kind === 'entry') {
         if (dd < bestD && !p.vel) { bestD = dd; bestItem = p; }
+        const ud = p.mesh.userData;
+        if (ud.ring) { ud.ring.position.y = 0.03 - p.pos.y; ud.ring.material.uniforms.uT.value = t + i; }
+        if (ud.beam?.material.uniforms) ud.beam.material.uniforms.uT.value = t + i;
+        if (ud.sparkle && Math.random() < dt * ud.sparkle * 4 && dd < 18) {
+          const a = Math.random() * 6.283, r = 0.25 + Math.random() * 0.35;
+          G.fx.spark?.(p.pos.x + Math.cos(a) * r, p.pos.y + 0.1 + Math.random() * 0.3, p.pos.z + Math.sin(a) * r, RARITY[(p.item || p.entry).rarity || 'vanlig'].hex);
+        }
         if (p.label) {
           tmp.set(p.pos.x, 0.65, p.pos.z).project(cam);
           const vis = tmp.z < 1 && Math.abs(tmp.x) < 1.1 && Math.abs(tmp.y) < 1.1 && dd < 16;
@@ -858,7 +951,6 @@ export class World {
           if (vis) p.label.style.transform = `translate(${(tmp.x * 0.5 + 0.5) * innerWidth}px, ${(-tmp.y * 0.5 + 0.5) * innerHeight}px) translate(-50%, -100%)`;
           p.label.classList.toggle('near', p === this.nearItem);
         }
-        if (p.mesh.userData.beam) p.mesh.userData.beam.material.opacity = (p.item.rarity === 'vanlig' ? 0.1 : 0.26) + Math.sin(t * 3) * 0.05;
       }
     }
     this.nearItem = bestItem;
