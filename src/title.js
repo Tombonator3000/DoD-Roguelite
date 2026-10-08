@@ -5,7 +5,7 @@ import { shaftMaterial } from './gfx.js';
 import { makeMotes } from './decor.js';
 import { FX } from './fx.js';
 import { buildCharacter, buildWeaponMesh, HOLD } from './kinmodels.js';
-import { weaponItem, armorItem, helmetItem } from './loot.js';
+import { weaponItem, armorItem } from './loot.js';
 
 // Egen scene for tittelskjermen: anda på en steinplattform i mørket.
 export class TitleScene {
@@ -160,7 +160,8 @@ export class TitleScene {
   // Bytter figuren på plattformen. sheet: { id, kin, profession, school, age, gear }
   setCharacter(sheet) {
     const g = sheet.gear || {};
-    const key = [sheet.id, sheet.kin, sheet.profession, sheet.school, sheet.age, (g.w || []).join(','), g.a, g.h].join('|');
+    const arm = [].concat(g.a || []);
+    const key = [sheet.id, sheet.kin, sheet.profession, sheet.school, sheet.age, (g.w || []).join(','), arm.join(',')].join('|');
     if (key === this.charKey) return;
     this.charKey = key;
     while (this.charTilt.children.length) this.charTilt.remove(this.charTilt.children[0]);
@@ -168,8 +169,8 @@ export class TitleScene {
     this.charShield = false;
     const A = G.assets;
     const ws = (g.w || []).map(id => weaponItem(id)).filter(Boolean);
-    let main = ws[0], off = ws[1];
-    if (main?.shield) { off = main; main = null; }
+    let main = ws.find(w => !w.shield) || null;
+    let off = ws.find(w => w.shield) || ws.find(w => w !== main) || null;
     let handR, handL;
     if (sheet.kin === 'anka' && A.duckGeo) {
       const m = new THREE.MeshStandardMaterial({ map: A.duckTex, roughness: 0.75 });
@@ -185,7 +186,9 @@ export class TitleScene {
       handL = new THREE.Group(); handL.position.set(0.38, 0.75, 0.2);
       this.charTilt.add(handR, handL);
     } else {
-      const c = buildCharacter(sheet, { armor: g.a ? armorItem(g.a) : null, helmet: g.h ? helmetItem(g.h) : null });
+      const pieces = arm.map(id => armorItem(id)).filter(Boolean);
+      const of = s2 => pieces.find(p => p.slot === s2) || null;
+      const c = buildCharacter(sheet, { armor: of('rustning'), helmet: of('hjalm'), arms: of('armar'), legs: of('ben') });
       this.charFx = c.fxU;
       this.charRig = c.rig;
       this.charTilt.add(c.root);
@@ -201,7 +204,7 @@ export class TitleScene {
     };
     if (main?.kind === 'bow') mount(main, handL);
     else mount(main, handR);
-    if (off && main?.grip !== 2 && main?.kind !== 'bow') { mount(off, handL); this.charShield = !!off.shield; }
+    if (off && !main?.twoOnly && main?.kind !== 'bow') { mount(off, handL); this.charShield = !!off.shield; }
     G.fx?.burst && this.fx.burst('portal', { x: 0, y: 0.5, z: 0 }, 24);
   }
 

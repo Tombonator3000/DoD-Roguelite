@@ -10,6 +10,8 @@ const ALIAS = {
   NAME: 'NAVN', HETER: 'NAVN', JOB: 'JOBB', ARBEID: 'JOBB', YRKE: 'JOBB', BYE: 'FARVEL', HADET: 'FARVEL', 'HA DET': 'FARVEL', ADJØ: 'FARVEL',
   KJØPE: 'HANDEL', KJØP: 'HANDEL', SELGE: 'HANDEL', SELG: 'HANDEL', SALG: 'HANDEL', SELL: 'HANDEL', BUY: 'HANDEL', TRADE: 'HANDEL', VARER: 'HANDEL',
   REV: 'REVEN', RØDPELS: 'REVEN', ROTTE: 'ROTTER', SAFFRAN: 'SAFRAN',
+  HELA: 'HELBREDER', VILA: 'ROM', TRÄNA: 'TRENING', ØVE: 'TRENING', ELEV: 'TRENING', SPYD: 'TRENING', SPYDET: 'TRENING', SVERD: 'TRENING',
+  BESVÄRJELSE: 'LÆRE', MAGI: 'LÆRE',
 };
 
 export function normWord(w) {
@@ -67,7 +69,7 @@ export class Talk {
     this.renderWho();
     const c = this.ctx();
     let text = opts.text || (typeof def.greet === 'function' ? def.greet(c) : def.greet) || '';
-    if (def.board) text = text + ' ' + def.start.map(k => `[${k.toLowerCase()}|${k}]`).join(', ') + '.';
+    if (def.board && def.start?.length) text = text + ' ' + def.start.map(k => `[${k.toLowerCase()}|${k}]`).join(', ') + '.';
     this.say(text, true);
     this.renderKeywords(opts.extra);
     G.ui.show('dialog');
@@ -190,11 +192,15 @@ export class Talk {
     el.hidden = false;
     el.innerHTML = '';
     const P = G.player;
+    // valuta: silvermynt, fjær fra tidligere løp, eller hjältepoäng
     const cur = o.currency || 'silver';
-    const have = cur === 'fjær' ? G.meta.feathers : P.silver;
+    const purse = () => (cur === 'fjær' ? G.meta.feathers : cur === 'hp' ? P.hjp : P.silver);
+    const pay = n => { if (cur === 'fjær') G.meta.feathers -= n; else if (cur === 'hp') P.hjp -= n; else P.silver -= n; };
+    const have = purse();
+    const unit = cur === 'fjær' ? 'fjær' : cur === 'hp' ? 'HP' : 'sm';
     const head = document.createElement('div');
     head.className = 'purse';
-    head.innerHTML = `Du har <b>${have}</b> ${cur}${o.note ? ` <span>(${o.note})</span>` : ''}`;
+    head.innerHTML = `Du har <b>${have}</b> ${unit}${o.note ? ` <span>(${o.note})</span>` : ''}`;
     el.appendChild(head);
     for (const r of rows) {
       if (r.hidden) continue;
@@ -202,12 +208,11 @@ export class Talk {
       row.className = 'ware';
       const price = r.price ?? 0;
       const off = r.disabled || have < price;
-      row.innerHTML = `<div class="txt"><div class="nm" style="color:${r.color || 'var(--parch)'}">${r.name}</div><div class="ds">${r.desc || ''}</div></div><button class="btn small" ${off ? 'disabled' : ''}>${r.label || (price ? `${price} ${cur}` : 'Gratis')}</button>`;
+      row.innerHTML = `<div class="txt"><div class="nm" style="color:${r.color || 'var(--parch)'}">${r.name}</div><div class="ds">${r.desc || ''}</div></div><button class="btn small" ${off ? 'disabled' : ''}>${r.label || (price ? `${price} ${unit}` : 'Gratis')}</button>`;
       row.querySelector('button').onclick = () => {
-        const now = cur === 'fjær' ? G.meta.feathers : P.silver;
-        if (now < price || r.disabled) return;
-        if (cur === 'fjær') G.meta.feathers -= price; else P.silver -= price;
-        if (price) G.audio.coin();
+        if (purse() < price || r.disabled) return;
+        pay(price);
+        if (price && cur !== 'hp') G.audio.coin();
         const t = r.buy();
         if (t) this.say(t);
         if (cur === 'fjær') G.game.persist();

@@ -15,7 +15,6 @@ window.bot = (sheetFn, secs = 90, floor = 1) => {
     const inp = G.input;
     inp.usingTouch = false;
     inp.mouse.rdown = false;
-    if (G.game.push) G.game.acceptPush(null);
     if (P.kp < P.maxKP * 0.3 && P.potions > 0) inp.pressed.add('Digit1');
     // nærmeste fiende langs gangene
     if (!window.__bt || t - window.__bt.t > 0.5 || !window.__bt.e || window.__bt.e.dead) {
@@ -31,7 +30,7 @@ window.bot = (sheetFn, secs = 90, floor = 1) => {
       window.__bt = { t, e: best, path: bp || [] };
     }
     const e = window.__bt.e;
-    if (!e) { inp.touchMove.active = false; inp.mouse.down = false; if (P.kp < P.maxKP * 0.6 && !P.floor.stretchRest) inp.pressed.add('KeyH'); return; }
+    if (!e) { inp.touchMove.active = false; inp.mouse.down = false; if (P.bleeding.size) inp.pressed.add('KeyH'); return; }
     G.aim.set(e.pos.x, 0.5, e.pos.z);
     const dx = e.pos.x - P.pos.x, dz = e.pos.z - P.pos.z, dd = Math.hypot(dx, dz) || 1;
     let vx = dx / dd, vz = dz / dd;
@@ -59,6 +58,6 @@ window.bot = (sheetFn, secs = 90, floor = 1) => {
   });
   G.input.touchMove.active = false;
   G.input.mouse.down = false;
-  return { name: sheet.name, prof: sheet.profession, err, died: P.dead, deathAt, kp: `${P.kp}/${P.maxKP}`, kills: G.run.kills, left: G.enemies.filter(x => !x.dead).length, potions: P.potions, dmgTaken: G.run.damageTaken, dodges: G.run.dodges, parries: G.run.parries, pushes: G.run.pushes, conds: Object.keys(P.cond) };
+  return { name: sheet.name, prof: sheet.profession, err, died: P.dead, deathAt, kp: `${P.kp}/${P.maxKP}`, kills: G.run.kills, left: G.enemies.filter(x => !x.dead).length, potions: P.potions, dmgTaken: G.run.damageTaken, dodges: G.run.dodges, parries: G.run.parries, perfekt: G.run.perfekt || 0, fummel: G.run.fummel || 0, psy: `${P.psy}/${P.maxPSY}`, loc: { ...P.loc } };
 };
 window.mk = (prof, kin) => () => { let ch; for (let i = 0; i < 2000; i++) { ch = G.dev.randomChoices(); if (ch.profession === prof && (!kin || ch.kin === kin)) break; } return G.dev.buildSheet(ch); };

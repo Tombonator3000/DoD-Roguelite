@@ -1,34 +1,35 @@
-// Packning etter Drakar och Demoner: bärförmåga er STY/2 (avrundet opp), +2 med ryggsäck (uv).
-// Våpen i hendene, rustning og hjelm som er på, teller ikke. Småsaker teller ikke.
-// Over bärförmåga er du överlastad: tregere, og nackdel på Smyga og Undvika (spillets tolkning, uv).
-// Legedrikker henger i beltet (fire plasser). Resten ligger i sekken.
+// Packning etter DoD91: du bærer høyst STY kg uten å bli tynget (Bok II s. 5, "Ej mer packning än STY kg").
+// Det du har på deg og i hendene teller ikke (uv). Over STY kg er du överlastad: tregere, og -5 på Smyga,
+// Akrobatik, Hoppa og Klättra (uv). Høyst 2 x STY kg. Legedrikker henger i beltet (fire plasser).
+// Penger er silvermynt (sm). Verdiene her er ganget med 10 fra versjon 0.4.
 import { G } from './state.js';
-import { d, rollDice } from './rules.js';
-import { RARITY } from './loot.js';
+import { rollDice } from './rules.js';
+import { RARITY, itemKg } from './loot.js';
 
-export const OVERLOAD_SLOTS = 4;
+export const BELT = 4;
+export const POTION_KG = 0.5;
 
 // Mat, drikk og annet som kan brukes
 export const CONS = {
-  brod: { name: 'Brød', icon: 'bread', value: 2, desc: 'Helbreder 2 KP. Mester Flansen regner det som en måltid.', heal: 2, bread: true },
-  polse: { name: 'Gåseleverpølse', icon: 'sausage', value: 3, desc: 'Helbreder 4 KP. Det adelen i Kardunien spiser når prestene ikke ser.', heal: 4 },
-  fisk: { name: 'Stekt abbor', icon: 'fish', value: 2, desc: 'Helbreder T6 KP.', healDie: 'D6' },
-  kanel: { name: 'Kanelbolle', icon: 'bun', value: 2, desc: 'Helbreder 2 KP og gir 1 VP.', heal: 2, vp: 1 },
-  legedrikk: { name: 'Legedrikk', icon: 'potion', value: 14, desc: 'Helbreder 2T6 KP. Hører hjemme i beltet.', healDie: '2D6', potion: true },
-  trolldrikk: { name: 'Trolldrikk', icon: 'potionvp', value: 10, desc: 'Alle VP tilbake med en gang. Smaker fiolett.', vpAll: true },
-  safran: { name: 'Nesten ekte safran', icon: 'saffron', value: 1, desc: 'Gul. Det er det meste man kan si om den.', junk: true },
+  brod: { name: 'Brød', icon: 'bread', value: 20, kg: 0.5, desc: 'Helbreder 2 KP. Mester Flansen regner det som et måltid.', heal: 2, bread: true },
+  polse: { name: 'Gåseleverpølse', icon: 'sausage', value: 30, kg: 0.3, desc: 'Helbreder 4 KP. Det adelen i Kardunien spiser når prestene ikke ser.', heal: 4 },
+  fisk: { name: 'Stekt abbor', icon: 'fish', value: 20, kg: 0.4, desc: 'Helbreder 1T6 KP.', healDie: 'D6' },
+  kanel: { name: 'Kanelbolle', icon: 'bun', value: 20, kg: 0.2, desc: 'Helbreder 2 KP og gir 1 PSY.', heal: 2, psy: 1 },
+  legedrikk: { name: 'Legedrikk', icon: 'potion', value: 140, kg: POTION_KG, desc: 'Helbreder 2T6 KP. Hører hjemme i beltet.', healDie: '2D6', potion: true },
+  trolldrikk: { name: 'Trolldrikk', icon: 'potionvp', value: 100, kg: 0.3, desc: 'All PSY tilbake med en gang. Smaker fiolett.', psyAll: true },
+  safran: { name: 'Nesten ekte safran', icon: 'saffron', value: 10, kg: 0.1, desc: 'Gul. Det er det meste man kan si om den.', junk: true },
 };
 
-// Verdisaker: tar plass, gjør ingenting, selges i byen
+// Verdisaker: veier litt, gjør ingenting, selges i byen
 export const VALUABLES = [
-  { vid: 'revemynt', name: 'Mynt med revehode', icon: 'coin', value: 8, depth: 1, desc: 'Preget i kloakken. Rødpels betaler med disse.' },
-  { vid: 'solvbeger', name: 'Sølvbeger', icon: 'cup', value: 16, depth: 1, desc: 'Bulkete, men ekte sølv.' },
-  { vid: 'bergkristall', name: 'Bergkristall', icon: 'crystal', value: 18, depth: 2, desc: 'Klar som is. Dvergene slipte slike til lamper.' },
-  { vid: 'rubin', name: 'Rubin', icon: 'gem_r', value: 30, depth: 2, desc: 'Rød som en revepels.' },
-  { vid: 'smaragd', name: 'Smaragd', icon: 'gem_g', value: 34, depth: 3, desc: 'Fra gruvene under Karad Batur, sier de.' },
-  { vid: 'dvergering', name: 'Dvergering', icon: 'ring', value: 26, depth: 3, desc: 'For stor for en finger. Dvergene bar dem på tommelen.' },
-  { vid: 'gullkjede', name: 'Gullkjede', icon: 'chain', value: 42, depth: 4, desc: 'Tung og glatt. Noen savner den.' },
-  { vid: 'kronesplint', name: 'Splint av en revekrone', icon: 'crown', value: 70, depth: 5, desc: 'Gull, med tannmerker.' },
+  { vid: 'revemynt', name: 'Mynt med revehode', icon: 'coin', value: 80, kg: 0.05, depth: 1, desc: 'Preget i kloakken. Rødpels betaler med disse.' },
+  { vid: 'solvbeger', name: 'Sølvbeger', icon: 'cup', value: 160, kg: 0.4, depth: 1, desc: 'Bulkete, men ekte sølv.' },
+  { vid: 'bergkristall', name: 'Bergkristall', icon: 'crystal', value: 180, kg: 0.3, depth: 2, desc: 'Klar som is. Dvergene slipte slike til lamper.' },
+  { vid: 'rubin', name: 'Rubin', icon: 'gem_r', value: 300, kg: 0.05, depth: 2, desc: 'Rød som en revepels.' },
+  { vid: 'smaragd', name: 'Smaragd', icon: 'gem_g', value: 340, kg: 0.05, depth: 3, desc: 'Fra gruvene under Karad Batur, sier de.' },
+  { vid: 'dvergering', name: 'Dvergering', icon: 'ring', value: 260, kg: 0.1, depth: 3, desc: 'For stor for en finger. Dvergene bar dem på tommelen.' },
+  { vid: 'gullkjede', name: 'Gullkjede', icon: 'chain', value: 420, kg: 0.2, depth: 4, desc: 'Tung og glatt. Noen savner den.' },
+  { vid: 'kronesplint', name: 'Splint av en revekrone', icon: 'crown', value: 700, kg: 0.3, depth: 5, desc: 'Gull, med tannmerker.' },
 ];
 
 export function makeValuable(depth) {
@@ -37,48 +38,60 @@ export function makeValuable(depth) {
   let r = Math.random() * w.reduce((a, b) => a + b, 0);
   let v = pool[0];
   for (let i = 0; i < pool.length; i++) { r -= w[i]; if (r <= 0) { v = pool[i]; break; } }
-  return { type: 'val', vid: v.vid, name: v.name, icon: v.icon, value: v.value, desc: v.desc, qty: 1, rarity: v.value >= 40 ? 'sjelden' : v.value >= 25 ? 'magisk' : 'vanlig' };
+  return { type: 'val', vid: v.vid, name: v.name, icon: v.icon, value: v.value, kg: v.kg, desc: v.desc, qty: 1, rarity: v.value >= 400 ? 'sjelden' : v.value >= 250 ? 'magisk' : 'vanlig' };
 }
 
 export function makeCons(cid, qty = 1) {
   const c = CONS[cid];
-  return { type: 'cons', cid, name: c.name, icon: c.icon, value: c.value, desc: c.desc, qty, rarity: 'vanlig' };
+  return { type: 'cons', cid, name: c.name, icon: c.icon, value: c.value, kg: c.kg, desc: c.desc, qty, rarity: 'vanlig' };
 }
 
 export const isGear = e => !!e?.slot;
 export const stackKey = e => (e.type === 'cons' ? 'c:' + e.cid : e.type === 'val' ? 'v:' + e.vid : null);
 
-export function bagCap(P) {
-  const sty = P.attrs?.STY ?? P.sheet.attrs.STY;
-  return Math.ceil(sty / 2) + (P.kit?.has('ryggsack') ? 2 : 0) + (P.mods?.bagCap || 0);
+// Vekt for én ting i sekken (gamle lagrede ting uten kg får en standardvekt)
+export function kgOf(e) {
+  if (!e) return 0;
+  if (isGear(e)) return itemKg(e);
+  const base = e.kg ?? (e.type === 'cons' ? CONS[e.cid]?.kg : VALUABLES.find(v => v.vid === e.vid)?.kg) ?? 0.2;
+  return Math.round(base * (e.qty || 1) * 100) / 100;
 }
-export function bagCount(P) { return P.bag.length; }
-export function isOverloaded(P) { return P.bag.length > bagCap(P); }
-export function hardCap(P) { return bagCap(P) + OVERLOAD_SLOTS; }
 
-// Er det plass? noOverload: bare innenfor bärförmåga (brukes når ting plukkes opp av seg selv)
+export function carriedKg(P) {
+  let kg = (P.potions || 0) * POTION_KG;
+  for (const e of P.bag || []) kg += kgOf(e);
+  return Math.round(kg * 10) / 10;
+}
+export function capKg(P) { return P.attrs?.STY ?? P.sheet.attrs.STY; }
+export function hardCapKg(P) { return capKg(P) * 2; }
+export function isOverloaded(P) { return carriedKg(P) > capKg(P); }
+
+// Gamle navn som andre moduler fortsatt bruker
+export const bagCap = capKg;
+export const hardCap = hardCapKg;
+
+// Er det plass? noOverload: bare innenfor STY kg (brukes når ting plukkes opp av seg selv)
 export function canCarry(P, e, noOverload = false) {
-  const k = stackKey(e);
-  if (k && P.bag.some(x => stackKey(x) === k)) return true;
-  return P.bag.length < (noOverload ? bagCap(P) : hardCap(P));
+  const lim = noOverload ? capKg(P) : hardCapKg(P);
+  return carriedKg(P) + kgOf(e) <= lim + 1e-6;
 }
 
-// Legg i sekken. Stabler like ting. Returnerer false hvis det ikke er plass i det hele tatt.
+// Legg i sekken. Stabler like ting. Returnerer false hvis du ikke orker mer.
 export function addToBag(P, e, quiet = false) {
+  if (!canCarry(P, e)) {
+    if (!quiet) { G.fx.float('For tungt', P.pos, 'miss'); G.ui.log(`Du orker ikke bære mer (høyst ${hardCapKg(P)} kg). Slipp noe først (I).`); }
+    return false;
+  }
   const k = stackKey(e);
   if (k) {
     const ex = P.bag.find(x => stackKey(x) === k);
     if (ex) { ex.qty += e.qty || 1; afterChange(P); return true; }
   }
-  if (P.bag.length >= hardCap(P)) {
-    if (!quiet) { G.fx.float('Sekken er full', P.pos, 'miss'); G.ui.log('Sekken er full. Slipp noe først (I).'); }
-    return false;
-  }
   if (!e.uid) e.uid = 'i' + Math.random().toString(36).slice(2, 9);
   P.bag.push(e);
   const was = P.overloaded;
   afterChange(P);
-  if (!quiet && P.overloaded && !was) G.ui.log(`${P.name} er <b class="c-cond">överlastad</b>: tregere, og nackdel på Smyga og Undvika. Bärförmåga ${bagCap(P)}.`);
+  if (!quiet && P.overloaded && !was) G.ui.log(`${P.name} er <b class="c-cond">överlastad</b> (${carriedKg(P)} av ${capKg(P)} kg): tregere, og -5 på Smyga, Akrobatik, Hoppa og Klättra.`);
   return true;
 }
 
@@ -96,35 +109,36 @@ export function removeFromBag(P, e, n = null) {
 }
 
 function afterChange(P) {
-  P.overloaded = isOverloaded(P);
   P.recalc?.();
   if (G.inv?.isOpen) G.inv.render();
 }
 
 // Gi spilleren en gjenstand: tar den på hvis plassen er ledig, ellers i sekken.
-// Er sekken full, byttes den med det du har på, og det gamle havner på bakken.
+// Orker du ikke mer, byttes den med det du har på, og det gamle havner på bakken.
 export function giveItem(item, o = {}) {
   const P = G.player;
   if (isGear(item)) {
-    const slot = item.slot === 'vapen' && item.shield ? 'vapen2' : item.slot;
-    if (!P.equip[slot] && !(slot === 'vapen' && !P.equip.vapen)) { equip(P, item, slot); logGot(item, 'tar på'); return 'equip'; }
-    if (slot === 'vapen' && !P.equip.vapen) { equip(P, item, 'vapen'); logGot(item, 'tar'); return 'equip'; }
+    const slot = item.shield ? 'vapen2' : item.slot;
+    if (!P.equip[slot]) { equip(P, item, slot); logGot(item, 'tar på'); return 'equip'; }
+    if (slot === 'vapen' && !P.equip.vapen2 && !item.shield) { equip(P, item, 'vapen2'); logGot(item, 'tar i den andre hånda'); return 'equip'; }
     if (addToBag(P, item, true)) { logGot(item, 'legger i sekken'); G.fx.float('I sekken', P.pos, 'silver'); return 'bag'; }
     if (o.noDrop) return null;
     G.world.equipItem(item);
     return 'swap';
   }
   if (item.type === 'cons' && item.cid === 'legedrikk') {
-    while (item.qty > 0 && P.potions < 4) { P.potions++; item.qty--; }
-    if (item.qty <= 0) { G.fx.float('Legedrikk', P.pos, 'heal'); return 'belt'; }
+    while (item.qty > 0 && P.potions < BELT) { P.potions++; item.qty--; }
+    if (item.qty <= 0) { P.recalc?.(); G.fx.float('Legedrikk', P.pos, 'heal'); return 'belt'; }
   }
   if (addToBag(P, item)) { G.fx.float(item.qty > 1 ? `${item.name} x${item.qty}` : item.name, P.pos, 'silver'); return 'bag'; }
   return null;
 }
 
 function logGot(item, verb) {
-  G.ui.log(`${G.player.name} ${verb} <b style="color:${RARITY[item.rarity]?.color || 'var(--parch)'}">${item.name}</b>.`);
-  if (item.str && G.player.attrs.STY < item.str) G.ui.log(`${item.name} krever STY ${item.str}. Du får nackdel med det.`);
+  const P = G.player;
+  G.ui.log(`${P.name} ${verb} <b style="color:${RARITY[item.rarity]?.color || 'var(--parch)'}">${item.name}</b>.`);
+  if (item.str && P.gripOf?.(item) === 0) G.ui.log(`${item.name} krever STY ${item.str}. Med STY ${P.attrs.STY} er det for tungt.`);
+  else if (item.str && P.attrs.STY < item.str && !item.ranged && !item.twoOnly) G.ui.log(`${item.name} krever STY ${item.str}. Du må bruke begge hender.`);
 }
 
 export function equip(P, item, slot) {
@@ -134,7 +148,7 @@ export function equip(P, item, slot) {
 
 export function refreshAfterEquip(P, slot) {
   P.recalc();
-  if (slot === 'rustning' || slot === 'hjalm') P.buildModel();
+  if (slot === 'rustning' || slot === 'hjalm' || slot === 'armar' || slot === 'ben') P.buildModel();
   else P.refreshWeaponMeshes();
   G.ui.buildBar?.();
 }
@@ -144,13 +158,13 @@ export function equipFromBag(P, item, want = null) {
   if (!isGear(item)) return false;
   let slot = want || item.slot;
   if (item.shield && slot === 'vapen') slot = 'vapen2';
-  if ((slot === 'vapen2') && item.slot !== 'vapen' && item.slot !== 'vapen2') return false;
+  if (slot === 'vapen2' && item.slot !== 'vapen' && item.slot !== 'vapen2') return false;
   if (slot !== 'vapen' && slot !== 'vapen2' && slot !== item.slot) return false;
   if (slot === 'vapen' && item.shield) return false;
   removeFromBag(P, item);
   const old = P.equip[slot];
   P.equip[slot] = item;
-  if (old) addToBag(P, old, true);
+  if (old && !addToBag(P, old, true)) G.world.spawnPickup(old.slot ? 'item' : 'entry', P.pos.x + 0.6, P.pos.z, old.slot ? { item: old } : { entry: old });
   refreshAfterEquip(P, slot);
   G.audio.swing?.(2, 0.15);
   return true;
@@ -159,7 +173,7 @@ export function equipFromBag(P, item, want = null) {
 export function unequip(P, slot) {
   const it = P.equip[slot];
   if (!it) return false;
-  if (P.bag.length >= hardCap(P)) { G.fx.float('Sekken er full', P.pos, 'miss'); return false; }
+  if (!canCarry(P, it)) { G.fx.float('For tungt', P.pos, 'miss'); return false; }
   P.equip[slot] = null;
   addToBag(P, it, true);
   refreshAfterEquip(P, slot);
@@ -185,23 +199,23 @@ export function useEntry(P, e) {
   const c = CONS[e.cid];
   if (!c || c.junk) return 'Det er ikke noe å bruke den til.';
   let txt = '';
-  if (c.vpAll) {
-    if (P.vp >= P.maxVP) return 'VP er allerede fulle.';
-    P.vp = P.maxVP;
+  if (c.psyAll) {
+    if (P.psy >= P.maxPSY) return 'PSY er allerede full.';
+    P.psy = P.maxPSY;
     G.fx.burst('will', P.pos, 20);
-    txt = 'Trolldrikk: alle VP tilbake.';
+    txt = 'Trolldrikk: all PSY tilbake.';
   } else {
-    if (P.kp >= P.maxKP && !(c.vp && P.vp < P.maxVP)) return 'Du er mett og hel. Spar den.';
+    const hurtLoc = P.loc && Object.keys(P.loc).some(l => P.loc[l] < P.locMax[l]);
+    if (P.kp >= P.maxKP && !hurtLoc && !(c.psy && P.psy < P.maxPSY)) return 'Du er mett og hel. Spar den.';
     let n = c.heal || 0;
     if (c.healDie) n = rollDice(c.healDie);
-    if (c.bread) n += (P.mods.breadHeal || 0) + (P.tricks?.has('lagamat') ? 2 : 0);
+    if (c.bread) n += P.mods?.breadHeal || 0;
     if (c.potion && P.flags?.has('lunch')) n += 3;
     const got = P.heal(n);
-    if (c.vp) P.vp = Math.min(P.maxVP, P.vp + c.vp);
-    if (c.bread) P.floorStats.bread = (P.floorStats.bread || 0) + 1;
+    if (c.psy) P.gainPSY ? P.gainPSY(c.psy) : (P.psy = Math.min(P.maxPSY, P.psy + c.psy));
+    if (c.bread && P.floorStats) P.floorStats.bread = (P.floorStats.bread || 0) + 1;
     G.fx.burst('heal', P.pos, 14);
-    txt = `${c.name}: +${got} KP${c.vp ? `, +${c.vp} VP` : ''}.`;
-    if (c.potion && P.dying) { P.dying = null; G.game.hideDying(); txt += ' Ikke lenger døende.'; }
+    txt = `${c.name}: +${got} KP${c.psy ? `, +${c.psy} PSY` : ''}.`;
   }
   removeFromBag(P, e, 1);
   G.audio.heal?.();
@@ -229,7 +243,7 @@ export function renderSellList(el, merchant, o = {}) {
   el.innerHTML = '';
   const head = document.createElement('div');
   head.className = 'purse';
-  head.innerHTML = `Du har <b>${P.silver}</b> silver <span>(du selger${merchant === 'bataar' ? ', bare våpen og rustning' : ''})</span>`;
+  head.innerHTML = `Du har <b>${P.silver}</b> sm <span>(du selger${merchant === 'bataar' ? ', bare våpen og rustning' : ''})</span>`;
   el.appendChild(head);
   const rows = P.bag.filter(e => merchant !== 'bataar' || isGear(e));
   if (!rows.length) {
@@ -250,7 +264,7 @@ export function renderSellList(el, merchant, o = {}) {
       removeFromBag(P, e, stackKey(e) ? 1 : null);
       P.silver += price;
       G.audio.coin();
-      if (o.say) o.say(o.line ? o.line(e, price) : `${price} silver for ${e.name.toLowerCase()}.`);
+      if (o.say) o.say(o.line ? o.line(e, price) : `${price} sm for ${e.name.toLowerCase()}.`);
       renderSellList(el, merchant, o);
     };
     el.appendChild(row);
@@ -264,5 +278,3 @@ export function renderSellList(el, merchant, o = {}) {
     el.appendChild(b);
   }
 }
-
-void d;

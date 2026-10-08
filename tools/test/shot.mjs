@@ -42,6 +42,6 @@ for (const a of actions) {
   else if (a.t === 'eval') logs.push('[eval] ' + JSON.stringify(await page.evaluate(a.js)));
   else if (a.t === 'shot') await page.screenshot({ path: out.replace('.png', `_${shotIdx++}.png`) });
 }
-await page.screenshot({ path: out });
 console.log(logs.slice(0, 80).join('\n'));
+try { await page.screenshot({ path: out, timeout: 20000 }); } catch (e) { console.log('[shot] ' + e.message.split('\n')[0]); }
 await browser.close();

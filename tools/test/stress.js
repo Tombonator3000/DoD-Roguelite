@@ -22,19 +22,24 @@ window.stress = (profId, secsPerFloor = 20, seedName = 'x') => {
     G.ui.buildBar();
   }
   out.kin = sheet.kin;
-  out.heroic = sheet.heroic;
   out.spells = sheet.spells;
   out.weapons = sheet.gear.w;
+  out.armor = sheet.gear.a;
   const keys = ['KeyR', 'KeyG', 'KeyT', 'KeyF', 'KeyQ', 'KeyZ', 'ShiftLeft', 'Digit1', 'Space', 'KeyV', 'KeyH', 'KeyE', 'KeyX'];
   for (let depth = 1; depth <= 5; depth++) {
     const P = G.player;
-    P.kp = P.maxKP; // hold liv i testen
+    P.healAll(); // hold liv i testen
     let held = null, heldT = 0;
     const err = window.sim(secsPerFloor, (t, G) => {
       const P = G.player;
       if (P.dead) return;
-      if (P.downed && G.state === 'deathroll') { G.game.survive(); }
-      if (P.kp < 4) P.kp = P.maxKP;
+      // medvetslös: la sekvensen gå, eller reis deg med en hjältepoäng
+      if (G.state === 'deathroll' && G.game.ko) {
+        if (G.game.ko.done) G.game.koWake();
+        else if (Math.random() < 0.05) { P.hjp = Math.max(P.hjp, 1); G.game.koHero(); }
+        return;
+      }
+      if (P.kp < 4 || P.loc.huvud < 2 || P.loc.brost < 2 || P.loc.mage < 2) P.healAll();
       const e = P.nearestEnemy(40);
       const inp = G.input;
       inp.usingTouch = false;
@@ -51,23 +56,19 @@ window.stress = (profId, secsPerFloor = 20, seedName = 'x') => {
       } else { inp.touchMove.active = false; inp.mouse.down = false; }
       if (Math.random() < 0.03) { const k = keys[Math.floor(Math.random() * keys.length)]; inp.pressed.add(k); if (k.startsWith('Key') && 'RGT'.includes(k[3])) { held = k; heldT = Math.random() * 1.2; inp.keys.add(k); } }
       if (held) { heldT -= 1 / 30; if (heldT <= 0) { inp.keys.delete(held); held = null; } }
-      if (G.game.push && Math.random() < 0.5) G.game.acceptPush(null);
       if (G.state === 'dialog') G.game.closeShop();
     });
     G.input.touchMove.active = false;
     G.input.mouse.down = false;
     if (err) { out.errors.push(`d${depth}: ${err}`); break; }
-    out.floors.push({ depth, kills: G.run.kills, rolls: G.run.rolls, kp: P.kp, vp: P.vp, conds: Object.keys(P.cond), enemiesLeft: G.enemies.filter(e => !e.dead).length });
+    out.floors.push({ depth, kills: G.run.kills, rolls: G.run.rolls, kp: P.kp, psy: P.psy, bleeding: [...P.bleeding], exp: Object.keys(P.exp).length, enemiesLeft: G.enemies.filter(e => !e.dead).length });
     if (depth < 5) {
       try {
         G.state = 'play';
         G.game.descend();
-        G.game.sessionQs?.forEach(q => q.pick && P.marks.add(q.pick));
-        G.game.offerGifts(1);
         const b = document.querySelector('#boon-cards .boon');
         b?.click();
-        const pb = G.game.pendingBoon;
-        if (pb) { if (pb.heroic) P.heroic.push(pb.heroic); else P.boons.push(pb); P.recalc(); }
+        G.game.applyPendingBoon();
         G.ui.hideScreens();
         G.state = 'play';
         G.game.loadFloor(depth + 1);
@@ -75,6 +76,6 @@ window.stress = (profId, secsPerFloor = 20, seedName = 'x') => {
       } catch (e2) { out.errors.push(`descend ${depth}: ${e2.message}\n${e2.stack}`); break; }
     }
   }
-  out.final = { kills: G.run.kills, drakes: G.run.drakes, demons: G.run.demons, pushes: G.run.pushes, parries: G.run.parries, dodges: G.run.dodges, heroic: G.player.heroic, boss: G.enemies.some(e => e.def.boss && !e.dead) ? 'lever' : 'død/borte' };
+  out.final = { kills: G.run.kills, perfekt: G.run.perfekt || 0, fummel: G.run.fummel || 0, parries: G.run.parries || 0, dodges: G.run.dodges || 0, hjp: G.player.hjp, ko: G.run.ko || 0, boss: G.enemies.some(e => e.def.boss && !e.dead) ? 'lever' : 'død/borte' };
   return out;
 };

@@ -4,7 +4,7 @@ window.townWander = (secs = 30, seed = 1) => {
   let s = seed;
   const R = () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
   const keys = ['KeyE', 'KeyE', 'KeyE', 'ShiftLeft', 'Space', 'KeyQ', 'Mouse0', 'KeyR', 'KeyF', 'KeyV', 'KeyH', 'Digit1', 'KeyZ'];
-  const words = ['navn', 'jobb', 'handel', 'rom', 'mat', 'øl', 'rykter', 'safran', 'reven', 'trening', 'helbreder', 'velsignelse', 'almisse', 'leke', 'opptre', 'sang', 'runene', 'døde', 'rotter', 'lære', 'trolldrikk', 'reparere', 'slipe', 'fiske', 'betale', 'vaktstua', 'xyz', 'karad', 'utu', 'shamash', 'farvel'];
+  const words = ['navn', 'jobb', 'handel', 'rom', 'mat', 'øl', 'rykter', 'safran', 'reven', 'trening', 'elev', 'hela', 'vila', 'helbreder', 'velsignelse', 'almisse', 'leke', 'opptre', 'sang', 'runene', 'døde', 'rotter', 'lære', 'trolldrikk', 'reparere', 'slipe', 'fiske', 'betale', 'vaktstua', 'xyz', 'karad', 'utu', 'shamash', 'farvel'];
   const RF = 1 / Math.SQRT2;
   let dir = [0, 0], dirT = 0;
   const stats = { talks: 0, asks: 0, buys: 0, uses: 0 };
@@ -19,7 +19,6 @@ window.townWander = (secs = 30, seed = 1) => {
       } else if (R() < 0.2) G.game.closeShop();
       return;
     }
-    if (G.game.push) { if (R() < 0.5) G.game.acceptPush(null); else G.game.declinePush(); }
     if (G.state !== 'play') return;
     dirT -= 1 / 30;
     if (dirT <= 0) { dirT = 0.5 + R() * 2.5; const a = R() * Math.PI * 2; dir = [Math.cos(a), Math.sin(a)]; }
@@ -50,7 +49,7 @@ window.talkAll = (maxBuys = 2) => {
   const G = window.G;
   const out = [];
   const life = G.dungeon.life;
-  G.player.silver = 999;
+  G.player.silver = 99999;
   G.meta.feathers = Math.max(G.meta.feathers || 0, 999);
   for (const n of life.npcs) {
     if (n.hidden || n.mode === 'sleep') { out.push(n.id + ': sover eller er borte'); continue; }
@@ -61,11 +60,10 @@ window.talkAll = (maxBuys = 2) => {
     for (const k of Object.keys(n.def.topics)) {
       if (k === 'FARVEL' || !G.talk?.def) continue;
       try { G.talk.ask(k); asked++; } catch (e) { out.push(`${n.id} ${k}: ${e.message}`); }
-      if (G.game.push) G.game.acceptPush(null);
       const btns = [...document.querySelectorAll('#dlg-wares .ware button')].filter(b => !b.disabled);
-      for (const b of btns.slice(0, maxBuys)) { try { b.click(); } catch (e) { out.push(`${n.id} kjøp: ${e.message}`); } if (G.game.push) G.game.acceptPush(null); }
+      for (const b of btns.slice(0, maxBuys)) { try { b.click(); } catch (e) { out.push(`${n.id} kjøp: ${e.message}`); } }
       const bar = document.querySelector('#dlg-wares .barter');
-      if (bar && Math.random() < 0.5) { try { bar.click(); } catch (e) { out.push(`${n.id} köpslå: ${e.message}`); } if (G.game.push) G.game.acceptPush(null); }
+      if (bar && Math.random() < 0.5) { try { bar.click(); } catch (e) { out.push(`${n.id} köpslå: ${e.message}`); } }
     }
     out.push(`${n.id}: ${asked} ord`);
     if (G.talk?.def) G.talk.close();

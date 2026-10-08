@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { G, T } from './state.js';
-import { rollDice, skillRoll, d } from './rules.js';
-import { SKILL } from './dod.js';
+import { rollDice, clRoll, d } from './rules.js';
+import { SKILL, hitLocation } from './dod.js';
 import { buildBarrel, buildCrate, buildChest } from './assets.js';
 import { buildWeaponMesh } from './kinmodels.js';
 import { makeItem, RARITY } from './loot.js';
@@ -369,7 +369,7 @@ export class World {
     g.position.set(enemy.pos.x + dir.x * 0.6, 1.0, enemy.pos.z + dir.z * 0.6);
     g.rotation.y = yaw;
     G.scene.add(g);
-    G.projectiles.push({ kind: 'arrow', mesh: g, pos: g.position, dir, speed: 17, life: 1.1, owner: 'enemy', src: enemy, skill: enemy.skill, dmg: enemy.def.dmg });
+    G.projectiles.push({ kind: 'arrow', mesh: g, pos: g.position, dir, speed: 17, life: 1.1, owner: 'enemy', src: enemy, skill: enemy.fv + (enemy.fvMod || 0), dmg: enemy.weapon?.dmg || 'D6', wname: enemy.weapon?.name?.toLowerCase(), startX: enemy.pos.x, startZ: enemy.pos.z });
   }
 
   updateProjectiles(dt) {
@@ -424,29 +424,31 @@ export class World {
     }
   }
 
+  // Besvärjelser som flyr (VINDPIL): fysisk manifestation, ingen parering
   spellHit(p, e) {
     const s = p.spell;
-    const r = { drake: false, success: true };
-    if (e.tryDefend?.(r, { ranged: true, dice: '0' })) return;
     tmp.set(p.dir.x, 0, p.dir.z);
-    e.takeHit(s.dmg, tmp, 3, { type: s.type, src: 'player' });
+    e.takeHit(s.dmg, tmp, 3, { type: s.type, src: 'player', magic: true, ranged: true, loc: s.loc && e.def.detailed ? hitLocation(true) : null, total: !s.loc });
     if (s.burn && !e.dead) e.addDot('burn');
   }
 
+  // Fiendens pil treffer: anfallsslaget slås når pila kommer fram (Bok II s. 16-17)
   arrowHit(p) {
     const P = G.player;
     const src = p.src && !p.src.dead ? p.src : null;
-    let bane = 0;
-    if (src && P.fx.tonkonst > 0 && Math.hypot(P.pos.x - src.pos.x, P.pos.z - src.pos.z) <= (P.fx.tonkonstR || 10)) bane++;
-    const r = skillRoll(p.skill, { bane });
-    r.skill = 'kortbåge';
-    if (!r.success || r.demon) {
-      G.fx.float('Bom', P.pos, 'miss');
-      G.ui.logRoll(r, 'Pila suser forbi.', true);
-      return;
+    // VIRVELSKÖLD: pila bøyes av hvis E vinner over pilens motståndsvärde 4 (Bok III)
+    if (P.buffs?.virvelskold) {
+      const rs = { success: Math.random() * 20 < 10 + P.buffs.virvelskold.e - 4 };
+      if (rs.success) { G.fx.float('Virvelen', P.pos, 'miss'); return; }
     }
-    const value = r.drake ? rollDice(p.dmg) + rollDice(p.dmg) : rollDice(p.dmg);
-    P.receiveAttack({ src, value, dmg: p.dmg, type: 'p', ranged: true, drake: r.drake, roll: r, who: 'En pil', verb: `treffer${r.drake ? ' midt i' : ''}`, ignoreInvuln: false });
+    let mod = 0;
+    if (P.prone?.()) mod -= Math.min(5, Math.floor(Math.hypot(P.pos.x - p.startX, P.pos.z - p.startZ) / 1.5));
+    if (P.immobile?.()) mod += 10;
+    const r = clRoll(p.skill + mod, p.skill);
+    r.skill = p.wname || 'kortbåge';
+    r.label = `${src?.def?.name || 'Pil'}: ${r.skill}`;
+    if (r.fummel) { G.fx.float('Bom', P.pos, 'miss'); G.ui.logRoll(r, 'Pila går langt over.', true); return; }
+    P.receiveAttack({ src, roll: r, dmg: p.dmg, type: 'p', ranged: true, who: 'Pila', verb: 'treffer' });
   }
 
   lightning(a, b, color = 0xbfd8ff) {
@@ -532,7 +534,7 @@ export class World {
 
   dropSilver(x, z, total) {
     if (total <= 0) return;
-    const piles = Math.min(5, Math.max(1, Math.ceil(total / 3)));
+    const piles = Math.min(5, Math.max(1, Math.ceil(total / 30)));
     let left = total;
     for (let i = 0; i < piles; i++) {
       const v = i === piles - 1 ? left : Math.max(1, Math.round(total / piles));
@@ -543,8 +545,7 @@ export class World {
 
   lootOpts(extra = {}) {
     const P = G.player;
-    const prefer = (P.sheet.trained || []).filter(s => SKILL[s]?.type === 'vap');
-    if (prefer.some(s => ['Svärd', 'Yxa', 'Hammare'].includes(s))) prefer.push('sköld');
+    const prefer = [...new Set([...(P.sheet.yrke || []), ...Object.keys(P.baseSkills || {})])].filter(s => SKILL[s]?.type === 'vap' && (P.baseSkills[s] || 0) > 0);
     return { prefer, school: P.sheet.school, ...extra };
   }
 
@@ -577,7 +578,7 @@ export class World {
     G.fx.burst('wood', { x: p.pos.x, y: 0.6, z: p.pos.z }, 18);
     G.fx.burst('dust', p.pos, 6);
     G.audio.crunch();
-    if (Math.random() < 0.5) this.dropSilver(p.pos.x, p.pos.z, 1 + Math.floor(Math.random() * 3) * (G.player.flags.has('greed') ? 2 : 1));
+    if (Math.random() < 0.5) this.dropSilver(p.pos.x, p.pos.z, (1 + Math.floor(Math.random() * 3)) * 10 * (G.player.flags.has('greed') ? 2 : 1));
     if (Math.random() < 0.15) this.spawnPickup('bread', p.pos.x, p.pos.z);
     if (Math.random() < 0.04) this.spawnPickup('potion', p.pos.x, p.pos.z);
     if (Math.random() < 0.04) this.spawnPickup('item', p.pos.x, p.pos.z, { item: makeItem(G.depth, this.lootOpts()) });
@@ -669,7 +670,7 @@ export class World {
 
   equipItem(item) {
     const P = G.player;
-    let slot = item.slot;
+    let slot = item.shield ? 'vapen2' : item.slot;
     let old = null;
     if (slot === 'vapen') {
       if (!P.equip.vapen) { P.equip.vapen = item; }
@@ -683,12 +684,13 @@ export class World {
       P.equip[slot] = item;
     }
     P.recalc();
-    if (slot === 'rustning' || slot === 'hjalm') P.buildModel();
+    if (slot === 'rustning' || slot === 'hjalm' || slot === 'armar' || slot === 'ben') P.buildModel();
     else P.refreshWeaponMeshes();
     if (old && !addToBag(P, old, true)) this.spawnPickup('item', P.pos.x, P.pos.z, { item: old });
     else if (old) G.ui.log(`${old.name} går i sekken.`);
     G.ui.log(`${P.name} tar <b style="color:${RARITY[item.rarity].color}">${item.name}</b>.`);
-    if (item.str && P.attrs.STY < item.str) G.ui.log(`${item.name} krever STY ${item.str}. Du får nackdel med det.`);
+    if (item.str && P.gripOf?.(item) === 0) G.ui.log(`${item.name} krever STY ${item.str}. Det er for tungt for deg.`);
+    else if (item.str && P.attrs.STY < item.str && !item.ranged && !item.twoOnly) G.ui.log(`${item.name} krever STY ${item.str}. Du må bruke begge hender.`);
   }
 
   // E tar opp (i sekken, eller på hvis plassen er ledig). X tar på med en gang.
@@ -723,23 +725,23 @@ export class World {
     if (!it.locked) return this.openChest(it, 'Kisten knirker opp.');
     if (it.busy && G.time < it.busy) return;
     it.busy = G.time + 1.2;
-    // trolleritrick og hjälteförmåga først
-    if (P.tricks.has('lasaupp') && P.vp >= 1) { P.vp -= 1; return this.openChest(it, 'Låsa upp: låsen klikker opp av seg selv.'); }
-    if (P.has('mastersnickare') && P.vp >= 1) { P.vp -= 1; G.fx.burst('wood', { x: it.pos.x, y: 0.6, z: it.pos.z }, 16); return this.openChest(it, 'Mästersnickare: lokket løsner med ett presist slag.'); }
-    if (it.forced) {
-      // bryt opp: STY-slag, men det bråker
-      const r = P.roll('STY', { noArmed: true });
+    const fv = P.skills['Låsdyrkning'] || 0;
+    if (it.forced || fv <= 0) {
+      // bryt opp: svårt STY-slag, og det bråker
+      const r = P.attrRoll('STY', 15, { label: 'Bryte opp' });
       G.audio.crunch();
       this.alertAround(it.pos, 12);
       if (r.success) this.openChest(it, 'Du bryter opp kisten. Det hørtes nok.');
-      else G.ui.logRoll(r, 'Kisten står imot. Det bråker.');
+      else G.ui.logRoll(r, `Kisten står imot. Det bråker.${fv <= 0 ? ' Uten Låsdyrkning må den brytes opp.' : ''}`);
+      if (fv <= 0) { it.forced = true; it.label = 'Bryt opp kisten (svårt STY-slag, bråker)'; }
       return;
     }
+    // Låsdyrkning (Bok I s. 52): uten dyrkar er CL halvert
     const lockpicks = P.kit.has('dyrkar');
-    P.rollPush('Fingerfärdighet', { important: true, bane: lockpicks ? 0 : 1, label: 'Dyrka' }, r => {
+    P.rollHero('Låsdyrkning', { mod: lockpicks ? 0 : -Math.ceil(fv / 2), label: 'Låsdyrkning' }, r => {
       if (r.success) { this.openChest(it, `${lockpicks ? 'Dyrkene' : 'En hårnål'} gjør jobben.`); G.ui.logRoll(r, 'Låset gir etter.'); }
-      else if (r.demon) { G.ui.logRoll(r, '<b class="c-demon">Demon!</b> Noe brekker inne i låsen. Nå må den brytes opp.'); it.forced = true; it.label = 'Bryt opp kisten (STY, bråker)'; }
-      else { G.ui.logRoll(r, `Låsen holder.${lockpicks ? '' : ' Uten dyrkar er det nackdel.'}`); it.forced = true; it.label = 'Bryt opp kisten (STY, bråker)'; }
+      else if (r.fummel) { G.ui.logRoll(r, '<b class="c-demon">Fummel!</b> Noe brekker inne i låsen. Nå må den brytes opp.'); it.forced = true; it.label = 'Bryt opp kisten (svårt STY-slag, bråker)'; }
+      else G.ui.logRoll(r, `Låset holder. Prøv igjen.${lockpicks ? '' : ' Uten dyrkar er CL halvert.'}`);
     });
   }
 
@@ -753,7 +755,7 @@ export class World {
     G.audio.coin();
     P.floorStats.chests = (P.floorStats.chests || 0) + 1;
     if (it.locked) P.floorStats.locks = (P.floorStats.locks || 0) + 1;
-    this.dropSilver(it.pos.x, it.pos.z, (6 + Math.floor(Math.random() * 10) + (it.locked ? 6 : 0)) * (P.flags.has('greed') ? 2 : 1));
+    this.dropSilver(it.pos.x, it.pos.z, (6 + Math.floor(Math.random() * 10) + (it.locked ? 6 : 0)) * 10 * (P.flags.has('greed') ? 2 : 1));
     this.spawnPickup('item', it.pos.x, it.pos.z, { item: makeItem(G.depth, this.lootOpts({ luck: it.locked ? 0.55 : 0.3 })) });
     if (Math.random() < (it.locked ? 0.6 : 0.35)) this.spawnPickup('potion', it.pos.x, it.pos.z);
     if (Math.random() < (it.locked ? 0.7 : 0.4)) this.spawnPickup('entry', it.pos.x, it.pos.z, { entry: makeValuable(G.depth + (it.locked ? 1 : 0)) });
@@ -771,7 +773,7 @@ export class World {
       if (c.known && dd < 2.2) { c.searched = true; G.ui.log('Her er det. Akkurat der Tobolt sa.'); this.revealCache(c); continue; }
       if (c.known) continue;
       c.searched = true;
-      P.rollPush('Finna dolda ting', { important: true, label: 'Finna dolda ting' }, r => {
+      P.rollHero('Finna dolda ting', { label: 'Finna dolda ting' }, r => {
         if (r.success) {
           c.found = true;
           G.ui.logRoll(r, 'En løs stein i veggen. Noen har gjemt noe her.');
@@ -805,7 +807,7 @@ export class World {
     c.taken = true;
     it.label = null;
     G.scene.remove(c.mesh);
-    this.dropSilver(c.x, c.z, rollDice('2D6') + G.depth * 2);
+    this.dropSilver(c.x, c.z, (rollDice('2D6') + G.depth * 2) * 10);
     if (Math.random() < 0.5) this.spawnPickup('potion', c.x, c.z);
     if (Math.random() < 0.35) this.spawnPickup('item', c.x, c.z, { item: makeItem(G.depth + 1, this.lootOpts({ rarity: 'magisk' })) });
     this.spawnPickup('entry', c.x, c.z, { entry: makeValuable(G.depth + 1) });
@@ -817,18 +819,19 @@ export class World {
     if (it.read) return;
     it.read = true;
     it.label = null;
-    const sk = (P.skills['Främmande språk'] || 0) >= (P.skills['Myter & legender'] || 0) ? 'Främmande språk' : 'Myter & legender';
+    // dvergeruner: Tala främmande språk (dvärgiska) eller Historia, det beste av dem
+    const sk = (P.skills['Tala främmande språk'] || 0) >= (P.skills.Historia || 0) ? 'Tala främmande språk' : 'Historia';
     P.floorStats.runes = (P.floorStats.runes || 0) + 1;
     G.run.runesRead = (G.run.runesRead || 0) + 1;
-    P.rollPush(sk, { important: true, label: 'Runer' }, r => {
+    P.rollHero(sk, { label: sk }, r => {
       if (r.success) {
         G.ui.logRoll(r, 'Runene er et kart over hallene, skrevet av dvergene i Karad Batur. Gjemmesteder og trapper står merket.');
         G.dungeon.explored.fill(1);
         for (const c of this.caches) c.known = true;
         if (this.runeMat) this.runeMat.color.setHex(0x7affc0);
-      } else if (r.demon) {
-        G.ui.logRoll(r, '<b class="c-demon">Demon!</b> Runene er en forbannelse mot tyver.');
-        P.addCond('RAD');
+      } else if (r.fummel) {
+        G.ui.logRoll(r, '<b class="c-demon">Fummel!</b> Runene er en forbannelse mot tyver.');
+        P.fearCheck(null, 2);
       } else G.ui.logRoll(r, 'Runene gir ingen mening.');
     });
   }
@@ -856,7 +859,7 @@ export class World {
       }
     }
     let bestItem = null, bestD = 1.7;
-    const magnet = P.tricks?.has('hamta') ? 10 : 3.5;
+    const magnet = 3.5;
     for (let i = G.pickups.length - 1; i >= 0; i--) {
       const p = G.pickups[i];
       p.t += dt;
@@ -898,14 +901,14 @@ export class World {
             P.silver += p.value;
             G.run.silver += p.value;
             P.floorStats.silver = (P.floorStats.silver || 0) + p.value;
-            G.fx.float(`+${p.value} silver`, P.pos, 'silver', 1.6);
+            G.fx.float(`+${p.value} sm`, P.pos, 'silver', 1.6);
             G.audio.coin();
           }
           this.removePickup(p);
         }
       } else if (p.kind === 'bread' && dd < 1.0 && p.t > 0.3) {
-        if (P.kp < P.maxKP) {
-          const got = P.heal(2 + (P.mods.breadHeal || 0) + (P.tricks.has('lagamat') ? 2 : 0));
+        if (P.kp < P.maxKP || P.helpless) {
+          const got = P.heal(2 + (P.mods.breadHeal || 0));
           P.floorStats.bread = (P.floorStats.bread || 0) + 1;
           G.ui.log(`Brød! +${got} KP.${P.isDuck ? ' Mester Flansen hadde ristet på hodet.' : ''}`);
           this.removePickup(p);
@@ -973,7 +976,7 @@ export class World {
       const fl = s.steady ? 1 : 0.82 + 0.1 * Math.sin(t * 11 + s.phase) + 0.08 * Math.sin(t * 23.7 + s.phase * 3);
       const dist = Math.sqrt(s.d);
       const fade = 1 - THREE.MathUtils.smoothstep(dist, 18, 28);
-      l.intensity = s.intensity * fl * fade * (P.tricks?.has('tanda') && !s.steady ? 1.2 : 1);
+      l.intensity = s.intensity * fl * fade;
       l.distance = s.dist || 15;
       if (s.ember && Math.random() < dt * 8) G.fx.ember({ x: s.pos.x, y: 1.4, z: s.pos.z });
     }

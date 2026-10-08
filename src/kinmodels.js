@@ -147,12 +147,21 @@ const CLOTHES = {
   nasare: { top: 0x8a6a20, pants: 0x3a2a1a, extra: 'hat' },
   lard: { top: 0x4a5060, pants: 0x30343c, extra: 'robe' },
   tjuv: { top: 0x2c282a, pants: 0x1e1c1e, extra: 'hood', hood: 0x18161a },
+  // yrkene i DoD91
+  helare: { top: 0xd8d2c0, pants: 0x4a5a3a, extra: 'robe' },
+  lardman: { top: 0x4a5060, pants: 0x30343c, extra: 'robe' },
+  lonnmordare: { top: 0x1e1a1c, pants: 0x161416, extra: 'hood', hood: 0x2a0e10 },
+  munk: { top: 0xc8781e, pants: 0x6a3a12, extra: 'robe' },
+  utbygdsjagare: { top: 0x3a5a2a, pants: 0x4a3a28, extra: 'hood', hood: 0x2e4a24 },
 };
 const SCHOOL_COL = { Animism: 0x2f5a3a, Elementarism: 0x8a3014, Mentalism: 0x4a2a7a };
 
 const KIN_SHAPE = {
   manniska: { s: 1, w: 1, head: 1 },
   halvling: { s: 0.7, w: 1.05, head: 1.22 },
+  halvlangdsman: { s: 0.7, w: 1.05, head: 1.22 },
+  halvalv: { s: 1.04, w: 0.92, head: 0.97 },
+  halvorch: { s: 1.05, w: 1.14, head: 1.06 },
   dvarg: { s: 0.8, w: 1.4, head: 1.12 },
   alv: { s: 1.08, w: 0.86, head: 0.95 },
   vargfolk: { s: 1.06, w: 1.08, head: 1.05 },
@@ -175,12 +184,22 @@ export function buildCharacter(sheet, gear = {}) {
   const cl = { ...(CLOTHES[sheet.profession] || CLOTHES.tjuv), ...(sheet.clothes || {}) };
   if (sheet.profession === 'magiker' && sheet.school && !sheet.clothes?.top) cl.top = SCHOOL_COL[sheet.school] || cl.top;
   const wolf = sheet.kin === 'vargfolk';
+  const small = sheet.kin === 'halvling' || sheet.kin === 'halvlangdsman';
+  const elfy = sheet.kin === 'alv' || sheet.kin === 'halvalv';
   const old = sheet.age === 'gammal';
-  const skinCol = wolf ? R(FUR) : sheet.kin === 'alv' ? R([0xf4e0cc, 0xe8c8a8, 0xb08060]) : sheet.kin === 'dvarg' ? R([0xe0a888, 0xc88a68, 0x9a6a50]) : R(SKIN);
-  const hairCol = old ? 0xb8b4b0 : sheet.kin === 'alv' ? R([0xf0e0b0, 0x1a1412, 0xd8d8e0, 0x8a2a14]) : R(HAIR);
+  const skinCol = wolf ? R(FUR) : sheet.kin === 'halvorch' ? R([0x8a9a6a, 0x7a8a5a, 0x6a7a50]) : sheet.kin === 'alv' ? R([0xf4e0cc, 0xe8c8a8, 0xb08060]) : sheet.kin === 'dvarg' ? R([0xe0a888, 0xc88a68, 0x9a6a50]) : R(SKIN);
+  const hairCol = old ? 0xb8b4b0 : elfy ? R([0xf0e0b0, 0x1a1412, 0xd8d8e0, 0x8a2a14]) : R(HAIR);
 
   const mats = [];
   const M = (c, o) => { const m = mat(c, o); mats.push(m); return m; };
+  // rustningens materiale fra DoD91-tabellen (mat) eller den gamle typen
+  const armorKind = a => a.mat || (a.type === 'ring' ? 'ring' : a.type === 'plat' ? 'plat' : a.aid === 'nitlader' ? 'nit' : 'lader');
+  const armorMats = {};
+  const armorMat = a => {
+    const k = armorKind(a);
+    if (!armorMats[k]) armorMats[k] = k === 'ring' ? M(0x8a8c90, { r: 0.55, m: 0.9 }) : k === 'plat' ? M(0xb8bcc4, { r: 0.25, m: 1 }) : k === 'nit' ? M(0x5a3a24, { r: 0.7 }) : k === 'tyg' ? M(0x7a6a50, { r: 0.95 }) : M(0x6a4428, { r: 0.8 });
+    return armorMats[k];
+  };
   const skin = M(skinCol, { r: wolf ? 0.95 : 0.7 });
   const top = M(cl.top, { r: 0.9 });
   const pants = M(cl.pants, { r: 0.92 });
@@ -203,8 +222,10 @@ export function buildCharacter(sheet, gear = {}) {
     const th = part(CAP(0.085 * Math.sqrt(W), 0.3), pants, 0, -0.2, 0, leg);
     void th;
     const knee = pivot(0, -0.42, 0, leg);
-    part(CAP(0.07 * Math.sqrt(W), 0.28), sheet.kin === 'halvling' ? pants : boots, 0, -0.18, 0, knee);
-    const foot = part(BOX(0.12 * W, 0.07, sheet.kin === 'halvling' ? 0.3 : 0.24), sheet.kin === 'halvling' ? skin : boots, 0, -0.39, 0.05, knee);
+    part(CAP(0.07 * Math.sqrt(W), 0.28), small ? pants : boots, 0, -0.18, 0, knee);
+    const foot = part(BOX(0.12 * W, 0.07, small ? 0.3 : 0.24), small ? skin : boots, 0, -0.39, 0.05, knee);
+    // benskydd
+    if (gear.legs) part(CYL(0.085 * Math.sqrt(W), 0.075 * Math.sqrt(W), 0.24, 10), armorMat(gear.legs), 0, -0.17, 0.005, knee);
     void foot;
     legs.push({ leg, knee });
   }
@@ -217,12 +238,14 @@ export function buildCharacter(sheet, gear = {}) {
   // rustning over
   const armor = gear.armor;
   if (armor) {
-    const col = armor.type === 'ring' ? 0x8a8c90 : armor.type === 'plat' ? 0xb8bcc4 : armor.aid === 'nitlader' ? 0x5a3a24 : 0x6a4428;
-    const am = M(col, armor.type === 'ring' ? { r: 0.55, m: 0.9 } : armor.type === 'plat' ? { r: 0.25, m: 1 } : { r: 0.8 });
+    const mt = armorKind(armor);
+    const am = armorMat(armor);
     const a = part(CAP(0.205, 0.26, 12), am, 0, 0.34, 0, torso);
     a.scale.set(1.16 * W, 1, 0.82);
-    if (armor.aid === 'nitlader') for (let i = 0; i < 10; i++) part(SPH(0.012, 5, 4), M(0xc0b090, { r: 0.3, m: 1 }), (i % 5 - 2) * 0.07 * W, 0.24 + Math.floor(i / 5) * 0.14, 0.17, torso);
-    if (armor.type === 'plat') for (const sx of [1, -1]) { const pd = part(HEMI(0.11, 10, 8, Math.PI / 2), am, sx * 0.25 * W, 0.53, 0, torso); pd.scale.set(1, 0.7, 1); }
+    if (mt === 'nit') for (let i = 0; i < 10; i++) part(SPH(0.012, 5, 4), M(0xc0b090, { r: 0.3, m: 1 }), (i % 5 - 2) * 0.07 * W, 0.24 + Math.floor(i / 5) * 0.14, 0.17, torso);
+    if (mt === 'plat') for (const sx of [1, -1]) { const pd = part(HEMI(0.11, 10, 8, Math.PI / 2), am, sx * 0.25 * W, 0.53, 0, torso); pd.scale.set(1, 0.7, 1); }
+    // brynja og hauberk går ned over lårene
+    if (armor.covers?.includes('hben')) { const sk = part(CYL(0.21 * W, 0.26 * W, 0.3, 12), am, 0, -0.08, 0, torso); sk.scale.z = 0.8; }
   }
   if (cl.extra === 'apron') part(BOX(0.3 * W, 0.4, 0.02), M(0x4a3020, { r: 0.9 }), 0, 0.2, 0.17, torso);
   if (cl.extra === 'robe') {
@@ -254,15 +277,15 @@ export function buildCharacter(sheet, gear = {}) {
     part(SPH(0.03, 6, 5), skin, 0, 0.12, 0.13, head).scale.set(1, 0.9, sheet.kin === 'dvarg' ? 1.6 : 1.1);
     for (const sx of [1, -1]) {
       part(SPH(0.017, 6, 5), eyeM, sx * 0.045, 0.15, 0.115, head, false);
-      if (sheet.kin === 'alv') { const ear = part(CONE(0.03, 0.14, 5), skin, sx * 0.13, 0.17, -0.01, head); ear.rotation.z = -sx * 1.1; }
+      if (elfy) { const ear = part(CONE(0.03, sheet.kin === 'alv' ? 0.14 : 0.09, 5), skin, sx * 0.13, 0.17, -0.01, head); ear.rotation.z = -sx * 1.1; }
       else part(SPH(0.03, 6, 5), skin, sx * 0.13, 0.13, 0, head).scale.set(0.5, 1, 0.8);
     }
     // hår
     if (!(cl.extra === 'hood')) {
       const h = part(HEMI(0.138, 14, 10, Math.PI * 0.55), hair, 0, 0.14, -0.012, head);
       h.scale.set(1, 1.05, 1.05);
-      if (sheet.kin === 'alv' || rnd() < 0.3) part(BOX(0.22, 0.28, 0.05), hair, 0, 0.02, -0.11, head);
-      if (sheet.kin === 'halvling') for (let i = 0; i < 7; i++) part(SPH(0.045, 6, 5), hair, Math.cos(i) * 0.11, 0.22 + Math.sin(i * 2) * 0.03, Math.sin(i) * 0.1 - 0.02, head);
+      if (elfy || rnd() < 0.3) part(BOX(0.22, 0.28, 0.05), hair, 0, 0.02, -0.11, head);
+      if (small) for (let i = 0; i < 7; i++) part(SPH(0.045, 6, 5), hair, Math.cos(i) * 0.11, 0.22 + Math.sin(i * 2) * 0.03, Math.sin(i) * 0.1 - 0.02, head);
     }
     if (sheet.kin === 'dvarg') {
       const beard = part(CONE(0.12, 0.34, 10), hair, 0, -0.06, 0.07, head);
@@ -270,15 +293,22 @@ export function buildCharacter(sheet, gear = {}) {
       part(BOX(0.16, 0.04, 0.03), hair, 0, 0.09, 0.125, head);
     } else if (sheet.kin === 'manniska' && rnd() < 0.35) {
       part(SPH(0.09, 10, 8), hair, 0, 0.05, 0.07, head).scale.set(1, 0.8, 0.8);
+    } else if (sheet.kin === 'halvorch') {
+      for (const sx of [1, -1]) { const tk = part(CONE(0.012, 0.05, 5), M(0xe8e0c8, { r: 0.5 }), sx * 0.04, 0.06, 0.12, head); tk.rotation.x = Math.PI; }
     }
   }
   // hodeplagg
   const helmet = gear.helmet;
-  if (helmet) {
+  const softHelm = helmet && !helmet.metal && (helmet.mat === 'tyg' || helmet.mat === 'lader' || helmet.mat === 'nit');
+  if (softHelm) {
+    // tyghuva og läderhuva
+    const hood = part(HEMI(0.152, 14, 10, Math.PI * 0.6), armorMat(helmet), 0, 0.13, -0.01, head);
+    hood.scale.set(1, 1.06, 1.08);
+  } else if (helmet) {
     const hm = M(0x9a9ca2, { r: 0.35, m: 1 });
     const cap = part(HEMI(0.15, 14, 10, Math.PI * 0.55), hm, 0, 0.14, 0, head);
     cap.scale.y = 1.1;
-    if (helmet.hid === 'tunnhjalm') {
+    if (helmet.hid === 'tunnhjalm' || helmet.aid === 'tunnhjalm') {
       part(CYL(0.155, 0.155, 0.26, 14), hm, 0, 0.1, 0, head);
       part(BOX(0.18, 0.015, 0.02), M(0x050505, { r: 1 }), 0, 0.15, 0.155, head);
     } else part(BOX(0.025, 0.12, 0.02), hm, 0, 0.08, 0.15, head);
@@ -313,6 +343,8 @@ export function buildCharacter(sheet, gear = {}) {
     part(CAP(0.052 * Math.sqrt(W), 0.18), wolf ? skin : top, 0, -0.12, 0, el);
     part(SPH(0.055, 8, 6), skin, 0, -0.27, 0.01, el);
     const hand = pivot(0, -0.28, 0.02, el);
+    // armskydd
+    if (gear.arms) part(CYL(0.062 * Math.sqrt(W), 0.056 * Math.sqrt(W), 0.17, 10), armorMat(gear.arms), 0, -0.13, 0, el);
     arms.push({ sh, el, hand });
   }
   if (wolf) {

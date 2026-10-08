@@ -4,7 +4,8 @@ import { G } from './state.js';
 import { GEAR } from './dod.js';
 import { RARITY } from './loot.js';
 import { diceAvg } from './rules.js';
-import { bagCap, hardCap, isGear, stackKey, equipFromBag, unequip, dropEntry, useEntry, removeFromBag, addToBag, refreshAfterEquip, makeCons, canCarry, OVERLOAD_SLOTS } from './inventory.js';
+import { capKg, hardCapKg, carriedKg, kgOf, isGear, stackKey, equipFromBag, unequip, dropEntry, useEntry, removeFromBag, addToBag, refreshAfterEquip, makeCons, canCarry } from './inventory.js';
+import { LOC_NAME } from './dod.js';
 
 const $ = s => document.querySelector(s);
 const SLOTS = [
@@ -13,9 +14,12 @@ const SLOTS = [
   { slot: 'vapen', name: 'Hovedhånd', area: 'w' },
   { slot: 'rustning', name: 'Rustning', area: 'r' },
   { slot: 'vapen2', name: 'Andre hånd', area: 'o' },
+  { slot: 'armar', name: 'Armskydd', area: 'm' },
+  { slot: 'ben', name: 'Benskydd', area: 'l' },
 ];
-const SLOT_NAME = { vapen: 'våpen', vapen2: 'skjold', rustning: 'rustning', hjalm: 'hjelm', amulett: 'amulett' };
+const SLOT_NAME = { vapen: 'våpen', vapen2: 'skjold', rustning: 'rustning', hjalm: 'hjälm', amulett: 'amulett', armar: 'armskydd', ben: 'benskydd' };
 const KIND_NAME = { val: 'Verdisak', cons: 'Mat og drikk' };
+const fmtKg = v => String(Math.round(v * 10) / 10).replace('.', ',');
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 function canEquip(e, slot) {
@@ -94,9 +98,9 @@ export class InvUI {
     const P = G.player;
     for (const e of P.bag) if (!e.uid) e.uid = 'i' + Math.random().toString(36).slice(2, 9);
     if (this.sel && !this.refOf(this.sel)) this.sel = null;
-    const cap = bagCap(P), hard = hardCap(P), n = P.bag.length;
-    const sty = P.attrs?.STY ?? P.sheet.attrs.STY;
-    const pack = P.kit.has('ryggsack');
+    const cap = capKg(P), hard = hardCapKg(P), n = P.bag.length;
+    const load = carriedKg(P);
+    const cells = Math.max(12, Math.ceil((n + 1) / 6) * 6);
     // kropp
     const doll = SLOTS.map(s => {
       const e = P.equip[s.slot];
@@ -107,16 +111,16 @@ export class InvUI {
     for (let i = 0; i < 4; i++) belt += `<div class="bslot" data-drop="belt">${this.cell(i < P.potions ? makeCons('legedrikk') : null, 'belt:' + i, 'round')}</div>`;
     // sekk
     let bag = '';
-    for (let i = 0; i < hard; i++) {
+    for (let i = 0; i < cells; i++) {
       const e = P.bag[i];
-      bag += `<div class="bcell ${i >= cap ? 'over' : ''}" data-drop="bag:${i}">${this.cell(e || null, e ? 'bag:' + e.uid : null)}</div>`;
+      bag += `<div class="bcell" data-drop="bag:${i}">${this.cell(e || null, e ? 'bag:' + e.uid : null)}</div>`;
     }
     const kit = [...P.kit].map(id => `<span class="chip" title="${esc(GEAR[id]?.name || id)}">${esc(GEAR[id]?.name || id)}</span>`).join('');
     const over = P.overloaded;
     this.el.querySelector('.inv-body').innerHTML = `
       <div class="inv-head">
         <div><div class="eyebrow">Packning</div><h2>${esc(P.name)}</h2></div>
-        <div class="inv-purse"><b>${P.silver}</b> silver</div>
+        <div class="inv-purse"><b>${P.silver}</b> sm</div>
       </div>
       <div class="inv-grid">
         <div class="col-a">
@@ -127,10 +131,10 @@ export class InvUI {
           <div class="kit">${kit || '<span class="none">Ingenting</span>'}</div>
         </div>
         <div class="col-b">
-          <h3>Sekken <span class="${over ? 'bad' : ''}">${n} av ${cap}</span></h3>
-          <div class="cap"><div class="capbar"><i style="width:${Math.min(100, (n / cap) * 100)}%"></i>${n > cap ? `<b style="width:${Math.min(100, ((n - cap) / OVERLOAD_SLOTS) * 100)}%"></b>` : ''}</div>
-            <div class="capnote">Bärförmåga ${cap}: STY ${sty} delt på to${pack ? ', +2 for ryggsäck' : ''}. Våpen i hendene, rustning og hjelm teller ikke.</div></div>
-          ${over ? '<div class="overwarn">Överlastad: du går tregere og har nackdel på Smyga og Undvika.</div>' : ''}
+          <h3>Sekken <span class="${over ? 'bad' : ''}">${fmtKg(load)} av ${cap} kg</span></h3>
+          <div class="cap"><div class="capbar"><i style="width:${Math.min(100, (load / cap) * 100)}%"></i>${load > cap ? `<b style="width:${Math.min(100, ((load - cap) / cap) * 100)}%"></b>` : ''}</div>
+            <div class="capnote">Bärförmåga ${cap} kg, like mye som STY (Bok II s. 5). Det du har på deg og i hendene teller ikke. Høyst ${hard} kg.</div></div>
+          ${over ? '<div class="overwarn">Överlastad: du går tregere og har -5 på Smyga, Akrobatik, Hoppa og Klättra.</div>' : ''}
           <div class="bag">${bag}</div>
           <div class="drop" data-drop="ground">Slipp på bakken</div>
           <div class="detail" id="inv-detail"></div>
@@ -174,7 +178,7 @@ export class InvUI {
         <div class="rar">${esc(kind)}${ref.kind === 'eq' ? ' <em>har på</em>' : ref.kind === 'belt' ? ' <em>i beltet</em>' : ''}</div>
         ${lines.map(l => `<div class="ln">${esc(l)}</div>`).join('')}
         ${flavor ? `<div class="fl">${esc(flavor)}</div>` : ''}
-        <div class="val">Verdi omtrent ${value} silver</div></div></div>
+        <div class="val">Verdi omtrent ${value} sm${!isGear(e) ? ` · ${fmtKg(kgOf(e))} kg` : ''}</div></div></div>
       ${cmp}
       <div class="acts">${acts}</div>`;
     const list = this.actions(ref);
@@ -189,17 +193,25 @@ export class InvUI {
     const cur = P.equip[slot];
     if (!cur) return `<div class="cmp"><div class="ch">Mot det du har</div><div class="cl up">Plassen er ledig</div></div>`;
     const rows = [];
-    if (e.armor != null && cur.armor != null) {
-      const dv = e.armor - cur.armor;
-      rows.push(`<div class="cl ${dv > 0 ? 'up' : dv < 0 ? 'down' : ''}">Skyddsvärde ${e.armor} mot ${cur.armor}</div>`);
-      const nb = (e.bane || []).length - (cur.bane || []).length;
-      if (nb) rows.push(`<div class="cl ${nb < 0 ? 'up' : 'down'}">${nb < 0 ? 'Færre' : 'Flere'} nackdeler</div>`);
+    if (e.covers && !e.shield && cur.covers) {
+      const ea = e.abs + (e.mods?.skydd || 0), ca = cur.abs + (cur.mods?.skydd || 0);
+      rows.push(`<div class="cl ${ea > ca ? 'up' : ea < ca ? 'down' : ''}">Absorbering ${ea} mot ${ca}</div>`);
+      const more = e.covers.filter(c => !cur.covers.includes(c)), less = cur.covers.filter(c => !e.covers.includes(c));
+      if (more.length) rows.push(`<div class="cl up">Dekker også ${more.map(c => LOC_NAME[c].toLowerCase()).join(', ')}</div>`);
+      if (less.length) rows.push(`<div class="cl down">Dekker ikke ${less.map(c => LOC_NAME[c].toLowerCase()).join(', ')}</div>`);
+      if (e.metal && !cur.metal) rows.push('<div class="cl down">Metall: ingen magi</div>');
+      if (e.clank && !cur.clank) rows.push('<div class="cl down">Klirrer: halv CL på Smyga og Klättra</div>');
     }
     if (e.dmg && cur.dmg && !e.shield) {
-      const a = diceAvg(e.dmg) + (e.mods?.dmg || 0), b = diceAvg(cur.dmg) + (cur.mods?.dmg || 0);
+      const a = diceAvg(e.dmg) + (e.mods?.dmg || 0) + (e.mods?.forh || 0), b = diceAvg(cur.dmg) + (cur.mods?.dmg || 0) + (cur.mods?.forh || 0);
       rows.push(`<div class="cl ${a > b ? 'up' : a < b ? 'down' : ''}">Snittskade ${a.toFixed(1)} mot ${b.toFixed(1)}</div>`);
-      if (e.str && P.attrs.STY < e.str) rows.push(`<div class="cl down">Krever STY ${e.str}, du har ${P.attrs.STY}</div>`);
+      const g = P.gripOf?.(e);
+      if (g === 0) rows.push(`<div class="cl down">For tungt: krever STY ${e.str}, du har ${P.attrs.STY}</div>`);
+      else if (g === 2 && !e.ranged && !e.twoOnly) rows.push(`<div class="cl down">Krever STY ${e.str}: du må bruke begge hender</div>`);
+      const fe = P.fvFor?.(e), fc = P.fvFor?.(cur);
+      if (fe != null && fc != null && fe !== fc) rows.push(`<div class="cl ${fe > fc ? 'up' : 'down'}">FV ${fe} mot ${fc}</div>`);
     }
+    if (e.shield && cur.shield) rows.push(`<div class="cl ${e.dur > cur.dur ? 'up' : e.dur < cur.dur ? 'down' : ''}">BV ${e.dur} mot ${cur.dur}</div>`);
     const ml = Object.keys(e.mods || {}).length, cl = Object.keys(cur.mods || {}).length;
     if (ml !== cl) rows.push(`<div class="cl ${ml > cl ? 'up' : 'down'}">${ml > cl ? 'Flere' : 'Færre'} egenskaper</div>`);
     return `<div class="cmp"><div class="ch">Mot ${esc(cur.name)}</div>${rows.join('') || '<div class="cl">Omtrent like</div>'}</div>`;
@@ -219,7 +231,7 @@ export class InvUI {
       } else if (e.type === 'cons') {
         if (e.cid === 'legedrikk') {
           out.push({ label: 'Drikk', fn: () => this.say(useEntry(P, e)) });
-          if (P.potions < 4) out.push({ label: 'Til beltet', fn: () => { removeFromBag(P, e, 1); P.potions++; } });
+          if (P.potions < 4) out.push({ label: 'Til beltet', fn: () => { removeFromBag(P, e, 1); P.potions++; P.recalc(); } });
         } else if (!e.junk && e.cid !== 'safran') out.push({ label: e.icon === 'potionvp' ? 'Drikk' : 'Spis', fn: () => this.say(useEntry(P, e)) });
       }
       out.push({ label: 'Slipp', fn: () => { dropEntry(P, e); this.sel = null; } });

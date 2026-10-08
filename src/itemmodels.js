@@ -51,9 +51,14 @@ const gemMat = (k, c, e) => mat('gem' + k, { c, r: 0.04, m: 0.25, e, ei: 0.55, f
 
 // --- gjenstander du kan bære ---------------------------------------------------------
 
+// Rustningens materiale i DoD91-tabellen (mat): tyg, lader, nit, ring, plat
+const kindOf = item => item.mat || (item.aid === 'platrustning' ? 'plat' : item.aid === 'ringbrynja' ? 'ring' : item.aid === 'nitlader' ? 'nit' : item.metal ? 'plat' : 'lader');
+const softMat = k => (k === 'tyg' ? mat('clothArm', { c: 0x8a7a5a, r: 0.95 }) : M.leather());
+
 function armor(item, g) {
-  const plate = item.aid === 'platrustning', ring = item.aid === 'ringbrynja', studs = item.aid === 'nitlader';
-  const body = item.metal ? (ring ? M.chain() : M.steel()) : M.leather();
+  const k = kindOf(item);
+  const plate = k === 'plat', ring = k === 'ring', studs = k === 'nit';
+  const body = plate ? M.steel() : ring ? M.chain() : softMat(k);
   const prof = [[0.0, -0.25], [0.15, -0.25], [0.16, -0.2], [0.14, -0.08], [0.15, 0.04], [0.19, 0.14], [0.2, 0.2], [0.13, 0.25], [0.06, 0.27], [0.0, 0.27]];
   const t = mesh(lathe('cuirass', prof, 20), body, 0, 0, 0, g);
   t.scale.z = 0.62;
@@ -87,6 +92,9 @@ function armor(item, g) {
       mesh(sg, M.brass(), x, y, 0.1 + (1 - Math.abs(c) * 0.25) * 0.005 - Math.abs(c) * 0.008, g);
     }
   }
+  // brynja og hauberk har ermer og skjørt
+  if (item.covers?.includes('harm')) for (const sx of [-1, 1]) { const sl = mesh(geo('sleeve', () => new THREE.CylinderGeometry(0.05, 0.06, 0.2, 10)), body, sx * 0.21, 0.1, 0, g); sl.rotation.z = sx * 0.5; }
+  if (item.covers?.includes('hben')) mesh(geo('skirt', () => new THREE.CylinderGeometry(0.15, 0.2, 0.16, 18, 1, true)), mat(plate ? 'steelds' : 'chainds', { c: plate ? 0xb8bcc4 : 0x8a8e96, r: plate ? 0.3 : 0.55, m: 1, ds: true }), 0, -0.32, 0, g).scale.z = 0.7;
   if (!item.metal) {
     // snøring foran
     const lg = geo('lace', () => new THREE.BoxGeometry(0.05, 0.006, 0.006));
@@ -95,7 +103,21 @@ function armor(item, g) {
 }
 
 function helmet(item, g) {
-  if (item.hid === 'tunnhjalm') {
+  const k = kindOf(item);
+  if (!item.metal) {
+    // tyghuva, läderhuva og nitläderhuva
+    const m = softMat(k);
+    mesh(geo('hood', () => new THREE.SphereGeometry(0.155, 18, 10, 0, Math.PI * 2, 0, Math.PI * 0.62)), m, 0, -0.03, 0, g).scale.set(1, 1.05, 1.1);
+    for (const sx of [-1, 1]) { const f = mesh(geo('hoodflap', () => new THREE.BoxGeometry(0.05, 0.12, 0.1)), m, sx * 0.13, -0.11, 0.01, g); f.rotation.z = sx * 0.15; }
+    if (k === 'nit') { const sg = geo('stud', () => new THREE.SphereGeometry(0.011, 6, 4)); for (let i = 0; i < 7; i++) { const a = -1.2 + i * 0.4; mesh(sg, M.brass(), Math.sin(a) * 0.15, 0.02, Math.cos(a) * 0.15, g); } }
+    return;
+  }
+  if (k === 'ring') {
+    mesh(geo('coif', () => new THREE.SphereGeometry(0.155, 18, 10, 0, Math.PI * 2, 0, Math.PI * 0.68)), M.chain(), 0, -0.03, 0, g).scale.set(1, 1.08, 1.05);
+    mesh(geo('coifneck', () => new THREE.CylinderGeometry(0.13, 0.17, 0.08, 18, 1, true)), mat('chainds', { c: 0x8a8e96, r: 0.55, m: 1, ds: true }), 0, -0.14, 0, g);
+    return;
+  }
+  if (item.hid === 'tunnhjalm' || item.aid === 'tunnhjalm') {
     mesh(geo('tunbody', () => new THREE.CylinderGeometry(0.15, 0.16, 0.24, 18, 1, true)), mat('steelds', { c: 0xb8bcc4, r: 0.3, m: 1, ds: true }), 0, 0, 0, g);
     mesh(geo('tuntop', () => new THREE.SphereGeometry(0.15, 18, 8, 0, Math.PI * 2, 0, Math.PI / 2)), M.steel(), 0, 0.12, 0, g).scale.y = 0.55;
     const slit = mesh(geo('slit', () => new THREE.BoxGeometry(0.2, 0.018, 0.04)), mat('void', { c: 0x050403, r: 1 }), 0, 0.04, 0.142, g);
@@ -112,6 +134,20 @@ function helmet(item, g) {
     mesh(geo('nasal', () => new THREE.BoxGeometry(0.03, 0.13, 0.02)), M.dark(), 0, -0.08, 0.165, g);
     const crest = mesh(geo('crest', () => new THREE.TorusGeometry(0.17, 0.012, 4, 20, Math.PI)), M.brass(), 0, -0.03, 0, g);
     crest.rotation.y = Math.PI / 2;
+  }
+}
+
+// Armskydd og benskydd: et par skinner
+function guards(item, g, legs) {
+  const k = kindOf(item);
+  const m = k === 'plat' ? M.steel() : k === 'ring' ? M.chain() : softMat(k);
+  for (const sx of [-1, 1]) {
+    const c = mesh(geo(legs ? 'greave' : 'bracer', () => new THREE.CylinderGeometry(legs ? 0.055 : 0.045, legs ? 0.05 : 0.04, legs ? 0.26 : 0.18, 12)), m, sx * 0.08, 0, 0, g);
+    c.rotation.z = sx * 0.12;
+    const band = mesh(geo(legs ? 'greaveband' : 'bracerband', () => new THREE.TorusGeometry(legs ? 0.056 : 0.046, 0.008, 4, 14)), k === 'plat' ? M.dark() : M.leatherDk(), sx * 0.08, legs ? 0.09 : 0.06, 0, g);
+    band.rotation.x = Math.PI / 2;
+    if (k === 'nit') mesh(geo('stud', () => new THREE.SphereGeometry(0.011, 6, 4)), M.brass(), sx * 0.08, 0, legs ? 0.056 : 0.046, g);
+    if (legs && k === 'plat') mesh(geo('kneecop', () => new THREE.SphereGeometry(0.04, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2)), M.steel(), sx * 0.08, 0.14, 0.03, g).rotation.x = 0.6;
   }
 }
 
@@ -282,7 +318,9 @@ export function iconKey(e) {
   if (e.slot) {
     if (e.slot === 'vapen' || e.slot === 'vapen2') return 'w:' + (e.wid || e.kind);
     if (e.slot === 'rustning') return 'a:' + (e.aid || 'lader');
-    if (e.slot === 'hjalm') return 'h:' + (e.hid || 'oppenhjalm');
+    if (e.slot === 'hjalm') return 'h:' + (e.aid || e.hid || 'oppenhjalm');
+    if (e.slot === 'armar') return 'ar:' + (e.aid || 'lader');
+    if (e.slot === 'ben') return 'be:' + (e.aid || 'lader');
     return 'm:' + (e.base || 'Amulett') + ':' + (e.rarity || 'magisk');
   }
   return 'e:' + e.icon;
@@ -298,6 +336,8 @@ export function buildItemModel(e) {
     g.userData.weapon = true;
   } else if (e.slot === 'rustning') armor(e, g);
   else if (e.slot === 'hjalm') helmet(e, g);
+  else if (e.slot === 'armar') guards(e, g, false);
+  else if (e.slot === 'ben') guards(e, g, true);
   else if (e.slot === 'amulett') amulet(e, g);
   else if (ENTRY[e.icon]) ENTRY[e.icon](g);
   else ENTRY.coin(g);

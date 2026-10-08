@@ -4,6 +4,8 @@
 // Et svar kan være tekst eller en funksjon (c) => tekst eller { say, act }.
 // c: { P, run, life, npc, hour, night, isNebb, bg, rykte }
 // bg er indeksen i AIDNE-tabellen (0 Fredlös ... 9 Högadel), eller null.
+// teach: ferdighetene en lärare kan lære bort en uke om gangen, med lärarens FV (uv). Läraren har INT 13 eller mer.
+// { fv, kin } betyr at bare det folket lærer den bort til nybegynnere.
 
 const q = (c, id) => (c.run.quests[id] || (c.run.quests[id] = { state: 'none' }));
 
@@ -81,13 +83,17 @@ export const PEOPLE = [
     look: 'En gammel and med hvite fjær, rød kappe og tøfler. Det ligger brødsmuler i fjærene hans.',
     model: { duck: 'flansen' }, shopHours: [6, 22],
     sched: [[0, 'dojo_bed'], [6, 'dojo_in'], [12, 'square_e'], [13.5, 'dojo_in'], [19, 'inn_t1'], [21.5, 'dojo_in'], [22.5, 'dojo_bed']],
+    teach: { Slagsmål: 18, 'Quack-fu': { fv: 20, kin: 'anka' } },
+    teachSay: 'En uke hos meg. Åtte timer om dagen, seks dager, og en dag til å klage. Du betaler i silver, jeg betaler i blåmerker.',
+    teachText: 'Sju dager med spark, vagg og brød. Flansen sier ikke mye. Han slår.',
     greet: c => c.isNebb ? 'Nebb. Du står skjevt. Du har alltid stått skjevt.' : 'En elev? Nei. En fremmed. Fremmede kan også lære, hvis de har fjær å betale med.',
     topics: {
       NAVN: 'Flansen. Mester Flansen for elevene. Flansen for brødbakeren, som jeg skylder penger.',
-      JOBB: 'Jeg lærer bort [Kvakk-Fu]. Svømmeføttenes vei. Og jeg tar betalt i [fjær], fordi silver blir så tungt.',
-      'KVAKK-FU': 'Kvakk-Fu er kunsten å slå uten å tenke og tenke uten å slå. Mest det første. Spark når de venter et slag. Vagg når de venter et spark.',
+      JOBB: 'Jeg lærer bort [Kvakk-Fu]. Svømmeføttenes vei. Jeg tar betalt i [fjær], fordi silver blir så tungt. Men vil du være [elev] en hel uke, tar jeg silver likevel.',
+      'KVAKK-FU': 'Kvakk-Fu er kunsten å slå uten å tenke og tenke uten å slå. Mest det første. Spark når de venter et slag. Vagg når de venter et spark. Den er laget for ender. Andre kan prøve, men de faller mer.',
       FJÆR: 'Hver gang noen går ned i mørket og kommer tilbake, eller ikke kommer tilbake, får dojoen fjær. Ikke spør hvordan. Si [trening] hvis du vil bruke dem.',
       TRENING: { act: 'train', always: true },
+      ELEV: { act: 'teachWeek', always: true },
       NEBB: c => c.isNebb ? 'Du var den verste eleven jeg har hatt. Og den eneste som kom tilbake hver dag. Det teller mer.' : 'Svart Nebb? Min verste elev. Han er sønnen til Nansen i butikken.',
       BRØD: 'Brød er livet. Tre brød er et godt liv. Fire brød er filosofi.',
       TØFLER: 'Man trener ikke i sko. Sko er for folk som er redde for gulvet.',
@@ -102,7 +108,7 @@ export const PEOPLE = [
     greet: c => c.night ? 'Sent ute. Vil du ha et [rom], eller vil du bare stå der og dryppe?' : 'Velkommen til Den feite gåsen. Tørk av føttene. Ja, du også.',
     topics: {
       NAVN: 'Rosmynda. Ros for vennene mine. Du er ikke en av dem ennå.',
-      JOBB: 'Jeg driver vertshuset. [Rom] for natta, [mat] for magen, [øl] for resten. Og [rykter], hvis du sitter lenge nok.',
+      JOBB: 'Jeg driver vertshuset. [Rom] for natta eller for en hel uke, [mat] for magen, [øl] for resten. Og [rykter], hvis du sitter lenge nok.',
       ROM: { act: 'innRoom', always: true },
       MAT: { act: 'innMeal', always: true },
       ØL: { act: 'innAle', always: true },
@@ -122,7 +128,7 @@ export const PEOPLE = [
     greet: c => c.bg === 7 ? 'En bror i lyset! Eller søster. Utu bryr seg ikke, og ikke jeg heller. Kom inn i varmen.' : c.night ? 'Det er sent. Utu sover ikke, men det gjør prestene hans. Hva vil du?' : 'Solen skinner på deg, fremmede. Utu ser deg. Det er ment som en trøst.',
     topics: {
       NAVN: 'Cassian. Fader Cassian, når folk vil ha noe av meg. Det vil de nesten alltid.',
-      JOBB: 'Jeg tjener [Utu] i Fristaden. Jeg [helbreder] de syke, gir [velsignelse] til de som går i mørket, og forklarer [Shamash] for de som har misforstått.',
+      JOBB: 'Jeg tjener [Utu] i Fristaden. Jeg [helbreder] de syke med HELA, gir [velsignelse] til de som går i mørket, og forklarer [Shamash] for de som har misforstått.',
       UTU: 'Utu er solens og rettferdighetens gud. Han ser alt solen når. Derfor handler vi på åpne torg, og derfor gjemmer tyver seg i [skyggene].',
       SKYGGENE: 'Det Utu ikke ser, må vi andre passe på. Om natta er Fristaden full av folk som har glemt det.',
       SHAMASH: 'I [Kardunien] tror de at Shamash er solguden, og at lidelse og sult er dyder. Hos oss tror vi at rikdom og glede skal vises fram i lyset. Det er mer behagelig.',
@@ -139,6 +145,9 @@ export const PEOPLE = [
     look: 'En høy kvinne i ringbrynje under en hvit våpenkjole med et svart tårn. Hun har et arr over det ene øyet, og hun ser på deg med det andre.',
     model: { kin: 'manniska', profession: 'riddare', age: 'medel', clothes: { top: 0xe8e2d4, cape: 0xe8e2d4 }, armor: { type: 'ring' }, helmet: null }, shopHours: [6, 22],
     sched: [[0, 'chapter_bed'], [6, 'memorial'], [8, 'chapter_in'], [12, 'memorial'], [13, 'chapter_in'], [19, 'inn_t2'], [21.5, 'chapter_in'], [22.5, 'chapter_bed']],
+    teach: { Kortsvärd: 17, Bredsvärd: 19, Bastardsvärd: 17, 'Vanlig sköld': 18 },
+    teachSay: 'Ordenen lærer bort sverdet til dem som vil verne de svake. Og til dem som betaler. Helst begge.',
+    teachText: 'Sju dager på gårdsplassen bak kapittelhuset, fra morgenbønnen til kveldsbønnen.',
     greet: c => {
       if (c.rykte <= -3) return 'Du har stjålet fra de svake i denne byen. Jeg snakker ikke med tyver. Gå.';
       if (c.bg === 8) return 'Du bærer deg som en som er født til sverd. Velkommen, ridder. Ordenen har bruk for folk som deg.';
@@ -146,7 +155,9 @@ export const PEOPLE = [
     },
     topics: {
       NAVN: 'Jehanne. Syster Jehanne av [Tornväktarorden|ORDENEN].',
-      JOBB: 'Jeg vokter Fristaden for ordenen. Vi holder [orchene] borte fra passene og [de døde|DØDE] i gravene sine.',
+      JOBB: 'Jeg vokter Fristaden for ordenen. Vi holder [orchene] borte fra passene og [de døde|DØDE] i gravene sine. Vil du lære sverd og skjold, kan du [trene|TRENING] med meg en uke. Har du gjort store [dåder], kan jeg vise deg hva de er verdt.',
+      TRENING: { act: 'teachWeek', always: true },
+      DÅDER: { act: 'hero', always: true },
       ORDENEN: 'Tornväktarorden ble grunnlagt for å bekjempe [Häxmästaren] i Svarta tornet. Han er død. Vi er ikke det. Vi har tre [løfter].',
       HÄXMÄSTAREN: 'Han satt i Svarta tornet i fjellene og sendte orcher mot alle levende. Ordenen vant. Tårnet er forseglet, og vi står vakt ved det.',
       LØFTER: 'Som riddere skal vi verne de svake. Som munker skal vi [helbrede] de syke. Som mystikere skal vi bevare de døde til de står opp igjen.',
@@ -167,7 +178,7 @@ export const PEOPLE = [
         c.life.questLog('dode');
         return 'Under kloakken ligger Karad Baturs gamle haller. Der går de døde igjen, og det er ikke slik det skal være. Gi seks [skjeletter] fred, så skal ordenen takke deg.';
       },
-      SKJELETTER: 'Bein uten sjel. Slå hardt, med kross hvis du kan. Stikk gjør lite mot dem.',
+      SKJELETTER: 'Bein uten sjel. Slå hardt, helst med noe som knuser. Stikk og piler går rett gjennom dem.',
       FARVEL: 'Vern de svake.',
     },
   },
@@ -191,7 +202,7 @@ export const PEOPLE = [
         if (s.state === 'done') return 'Du leste runene for meg. Våpenet ditt er bedre nå enn det fortjener.';
         if (s.state === 'active') {
           if ((c.run.runesRead || 0) > (s.base || 0)) { s.state = 'done'; return { say: 'Du har lest dem? "Her hviler hammeren til Dorj, inntil fjellet faller." Så de står der fortsatt. Gi meg våpenet ditt. Jeg skal gjøre det til noe.', act: 'rewardRunes' }; }
-          return 'Runesteinen står i en av de gamle hallene. Les den og kom tilbake. Du trenger Främmande språk eller gamle sagn for å skjønne den.';
+          return 'Runesteinen står i en av de gamle hallene. Les den og kom tilbake. Du trenger Tala främmande språk eller Historia for å skjønne den.';
         }
         s.state = 'active';
         s.base = c.run.runesRead || 0;
@@ -207,23 +218,24 @@ export const PEOPLE = [
     id: 'gynerva', name: 'Gynerva', short: 'en kvinne i fiolett kappe', title: 'trollkyndig',
     look: 'En mager kvinne i fiolett kappe og spiss hatt. Fingrene hennes er flekkete av blekk, og øynene glitrer litt for mye.',
     model: { kin: 'manniska', profession: 'magiker', school: 'Mentalism', age: 'medel' }, shopHours: [10, 27],
+    teachText: 'Sju dager med formler, blekk og kald te. Gynerva sover ikke. Du gjør det nesten ikke heller.',
     sched: [[0, 'tower_in'], [3, 'tower_stairs'], [10, 'tower_in']],
-    greet: c => c.P.sheet.school ? `En ${c.P.sheet.school.toLowerCase()}! Jeg kjente det på deg. Det kribler i lufta.` : 'Besøk. Hvor sjelden. Rør ingenting som lyser.',
+    greet: c => c.P.sheet.school ? `${c.P.sheet.school}! Jeg kjente det på deg. Det kribler i lufta.` : 'Besøk. Hvor sjelden. Rør ingenting som lyser.',
     topics: {
       NAVN: 'Gynerva. Bare Gynerva. Titler er for folk som ikke kan noe.',
       JOBB: 'Jeg studerer [magi] i tårnet. Jeg [lærer] bort det jeg kan til dem som har gnisten, og selger [trolldrikk] til dem som ikke har den.',
       MAGI: 'Magi er å vri verden litt. [Shamash] sier det er gudløst. Jeg sier at verden trenger å vris litt innimellom.',
       LÆRE: { act: 'teach', always: true },
-      TROLLDRIKK: { act: 'potionVP', always: true },
+      TROLLDRIKK: { act: 'potionShop', always: true },
       SHAMASH: 'I Kardunien brenner de folk som meg. Her i Zorakin får vi et tårn. Jeg vet hvor jeg vil bo.',
       KULA: 'Kula på bordet er et orbuculum. Den viser ting. Mest viser den meg, når jeg ser for lenge inn i den.',
       FARVEL: 'Gå forsiktig. Og ikke tenk for høyt.',
     },
   },
   {
-    id: 'tobolt', barks: ['En mynt til kongen?', 'Rottene vet ting!'], name: 'Tobolt', short: 'en halvling i filler', title: 'tiggarkung under brua',
-    look: 'En liten halvling i filler med en krone av blikk på hodet. Han sitter ved et bål under brua som om han eier den. Kanskje han gjør det.',
-    model: { kin: 'halvling', profession: 'tjuv', age: 'gammal', clothes: { top: 0x5a4a38, pants: 0x3a3028, hood: 0x4a3c2c } },
+    id: 'tobolt', barks: ['En mynt til kongen?', 'Rottene vet ting!'], name: 'Tobolt', short: 'en halvlängdsman i filler', title: 'tiggarkung under brua',
+    look: 'En liten halvlängdsman i filler med en krone av blikk på hodet. Han sitter ved et bål under brua som om han eier den. Kanskje han gjør det.',
+    model: { kin: 'halvlangdsman', profession: 'tjuv', age: 'gammal', clothes: { top: 0x5a4a38, pants: 0x3a3028, hood: 0x4a3c2c } },
     sched: [[0, 'bridge_camp']],
     greet: c => c.bg === 1 ? 'Du! Jeg kjenner deg! Vi tigget på samme veikant en vinter. Sett deg, sett deg. For deg er alt gratis.' : 'Velkommen til mitt rike, fremmede. Det er lite, men det er tørt. Nesten.',
     topics: {
@@ -278,12 +290,16 @@ export const PEOPLE = [
     model: { kin: 'manniska', profession: 'krigare', age: 'gammal', clothes: { top: 0x1c2a5a }, armor: { type: 'ring' }, helmet: { hid: 'oppenhjalm' }, weapon: 'kortspjut' },
     patrol: ['p1', 'p2', 'p3', 'p4', 'p3', 'p2', 'p5', 'p2', 'p6', 'p7'],
     sched: [[0, 'patrol'], [6, 'guard_bed2'], [14, 'gate_r'], [19, 'patrol']],
+    teach: { Kortspjut: 18, Långspjut: 17 },
+    teachSay: 'Spydet er enkelt. Den spisse enden mot fienden. Resten tar en uke.',
+    teachText: 'Sju dager med spydet ved Nordporten. Garin ser ut som han sover, men han våkner hver gang du gjør feil.',
     greet: c => c.night ? 'Hvem der? Å, bare deg. Det er sent å være ute. Folk som er ute om natta, er sjelden ute i gode ærend.' : 'Jeg står vakt ved porten om ettermiddagen og går runder om natta. Sove gjør jeg når det passer.',
     topics: {
       NAVN: 'Garin. Tretti år i vakta. Tjueni av dem om natta.',
-      JOBB: 'Jeg går runder om natta og ser etter [tyver]. Om dagen står jeg ved porten med Folkard og ser etter ingenting.',
+      JOBB: 'Jeg går runder om natta og ser etter [tyver]. Om dagen står jeg ved porten med Folkard og ser etter ingenting. Har du en uke, kan jeg lære deg [spydet|TRENING].',
       TYVER: 'Om natta ser ikke Utu noe, sier prestene. Men jeg ser. Jeg har lykt.',
-      LOVEN: 'Ti silver i bot for første tyveri. Mer for neste. Kan du ikke betale, sover du i vaktstua.',
+      TRENING: { act: 'teachWeek', always: true },
+      LOVEN: 'Hundre silver i bot for første tyveri. Mer for neste. Kan du ikke betale, sover du i vaktstua.',
       NATT: 'Natta er lang i Fristaden. Det er bare meg, rottene og Gynerva i tårnet som er våkne.',
       FARVEL: 'Hold deg i lyset.',
     },
@@ -309,7 +325,7 @@ export const PEOPLE = [
         s.state = 'active';
         s.base = c.run.killsByType.rat || 0;
         c.life.questLog('rotter');
-        return 'Rottene kommer opp fra kloakken og spiser kålen min. Drep ti av dem der nede, så skal du få tjue silver. Det er alt jeg har. Nesten.';
+        return 'Rottene kommer opp fra kloakken og spiser kålen min. Drep ti av dem der nede, så skal du få to hundre silver. Det er alt jeg har. Nesten.';
       },
       ROTTER: c => PEOPLE.find(p => p.id === 'edegar').topics.ROTTENE(c),
       FOGDEN: 'Fogden tar skatt på kålen. Kongen tar skatt på fogden. Det går rundt.',
@@ -325,17 +341,17 @@ export const PEOPLE = [
     topics: {
       NAVN: 'Regin. Jeg fisker i elva og selger på torget.',
       JOBB: 'Jeg [fisker]. Elva gir lite, men den gir. Om morgenen og ettermiddagen står jeg på [brygga].',
-      FISKER: 'Vil du prøve? Gå ut på brygga og kast ut. Det er Jakt & fiske som teller. Og tålmodighet, men det er ikke en ferdighet.',
-      FISKE: 'Vil du prøve? Gå ut på brygga og kast ut. Det er Jakt & fiske som teller.',
+      FISKER: 'Vil du prøve? Gå ut på brygga og kast ut. Det er Överlevnad som teller. Og tålmodighet, men det er ikke en ferdighet.',
+      FISKE: 'Vil du prøve? Gå ut på brygga og kast ut. Det er Överlevnad som teller. Kan du det ikke, får du håpe fisken er dum.',
       BRYGGA: 'Den lille brygga øst for elva. Den er gammel, men den holder. Stort sett.',
       ELVA: 'Elva kommer fra Aidnefjellene. Den renner gjennom Fristaden og videre mot havet. Det meste av byen havner i den før eller senere.',
       FARVEL: 'Måtte de bite.',
     },
   },
   {
-    id: 'pimpa', barks: ['Jeg så en rev!', 'Du er den!', 'Hei, helt!'], name: 'Pimpa', short: 'en halvlingunge', title: 'halvlingunge',
-    look: 'En liten halvling med skitne kinn og en pinne hun bruker som sverd.',
-    model: { kin: 'halvling', profession: 'bard', age: 'ung', clothes: { top: 0xd87a3a, pants: 0x4a3a2a }, child: true },
+    id: 'pimpa', barks: ['Jeg så en rev!', 'Du er den!', 'Hei, helt!'], name: 'Pimpa', short: 'en liten halvlängdsjente', title: 'halvlängdsjente',
+    look: 'En liten halvlängdsjente med skitne kinn og en pinne hun bruker som sverd.',
+    model: { kin: 'halvlangdsman', profession: 'bard', age: 'ung', clothes: { top: 0xd87a3a, pants: 0x4a3a2a }, child: true },
     wanderer: true,
     sched: [[0, 'farm_bed'], [7, 'square_c'], [11, 'well'], [13, 'square_w'], [16, 'graveyard'], [18, 'square_c'], [20.5, 'farm_bed']],
     greet: () => 'Hvem er du? Er du en helt? Du ser ikke ut som en helt. Du ser ut som en som har gått seg vill.',
@@ -373,7 +389,7 @@ export const BOARD = {
   greet: () => 'Lapper med nåler i. Noen er nye, noen er så gamle at blekket har rent.',
   topics: {
     SAFRAN: 'BORTKOMMET: Tre sekker safran fra Hvass handel. Belønning til den som finner dem. Kontakt [Hvass]. Betjenten har ingen myndighet.',
-    ROTTER: 'ROTTEFANGER SØKES. Ti rotter, tjue silver. Spør etter [Edegar] i kålhagen.',
+    ROTTER: 'ROTTEFANGER SØKES. Ti rotter, to hundre silver. Spør etter [Edegar] i kålhagen.',
     DØDE: 'TORNVÄKTARORDEN søker modige sjeler som vil gi de døde i hallene fred. Meld deg hos [Syster Jehanne|JEHANNE].',
     RUNENE: 'Kan du lese dvergerunar? Mäster [Bataar] i smia betaler med stål.',
     LOVEN: 'Etter fogdens ordre: Tyveri straffes med bot. Den som ikke kan betale, sitter i vaktstua. Utu ser deg.',

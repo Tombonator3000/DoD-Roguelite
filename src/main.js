@@ -12,15 +12,15 @@ import { CombatFX as FX } from './combatfx.js';
 import { UI } from './ui.js';
 import { Sound } from './audio.js';
 import { Input } from './input.js';
-import { skillRoll, d, rollDice, svartNebb, meetsReq, randomChoices, buildSheet } from './rules.js';
-import { CONDITIONS, COND_BY_ID, COND_BY_ATTR, SKILL, SKILLS, KIN, PROF, HEROIC, HEROIC_REWARDS, INJURIES, fromRange, WEAKNESS, ATTR_NAME } from './dod.js';
-import { boonChoices, SRC_COLOR, makeItem, RARITY, setNebbCheck, refinalize } from './loot.js';
+import { d, rollDice, svartNebb, randomChoices, buildSheet, clRoll, resist } from './rules.js';
+import { SKILL, RACE, PROF, SR, LOC_SHORT, fvCost, spellBaseCost, SPELLS } from './dod.js';
+import { boonChoices, SRC_COLOR, makeItem, RARITY, setNebbCheck, refinalize, weaponItem, armorItem } from './loot.js';
+import { baseCost } from './rules.js';
 import { Gfx } from './gfx.js';
 import { GradePass } from './post.js';
 import { Ambient } from './decor.js';
 import { TitleScene } from './title.js';
 import { Creator } from './creation.js';
-import { Companion } from './companion.js';
 import { Enemy } from './enemies.js';
 import { Town, skyAt } from './town.js';
 import { hourOf, QUEST_TITLES } from './townfolk.js';
@@ -38,10 +38,11 @@ const tmp2 = new THREE.Vector3();
 const tmp3 = new THREE.Vector3();
 const CLOSE_OFF = new THREE.Vector3(3.3, 1.75, 3.3);
 
+// Mester Flansens dojo: varige forbedringer mellom løpene, kjøpt for fjær (spillets eget lag, uv)
 const UPGRADES = [
-  { id: 'trening', name: 'Hard trening', desc: '+1 på den beste tränade vapenfärdigheten i alle fremtidige løp.', cost: 15, max: 3 },
-  { id: 'seig', name: 'Seig kropp', desc: '+2 maks KP.', cost: 20, max: 3 },
-  { id: 'vilje', name: 'Indre ro', desc: '+2 maks VP.', cost: 20, max: 2 },
+  { id: 'trening', name: 'Hard trening', desc: '+1 FV i den beste vapenfärdigheten din i alle fremtidige løp.', cost: 15, max: 3 },
+  { id: 'seig', name: 'Seig kropp', desc: '+2 totala KP (og KP i kroppsdelene etter tabellen).', cost: 20, max: 3 },
+  { id: 'vilje', name: 'Indre ro', desc: '+1 PSY.', cost: 20, max: 2 },
   { id: 'niste', name: 'Fars niste', desc: 'Start med en ekstra legedrikk.', cost: 15, max: 2 },
   { id: 'slip', name: 'Slipestein', desc: '+1 skade på alle treff.', cost: 30, max: 2 },
 ];
@@ -104,7 +105,7 @@ function saveMeta(m) {
   try { localStorage.setItem('svartnebb.meta.v1', JSON.stringify(m)); } catch (e) { /* ignorer */ }
 }
 function loadSettings(touch) {
-  const def = { music: 70, sfx: 100, quality: touch ? 'middels' : 'hoy', shake: 1, push: 'viktiga', injuries: 1 };
+  const def = { music: 70, sfx: 100, quality: touch ? 'middels' : 'hoy', shake: 1 };
   try {
     const s = localStorage.getItem('svartnebb.settings.v1');
     if (s) return { ...def, ...JSON.parse(s) };
@@ -117,7 +118,7 @@ function saveSettings(s) {
 function loadChars() {
   try {
     const s = localStorage.getItem('svartnebb.chars.v1');
-    if (s) return JSON.parse(s).filter(c => c && c.v === 1);
+    if (s) return JSON.parse(s).filter(c => c && c.v === 2 && c.rules === 'dod91');
   } catch (e) { /* valgfritt */ }
   return [];
 }
@@ -137,7 +138,7 @@ class Game {
   constructor() {
     G.game = this;
     window.G = G; // praktisk for feilsøking i konsollen
-    G.dev = { randomChoices, buildSheet, inv: INV, makeItem };
+    G.dev = { randomChoices, buildSheet, inv: INV, makeItem, weaponItem, armorItem, clRoll, resist, SPELLS };
     this.upgrades = UPGRADES;
     this.sky = {};
   }
@@ -154,16 +155,14 @@ class Game {
     const P = G.player;
     const mm = P.metaMods;
     if (u.id === 'trening') {
-      const S = P.sheet;
-      const best = S.trained.filter(k => SKILL[k]?.type === 'vap').sort((a, b) => S.skills[b] - S.skills[a])[0] || 'Slagsmål';
+      const best = P.bestWeaponSkill();
       mm['skill:' + best] = (mm['skill:' + best] || 0) + 1;
-    } else if (u.id === 'seig') mm.maxKP = (mm.maxKP || 0) + 2;
-    else if (u.id === 'vilje') mm.maxVP = (mm.maxVP || 0) + 2;
+    } else if (u.id === 'seig') mm.kp = (mm.kp || 0) + 2;
+    else if (u.id === 'vilje') mm.psy = (mm.psy || 0) + 1;
     else if (u.id === 'slip') mm.dmg = (mm.dmg || 0) + 1;
     else if (u.id === 'niste') P.potions = Math.min(4, P.potions + 1);
     P.recalc();
-    if (u.id === 'seig') P.kp = Math.min(P.maxKP, P.kp + 2);
-    if (u.id === 'vilje') P.vp = Math.min(P.maxVP, P.vp + 2);
+    if (u.id === 'vilje') P.psy = Math.min(P.maxPSY, P.psy + 1);
     G.fx.burst('feather', P.pos, 18);
     G.audio.drake?.();
     G.ui.log(`Mester Flansen lærer deg <b>${u.name}</b>.`);
@@ -307,12 +306,12 @@ class Game {
     const list = $('#pick-list');
     list.innerHTML = '';
     for (const s of this.allSheets()) {
-      const kin = KIN[s.kin], prof = PROF[s.profession];
+      const kin = RACE[s.kin] || RACE.manniska, prof = PROF[s.profession] || PROF.krigare;
       const row = document.createElement('div');
       row.className = 'pick' + (s.id === this.selectedId ? ' on' : '');
       const A = s.attrs;
       row.innerHTML = `<button class="pick-main"><div class="nm">${s.name}${s.premade ? ' <i>ferdig rollperson</i>' : ''}</div>
-        <div class="ds">${kin.name}, ${prof.name.toLowerCase()}${s.school ? ` (${s.school.toLowerCase()})` : ''}. ${['STY', 'FYS', 'SMI', 'INT', 'PSY', 'KAR'].map(k => `${k} ${A[k]}`).join(' · ')}</div></button>
+        <div class="ds">${kin.name}, ${prof.name.toLowerCase()}${s.school ? ` (${s.school.toLowerCase()})` : ''}. ${['STY', 'STO', 'FYS', 'SMI', 'INT', 'PSY', 'KAR'].map(k => `${k} ${A[k]}`).join(' · ')}</div></button>
         ${s.premade ? '' : '<button class="btn small edit">Endre</button><button class="btn small del" title="Slett">Slett</button>'}`;
       row.querySelector('.pick-main').onclick = () => { this.selectChar(s.id); this.refreshPick(); G.audio.menuTick?.(67); };
       row.querySelector('.pick-main').ondblclick = () => this.startWith(s);
@@ -324,7 +323,7 @@ class Game {
       list.appendChild(row);
     }
     const S = this.selectedSheet();
-    $('#pick-blurb').textContent = S.blurb || `${KIN[S.kin].name}, ${PROF[S.profession].name.toLowerCase()}. ${S.appearance ? S.appearance + '. ' : ''}${S.weakness ? 'Svaghet: ' + S.weakness.toLowerCase() + '.' : ''}`;
+    $('#pick-blurb').textContent = S.blurb || `${(RACE[S.kin] || RACE.manniska).name}, ${(PROF[S.profession] || PROF.krigare).name.toLowerCase()}. ${S.appearance ? S.appearance + '. ' : ''}${S.special ? 'Särskild förmåga: ' + S.special.name.toLowerCase() + '.' : ''}`;
   }
 
   startWith(sheet) {
@@ -396,8 +395,6 @@ class Game {
     G.ui.hud.hidden = true;
     $('#touch').hidden = true;
     G.ui.hideBoss();
-    this.hideDying();
-    this.hidePush(false);
     const t = $('#title');
     document.querySelectorAll('.screen').forEach(x => { if (x.id !== 'title' && x.id !== 'splash') x.hidden = true; });
     t.hidden = false;
@@ -420,7 +417,7 @@ class Game {
     if (last) { const d = describeSave(last.data); $('#mi-cont-hint').textContent = `${d.title}${d.place ? ', ' + d.place : ''}`; }
     const S = this.selectedSheet();
     $('#mi-char').textContent = S.name;
-    $('#statline').innerHTML = ['STY', 'FYS', 'SMI', 'INT', 'PSY', 'KAR'].map(k => `<div><b>${S.attrs[k]}</b><span>${k}</span></div>`).join('');
+    $('#statline').innerHTML = ['STY', 'STO', 'FYS', 'SMI', 'INT', 'PSY', 'KAR'].map(k => `<div><b>${S.attrs[k]}</b><span>${k}</span></div>`).join('');
   }
 
   showView(id) {
@@ -540,8 +537,6 @@ class Game {
     }
     document.querySelectorAll('#set-quality button').forEach(b => b.classList.toggle('on', b.dataset.q === st.quality));
     document.querySelectorAll('#set-shake button').forEach(b => b.classList.toggle('on', +b.dataset.s === st.shake));
-    document.querySelectorAll('#set-push button').forEach(b => b.classList.toggle('on', b.dataset.p === st.push));
-    document.querySelectorAll('#set-inj button').forEach(b => b.classList.toggle('on', +b.dataset.i === st.injuries));
   }
 
   buyUpgrade(u) {
@@ -587,8 +582,6 @@ class Game {
     }));
     seg('#set-quality', 'quality', 'q', false);
     seg('#set-shake', 'shake', 's', true);
-    seg('#set-push', 'push', 'p', false);
-    seg('#set-inj', 'injuries', 'i', true);
     $('#btn-resume').onclick = () => this.resume();
     $('#btn-mute').onclick = () => { G.audio.setMuted(!G.audio.muted); $('#btn-mute').textContent = G.audio.muted ? 'Slå på lyd' : 'Slå av lyd'; };
     $('#btn-quit').onclick = () => { G.ui.hideBoss(); this.endRunCleanup(); this.titleScene(); };
@@ -596,13 +589,10 @@ class Game {
     $('#btn-totitle').onclick = () => this.titleScene();
     $('#btn-sheet-close').onclick = () => this.resume();
     $('#btn-sheet').onclick = () => this.openSheet();
-    $('#btn-rest-round').onclick = () => { this.resume(); G.player.roundRest(); };
-    $('#btn-rest-stretch').onclick = () => { this.resume(); G.player.startStretchRest(); };
     $('#btn-continue').onclick = () => this.nextFloor();
     $('#btn-up').onclick = () => this.goUpToTown();
-    $('#btn-improve').onclick = () => this.rollImprovements();
-    $('#btn-dr-roll').onclick = () => this.deathRollSequence();
-    $('#btn-dr-rally').onclick = () => this.rallySelf();
+    $('#btn-ko-go').onclick = () => this.koWake();
+    $('#btn-ko-hero').onclick = () => this.koHero();
     $('#tbtn-pause').addEventListener('touchstart', e => { e.preventDefault(); this.pause(); }, { passive: false });
     $('#tbtn-inv').addEventListener('touchstart', e => { e.preventDefault(); if (G.state === 'play') G.inv.open(); }, { passive: false });
     $('#bagchip').onclick = () => { if (G.state === 'play') G.inv.open(); };
@@ -613,7 +603,8 @@ class Game {
   }
 
   endRunCleanup() {
-    if (G.companion) { G.companion.dispose(); G.companion = null; }
+    if (this.koTimer) { clearTimeout(this.koTimer); this.koTimer = null; }
+    this.ko = null;
   }
 
   startRun() {
@@ -628,7 +619,7 @@ class Game {
     G.depth = 1;
     G.ui.hideScreens();
     G.ui.hideBoss();
-    this.hideDying();
+    G.post.desat = 0;
     G.ui.logEl.innerHTML = '';
     G.ui.hud.hidden = false;
     $('#touch').hidden = !G.touch;
@@ -701,16 +692,13 @@ class Game {
     P.onFloor();
     if (!town) {
       P.fx.utu = false;
-      if (G.run.blessing) { G.run.blessing = false; P.fx.utu = true; P.fx.light = true; G.ui.log('Utus velsignelse følger deg ned: sterkere lys og fördel mot skräck.'); }
-      if (G.run.sharpen) { G.run.sharpen = false; P.fx.sharpened = true; G.ui.log('Bataars slipte egg biter gjennom rustning på dette nivået.'); }
+      if (G.run.blessing) { G.run.blessing = false; P.fx.utu = true; P.fx.light = true; G.ui.log('Utus velsignelse følger deg ned: sterkere lys og -2 på Skräcktabellen.'); }
+      if (G.run.sharpen) { G.run.sharpen = false; P.fx.sharpened = true; G.ui.log('Bataars slipte egg gir +1 skade på dette nivået.'); }
     }
     if (title) {
       for (const e of G.enemies) e.dispose();
       G.enemies.length = 0;
     }
-    // jegerens hund følger med ned
-    if (G.companion) { G.companion.dispose(); G.companion = null; }
-    if (P.has('foljeslagare')) G.companion = new Companion(P.pos.x - 1.2, P.pos.z - 0.8);
     G.dungeon.computeFlow(P.pos.x, P.pos.z);
     this.camTarget.copy(P.pos);
     G.camera.position.copy(P.pos).add(CAM_OFF);
@@ -761,7 +749,7 @@ class Game {
       P.deserialize(d.player);
       G.ui.hideScreens();
       G.ui.hideBoss();
-      this.hideDying();
+      G.post.desat = 0;
       G.ui.logEl.innerHTML = '';
       G.ui.hud.hidden = false;
       $('#touch').hidden = !G.touch;
@@ -779,7 +767,6 @@ class Game {
       P.pos.set(d.pos.x, 0, d.pos.z);
       P.yaw = d.pos.yaw || 0;
       P.vel.set(0, 0, 0);
-      if (G.companion) G.companion.pos?.set(P.pos.x - 1.2, 0, P.pos.z - 0.8);
       G.dungeon.computeFlow(P.pos.x, P.pos.z);
       if (G.dungeon.isTown) G.dungeon.life?.snapAll?.();
       this.camTarget.copy(P.pos);
@@ -871,334 +858,140 @@ class Game {
     const P = G.player;
     const b = this.pendingBoon;
     if (b) {
-      if (b.heroic) {
-        P.heroic.push(b.heroic);
-        G.ui.log(`Ny hjälteförmåga: <b style="color:${SRC_COLOR['Hjältedåd']}">${b.name}</b>.`);
-      } else {
-        P.boons.push(b);
-        if (b.silver) P.silver += b.silver;
-        if (b.potion) P.potions = Math.min(4, P.potions + b.potion);
-        G.ui.log(`Gave fra ${b.src}: <b style="color:${SRC_COLOR[b.src]}">${b.name}</b>.`);
-      }
+      P.boons.push(b);
+      if (b.silver) P.silver += b.silver * 10;
+      if (b.potion) P.potions = Math.min(4, P.potions + b.potion);
+      G.ui.log(`Gave fra ${b.src}: <b style="color:${SRC_COLOR[b.src]}">${b.name}</b>.`);
       P.recalc();
     }
     this.pendingBoon = null;
+    // bonuspoeng fra trappa (Bok I s. 63)
+    for (const q of this.bonusPicks || []) if (q.pick) P.addExp(q.pick, 1);
+    if (this.bonusPicks?.length) G.ui.log(`Bonuspoeng: ${this.bonusPicks.map(q => q.pick).join(', ')} (+1 EP hver).`);
+    this.bonusPicks = null;
   }
 
-  companionAction() {
-    const P = G.player;
-    const C = G.companion;
-    if (!C || !C.alive) {
-      if (C) C.dispose();
-      G.companion = new Companion(P.pos.x - 1, P.pos.z - 1);
-      G.fx.burst('dust', G.companion.pos, 10);
-      G.ui.log('Du plystrer, og hunden kommer.');
-      return;
-    }
-    const t = P.aimedEnemy(16) || P.nearestEnemy(12);
-    if (!t) { P.vp += 3; G.fx.float('Ingen å angripe', P.pos, 'miss'); return; }
-    C.order(t);
-  }
-
-  // Bakhold og Bestiologi når en flokk får øye på deg
+  // Når en flokk får øye på deg: Upptäcka fara mot bakhold, og kunnskap om fienden
   onEnemiesAlerted(flock, cause) {
     const P = G.player;
-    if (G.state !== 'play' || P.downed) return;
+    if (G.state !== 'play' || P.ko) return;
     for (const e of flock) {
       if (G.run.known.has(e.type) || e.def.boss) continue;
       G.run.known.add(e.type);
       if (!e.def.lore) continue;
-      const r = P.roll('Bestiologi', { noArmed: true });
-      if (r.success) { G.ui.logRoll(r, `<b class="c-mark">Bestiologi:</b> ${e.def.lore}`); P.floorStats.lore = (P.floorStats.lore || 0) + 1; }
+      const sk = e.def.undead ? 'Kunskap om odöda' : e.type === 'demon' ? 'Kunskap om demoner' : 'Zoologi';
+      if (!(P.skills[sk] > 0)) continue;
+      const r = P.roll(sk, { label: sk });
+      if (r.success) { G.ui.logRoll(r, `<b class="c-mark">${sk}:</b> ${e.def.lore}`); P.floorStats.lore = (P.floorStats.lore || 0) + 1; }
     }
     if (cause !== 'sight' || flock.some(e => e.def.boss || e.ambushDone)) return;
     flock.forEach(e => (e.ambushDone = true));
-    let boon = 0;
-    if (P.tricks.has('fagelsang') && P.vp >= 1) { P.vp -= 1; boon = 1; }
-    P.rollPush('Upptäcka fara', { important: false, boon, label: 'Upptäcka fara' }, r => {
-      if (r.success) {
-        for (const e of flock) if (!e.dead) e.surprised = 1.3;
-        G.ui.logRoll(r, `${P.name} ser dem først. De er overrasket.`);
-        G.fx.float('Overrasket!', flock[0].pos, 'sneak');
-      } else if (r.demon) {
-        G.ui.logRoll(r, 'Bakhold! De kommer over deg før du skjønner noe.');
-        P.lock = 0.8;
-        for (const e of flock) e.cd = 0;
-      } else G.ui.logRoll(r, 'Fiender!');
-    });
+    // Upptäcka fara: en intuitiv følelse av at noe er på gang (Bok I s. 44)
+    const r = P.roll('Upptäcka fara', { label: 'Upptäcka fara' });
+    if (r.success) {
+      for (const e of flock) if (!e.dead) e.surprised = r.perfekt ? 2.2 : 1.3;
+      G.ui.logRoll(r, `${P.name} merker dem først. De er overrasket.`);
+      G.fx.float('Overrasket!', flock[0].pos, 'sneak');
+    } else if (r.fummel) {
+      G.ui.logRoll(r, 'Bakhold! De er over deg før du skjønner noe.');
+      P.lock = 0.8;
+      for (const e of flock) e.cd = 0;
+    } else G.ui.logRoll(r, 'Fiender!');
   }
 
-  summonDemon() {
-    const P = G.player;
-    for (let k = 0; k < 12; k++) {
-      const a = Math.random() * Math.PI * 2;
-      const x = P.pos.x + Math.cos(a) * 6, z = P.pos.z + Math.sin(a) * 6;
-      if (!G.dungeon.walkable(x, z)) continue;
-      const e = new Enemy('demon', x, z, G.depth);
-      e.alerted = true;
-      e.state = 'chase';
-      G.enemies.push(e);
-      G.fx.burst('fire', { x, y: 0.5, z }, 40);
-      G.fx.ring({ x, z }, 3, 0xff3010, 0.6);
-      G.audio.roar();
-      G.ui.log('<b class="c-demon">Noe kommer gjennom sløret.</b> En demon har lagt merke til deg.');
-      return;
-    }
-  }
+  // --- trappa ned: søvn, erfarenhet, bonuspoeng og gaver ---------------------
 
-  buildRatModel() {
-    return buildRat().root;
-  }
-
-  // --- pressa slag --------------------------------------------------------------
-
-  wantsPush(o) {
-    const mode = this.settings.push;
-    if (mode === 'aldri') return false;
-    if (mode === 'alla') return true;
-    return !!o?.important;
-  }
-
-  offerPush(r, cb) {
-    if (this.push || G.state === 'title') { cb(r); return; }
-    const P = G.player;
-    const free = CONDITIONS.filter(c => !P.hasCond(c.id));
-    if (!free.length) { cb(r); return; }
-    const attr = ATTR_NAME[r.skill] ? r.skill : SKILL[r.skill]?.attr;
-    const def = free.find(c => c.id === COND_BY_ATTR[attr]) || free[0];
-    this.push = { r, cb, def: def.id, t: 1.8 };
-    const box = $('#pushbox');
-    box.querySelector('.ps-roll').innerHTML = `<b>${r.o?.label || r.skill}</b> misslyckas: ${r.dice.join('|')} mot ${r.target}`;
-    box.querySelector('.ps-conds').innerHTML = CONDITIONS.map((c, i) => `<button data-c="${c.id}" class="${P.hasCond(c.id) ? 'had' : ''}${c.id === def.id ? ' def' : ''}" ${P.hasCond(c.id) ? 'disabled' : ''}><kbd>${i + 1}</kbd>${c.name}</button>`).join('');
-    box.querySelectorAll('.ps-conds button').forEach(b => (b.onclick = () => this.acceptPush(b.dataset.c)));
-    box.querySelector('.ps-no').onclick = () => this.declinePush();
-    box.hidden = false;
-    box.classList.remove('on');
-    void box.offsetWidth;
-    box.classList.add('on');
-    G.audio.menuTick?.(57);
-  }
-
-  acceptPush(cid) {
-    const p = this.push;
-    if (!p) return;
-    const P = G.player;
-    const id = cid || p.def;
-    if (P.hasCond(id)) return;
-    this.hidePush(true);
-    P.addCond(id, true);
-    const r2 = P.reroll(p.r);
-    G.run.pushes++;
-    P.floorStats.pushes = (P.floorStats.pushes || 0) + 1;
-    G.fx.float('PRESSAT', P.pos, 'cond big', 2.4);
-    G.audio.dice();
-    if (r2.success) G.audio.drake?.();
-    p.cb(r2);
-  }
-
-  declinePush() {
-    const p = this.push;
-    if (!p) return;
-    this.hidePush(true);
-    p.cb(p.r);
-  }
-
-  hidePush(keep) {
-    this.push = null;
-    const box = $('#pushbox');
-    if (box) box.hidden = true;
-    void keep;
-  }
-
-  pushKeys(inp, realDt) {
-    const p = this.push;
-    if (!p) return;
-    p.t -= realDt;
-    $('#pushbox .ps-bar i').style.width = `${Math.max(0, p.t / 1.8) * 100}%`;
-    if (inp.wasPressed('KeyX') || inp.wasPressed('Enter') || inp.wasPressed('TPush')) return this.acceptPush(null);
-    for (let i = 0; i < 6; i++) if (inp.wasPressed('Digit' + (i + 1))) { inp.pressed.delete('Digit' + (i + 1)); return this.acceptPush(CONDITIONS[i].id); }
-    if (inp.wasPressed('Escape') || p.t <= 0) { inp.pressed.delete('Escape'); this.declinePush(); }
-  }
-
-  // --- vila ------------------------------------------------------------------
-
-  // Kort vila: T6 KP, T6 VP og ett tillstånd. Alver mediterer, minnessaken tar ett til.
-  doStretchRest(stairs) {
+  // En natts søvn i trappa (uv: det boka gir på en uke, gir spillet på en natt)
+  sleepStairs() {
     const P = G.player;
     const out = [];
-    const elf = P.kinAb.includes('inrefrid');
-    let kp = d(6), vp = d(6), conds = 1;
-    if (elf) { kp += d(6); vp += d(6); conds++; out.push('Alven mediterer.'); }
-    const had = CONDITIONS.filter(c => P.hasCond(c.id));
-    if (had.length > conds && P.sheet.memento && !P.floor.memento) { conds++; P.floor.memento = true; out.push(`${P.sheet.memento} gir trøst.`); }
-    const gotKP = P.heal(kp, true);
-    const before = P.vp;
-    P.vp = Math.min(P.maxVP, P.vp + vp);
-    // fjern de tillståndene som skader mest (de som hører til våpenet ditt først)
-    const wAttr = SKILL[P.weapon().skill]?.attr;
-    const order = [...had].sort((a, b) => (b.attr === wAttr) - (a.attr === wAttr));
-    const healed = order.slice(0, conds);
-    for (const c of healed) P.clearCond(c.id);
-    // hunden plastres om (Läkekonst)
-    const C = G.companion;
-    if (C?.alive && C.kp < C.maxKP && P.skills['Läkekonst'] != null) {
-      const r = P.roll('Läkekonst', { noArmed: true });
-      if (r.success) { C.kp = Math.min(C.maxKP, C.kp + d(6)); out.push('Hunden får plaster.'); }
+    if (P.bleeding.size) {
+      const can = P.loc.harm > 0 && P.loc.varm > 0;
+      const r = can ? P.roll('Första hjälpen', { label: 'Första hjälpen', mod: (P.critVital ? -10 : 0) + (P.kit.has('forband') ? 2 : 0), always: true }) : null;
+      if (r?.success) { P.stopBleeding(); out.push('Du legger forbinding før du sover.'); }
+      else {
+        const n = d(3);
+        P.kp -= n;
+        P.stopBleeding();
+        out.push(`Du får ikke stoppet blødningen før den har kostet ${n} KP.`);
+        if (P.kp <= -P.attrs.FYS) { this.onDeath(false, 'blødde i hjel i trappa'); return null; }
+      }
     }
-    const gains = [gotKP ? `+${gotKP} KP` : '', P.vp > before ? `+${P.vp - before} VP` : ''].filter(Boolean).join(', ');
-    out.unshift(`${gains || 'KP og VP var allerede fulle'}${healed.length ? `${gains ? ',' : '.'} kvitt ${healed.map(c => c.name.toLowerCase()).join(' og ')}` : ''}.`);
-    void stairs;
-    return out.join(' ');
+    let mult = 1;
+    if (P.sheet.special?.fx?.healMul) mult *= P.sheet.special.fx.healMul;
+    if (P.has('snabblakning')) mult *= 2;
+    if ((P.skills['Läkekonst'] || 0) > 0 && P.kp < P.maxKP) {
+      const r = P.roll('Läkekonst', { label: 'Läkekonst', always: true, noExp: true });
+      if (r.success) { mult *= 2; out.push('Läkekonst: sårene gror dobbelt så fort.'); }
+    }
+    const kb = P.kp;
+    for (const l of Object.keys(P.loc)) if (P.loc[l] < P.locMax[l] && !P.body.lame.has(l)) P.loc[l] = Math.min(P.locMax[l], P.loc[l] + mult);
+    P.kp = Math.min(P.maxKP, P.kp + mult);
+    if (Object.keys(P.loc).every(l => P.loc[l] >= P.locMax[l] || P.body.lame.has(l))) P.kp = P.maxKP;
+    if (P.kp > kb) out.push(`Søvnen gir +${P.kp - kb} KP.`);
+    // PSY: 1 per time i hvile (Bok III s. 4), åtte timer
+    const pb = P.psy;
+    P.gainPSY(8);
+    if (P.psy > pb) out.push(`+${P.psy - pb} PSY.`);
+    if (P.kp > 0 && P.loc.huvud > 0) P.helpless = false;
+    P.onSleep();
+    // reparasjon med Hantverk (Bok I s. 49)
+    for (const it of Object.values(P.equip)) {
+      if (!it || !(it.broken || (it.durMax && it.dur < it.durMax))) continue;
+      if (!(P.skills.Hantverk > 0)) continue;
+      const r = P.roll('Hantverk', { label: 'Hantverk', always: true });
+      if (r.success) { it.broken = false; if (it.durMax) it.dur = it.durMax; refinalize(it); out.push(`Hantverk: ${it.name} er reparert.`); }
+      else out.push(`Hantverk: ${it.name} er fortsatt skadet.`);
+    }
+    P.recalc();
+    return out.join(' ') || 'Du sover dårlig, men du sover.';
   }
-
-  stretchRestResult(txt) {
-    G.ui.log(`Kort vila: ${txt}`);
-    G.fx.burst('heal', G.player.pos, 20);
-    G.audio.heal();
-  }
-
-  // --- trappa ned: vila, sesjonsspørsmål, forbedring og gaver ---------------------
 
   descend() {
     if (G.state !== 'play') return;
     G.state = 'transition';
     G.audio.ui();
     const P = G.player;
-    if (P.chanRest) P.chanRest = null;
+    P.chan = null;
     P.fx.barsark = 0;
     P.breakStealth();
     P.forced = null;
-    P.armed = null;
-    // kort vila i trappa
-    const restTxt = this.doStretchRest(true);
-    const extra = [];
-    // reparasjon med Hantverk eller mesterhender
-    const broken = Object.values(P.equip).filter(it => it?.broken);
-    for (const it of broken) {
-      const wood = it.slot === 'vapen2' || !it.metal;
-      if ((P.has('mastersmed') && it.metal) || (P.has('mastersnickare') && wood)) { it.broken = false; refinalize(it); extra.push(`${it.name} er reparert (mesterhender).`); continue; }
-      const r = P.roll('Hantverk', { noArmed: true });
-      if (r.success) { it.broken = false; refinalize(it); extra.push(`Hantverk ${r.r}/${r.target}: ${it.name} er reparert.`); }
-      else extra.push(`Hantverk ${r.r}/${r.target}: ${it.name} er fortsatt trasig.`);
-    }
-    if (P.has('mastergarvare') && P.floorStats.beasts > 0 && P.equip.rustning && P.equip.rustning.type === 'lader' && !(P.equip.rustning.tanned >= 2)) {
-      const a = P.equip.rustning;
-      a.tanned = (a.tanned || 0) + 1;
-      a.armor++;
-      refinalize(a);
-      extra.push(`Mästergarvare: ${a.name} er forsterket med skinn (+1).`);
-    }
-    // svåra skador gror
-    for (const inj of P.injuries) if (!inj.perm) inj.left--;
-    const healedInj = P.injuries.filter(i => !i.perm && i.left <= 0);
-    if (healedInj.length) { P.injuries = P.injuries.filter(i => i.perm || i.left > 0); extra.push(`Grodd: ${healedInj.map(i => i.name.toLowerCase()).join(', ')}.`); }
-    P.curse.noRegen = false;
-    P.recalc();
-    $('#rest-text').innerHTML = `${P.name} setter seg i trappa for en kort vila. ${restTxt}${extra.length ? '<br>' + extra.join(' ') : ''}`;
-    // sesjonsspørsmål: hvert ja gir ett kryss du velger selv
-    const qs = this.sessionQuestions();
-    this.freeMarks = qs.filter(q => q.yes).length;
+    P.charge = null;
+    P.heroArmed = false;
+    const restTxt = this.sleepStairs();
+    if (restTxt == null) return;
+    $('#rest-text').innerHTML = `${P.name} setter seg i trappa og sover noen timer. ${restTxt}`;
+    this.renderExp();
+    // bonuspoeng etter nivået (Bok I s. 63, tilpasset)
+    const F = P.floorStats;
+    const reasons = ['Nivået er klart'];
+    if ((F.monsters || 0) > 0 || (F.kills || 0) >= 8) reasons.push('Du beseiret farlige fiender');
+    if ((F.locks || 0) > 0 || (F.runes || 0) > 0 || G.world.caches.some(c => c.found)) reasons.push('Du løste noe uten å slåss');
+    if ((F.lore || 0) > 0) reasons.push('Du visste hva du møtte');
+    const opts = Object.keys(P.baseSkills).filter(id => SKILL[id] && SKILL[id].kat !== 'B' && SKILL[id].type !== 'magi').sort((a, b) => a.localeCompare(b, 'sv'));
+    const best = P.bestWeaponSkill();
+    this.bonusPicks = reasons.slice(0, 4).map((q, i) => ({ q, pick: i === 0 ? best : P.sheet.yrke?.find(s => opts.includes(s) && s !== best) || best }));
     const sl = $('#session-list');
-    const marked = P.marks;
-    const options = Object.keys(P.skills).sort((a, b) => a.localeCompare(b, 'sv'));
-    const defaultPick = () => {
-      const tr = P.sheet.trained.filter(s => !marked.has(s) && P.skills[s] < 18);
-      return tr.sort((a, b) => P.skills[a] - P.skills[b])[0] || options[0];
-    };
-    sl.innerHTML = qs.map((q, i) => `<div class="sq ${q.yes ? 'yes' : 'no'}"><span class="q">${q.q}</span><span class="a">${q.yes ? 'Ja' : 'Nei'}</span>${q.yes ? `<select data-i="${i}">${options.map(o => `<option${o === (q.pick || (q.pick = defaultPick())) ? ' selected' : ''}>${o}</option>`).join('')}</select>` : '<span></span>'}</div>`).join('');
-    this.sessionQs = qs;
-    sl.querySelectorAll('select').forEach(s => (s.onchange = () => { qs[+s.dataset.i].pick = s.value; }));
-    $('#improve-list').innerHTML = '';
-    this.renderMarked();
-    $('#btn-improve').disabled = false;
-    $('#btn-improve').hidden = false;
-    $('#btn-continue').disabled = true;
-    this.improved = false;
-    this.renderBoons([]);
+    sl.innerHTML = this.bonusPicks.map((q, i) => `<div class="sq yes"><span class="q">${q.q}</span><span class="a">+1 EP</span><select data-i="${i}">${opts.map(o => `<option${o === q.pick ? ' selected' : ''}>${o}</option>`).join('')}</select></div>`).join('');
+    sl.querySelectorAll('select').forEach(el => (el.onchange = () => { this.bonusPicks[+el.dataset.i].pick = el.value; }));
+    this.renderBoons(boonChoices(P.boons, []));
     $('#transition-title').textContent = `Trappa ned til nivå ${G.depth + 1}`;
     $('#transition-next').textContent = FLOORS[G.depth + 1].name;
-    $('#btn-up').disabled = true;
     G.ui.show('transition');
   }
 
-  sessionQuestions() {
-    const P = G.player, F = P.floorStats;
-    const w = P.sheet.weakness;
-    const weakTrig = {
-      'Grådig': F.silver >= 25, 'Fråtser': F.bread >= 2, 'Kleptoman': F.chests >= 1, 'Monsterhater': F.monsters >= 1,
-      'Voldelig': F.kills >= 10, 'Feig': F.dodges >= 18, 'Overilt': F.pushes >= 2, 'Hensynsløs': F.pushes >= 2,
-      'Kunnskapstørst': F.runes + F.lore >= 1, 'Lat': !P.floor.stretchRest && !P.floor.roundRest ? false : true,
-      'Skrythals': F.kills >= 6, 'Arrogant': F.kills >= 6, 'Pessimist': P.kp < P.maxKP / 2,
-    };
-    const qs = [
-      { q: 'Utforsket du et nytt sted?', yes: true },
-      { q: 'Beseiret du en farlig fiende?', yes: (F.monsters || 0) > 0 || (F.kills || 0) >= 8 },
-      { q: 'Overvant du et hinder uten å slåss? (lås, gjemmested, runer)', yes: (F.locks || 0) > 0 || (F.runes || 0) > 0 || G.world.caches.some(c => c.found) },
-    ];
-    if (w) qs.push({ q: `Spilte du på svakheten din (${w.toLowerCase()})?`, yes: !!weakTrig[w] });
-    return qs;
-  }
-
-  renderMarked() {
+  renderExp() {
     const P = G.player;
+    const sheetLike = { yrke: P.sheet.yrke || [], specialFx: P.sheet.special?.fx || {}, kin: P.sheet.kin };
+    const rows = Object.entries(P.exp).filter(([, n]) => n > 0).sort((a, b) => b[1] - a[1]);
     const list = $('#improve-list');
-    const marks = [...P.marks];
-    list.innerHTML = marks.length ? marks.map(sk => `<div class="imp" data-sk="${sk}"><span class="nm">${sk}</span><span class="cur">${P.baseSkills[sk] ?? '?'}</span><span class="die">?</span><span class="res">Markert</span></div>`).join('') : '<div class="imp none">Ingen markerte ferdigheter ennå. Drake og Demon markerer, og hvert ja over gir ett kryss.</div>';
-  }
-
-  rollImprovements() {
-    if (this.improved) return;
-    this.improved = true;
-    $('#btn-improve').disabled = true;
-    const P = G.player;
-    for (const q of this.sessionQs || []) if (q.yes && q.pick) P.marks.add(q.pick);
-    $('#session-list').querySelectorAll('select').forEach(s => (s.disabled = true));
-    this.renderMarked();
-    const list = $('#improve-list');
-    const marks = [...P.marks];
-    P.marks.clear();
-    const reached18 = [];
-    marks.forEach((sk, i) => {
-      const row = list.querySelector(`[data-sk="${CSS.escape(sk)}"]`);
-      const cur = P.baseSkills[sk] ?? 0;
-      setTimeout(() => {
-        const die = row.querySelector('.die');
-        let n = 0;
-        const iv = setInterval(() => {
-          die.textContent = d(20);
-          if (++n > 9) {
-            clearInterval(iv);
-            const r = d(20);
-            die.textContent = r;
-            G.audio.dice();
-            if (r > cur && cur < 18) {
-              P.baseSkills[sk] = cur + 1;
-              row.querySelector('.res').innerHTML = `<b class="up">${cur} til ${cur + 1}</b>`;
-              row.classList.add('win');
-              G.audio.drake();
-              if (cur + 1 === 18) { reached18.push(sk); row.querySelector('.res').innerHTML += ' <b class="up">Ny hjälteförmåga!</b>'; }
-              P.recalc();
-            } else row.querySelector('.res').textContent = 'Ingen framgang';
-          }
-        }, 55);
-      }, 200 + i * 520);
-    });
-    setTimeout(() => this.offerGifts(reached18.length), 400 + marks.length * 520 + 300);
-  }
-
-  offerGifts(n18) {
-    const P = G.player;
-    // hjälteförmågor: når en ferdighet når 18, og etter nivå 2 og 4 (SL belønner storverk)
-    const heroicCards = [];
-    const want = n18 + (G.depth === 2 || G.depth === 4 ? 1 : 0);
-    if (want > 0) {
-      const pool = HEROIC_REWARDS.filter(id => (HEROIC[id].stack || !P.has(id)) && meetsReq(P.skills, id) && !(id === 'tvillingpil' && !P.skills['Pilbåge']));
-      for (const id of pool.sort(() => Math.random() - 0.5).slice(0, Math.min(2, want + 1))) {
-        const h = HEROIC[id];
-        heroicCards.push({ id: 'h_' + id, heroic: id, src: 'Hjältedåd', name: h.name, desc: h.game + (h.vp ? ` (${h.vp} VP)` : '') });
-      }
-    }
-    this.renderBoons(boonChoices(P.boons, heroicCards.slice(0, 2)));
+    if (!rows.length) { list.innerHTML = '<div class="imp none">Ingen EP ennå. Første lyckade slag i en ferdighet etter søvn gir 1 EP.</div>'; return; }
+    list.innerHTML = `<div class="explist"><span class="h">Ferdighet</span><span class="h">EP</span><span class="h">Neste FV koster</span>${rows.map(([id, n]) => {
+      const isSpell = !!SPELLS[id];
+      const fv = isSpell ? P.spells[id] || 0 : P.baseSkills[id] || 0;
+      const cost = fvCost(fv, fv + 1, isSpell ? spellBaseCost(SPELLS[id].sv) : baseCost(id, sheetLike));
+      return `<span>${isSpell ? SPELLS[id].name : id} <i style="color:var(--dim)">FV ${fv}</i></span><span class="${n >= cost ? 'ok' : ''}">${n}</span><span>${cost}</span>`;
+    }).join('')}</div>`;
   }
 
   renderBoons(choices) {
@@ -1222,7 +1015,8 @@ class Game {
       cards.appendChild(c);
     }
     this.pendingBoon = null;
-    if (!choices.length && this.improved) { $('#btn-continue').disabled = false; $('#btn-up').disabled = false; }
+    $('#btn-continue').disabled = !!choices.length;
+    $('#btn-up').disabled = !!choices.length;
   }
 
   nextFloor() {
@@ -1238,147 +1032,166 @@ class Game {
     });
   }
 
-  // --- dödsslag ----------------------------------------------------------------
+  // --- medvetslös (Bok II s. 18-19, IMPLEMENTERING.md) -------------------------------------
 
-  onPlayerDown() {
+  onKnockout(cause) {
     const P = G.player;
-    if (P.downed || P.dead) return;
-    P.downed = true;
-    P.breakStealth();
-    P.chanRest = null;
-    this.hidePush(false);
+    if (P.dead || this.ko) return;
     G.state = 'deathroll';
+    G.run.ko = (G.run.ko || 0) + 1;
     G.post.desat = 0.85;
     G.audio.music?.setIntensity(0);
-    P.voice('down');
-    const bane = P.hasCond('KRA') ? 1 : 0;
-    this.dr = { s: 0, f: 0, bane, running: false };
-    $('#dr-target').innerHTML = `Slå T20 under eller lik <b>${P.attrs.FYS}</b> (FYS)${bane ? '. Krasslig gir nackdel.' : '.'} Dödsslag kan ikke presses.`;
-    $('#dr-ok').innerHTML = $('#dr-bad').innerHTML = '<i></i><i></i><i></i>';
-    $('#dr-die').textContent = '';
-    $('#dr-die').className = 'bigdie';
-    $('#dr-msg').textContent = `${P.name} ligger i mørket. Tre lyktes før tre feil, så stabiliserer det seg.`;
-    $('#dr-actions').hidden = false;
-    $('#btn-dr-rally').disabled = false;
+    this.ko = { cause, done: false };
+    $('#ko-title').textContent = 'Det blir svart';
+    $('#ko-cause').textContent = `${P.name} er medvetslös (${cause}). Totala KP ${P.kp}. Døden kommer ved minus FYS (${-P.attrs.FYS}).`;
+    $('#ko-log').innerHTML = '';
+    $('#btn-ko-hero').hidden = !(P.hjp > 0);
+    $('#btn-ko-hero').disabled = false;
+    $('#btn-ko-go').disabled = true;
     G.ui.update(0);
     G.ui.show('deathroll');
+    this.koQueue = this.koSteps();
+    this.koTimer = setTimeout(() => this.koStep(), 700);
   }
 
-  drPips() {
-    $('#dr-ok').querySelectorAll('i').forEach((x, i) => x.classList.toggle('on', i < this.dr.s));
-    $('#dr-bad').querySelectorAll('i').forEach((x, i) => x.classList.toggle('on', i < this.dr.f));
+  koLine(html, cls = '') {
+    const el = document.createElement('div');
+    el.className = cls;
+    el.innerHTML = html;
+    $('#ko-log').appendChild(el);
   }
 
-  // Samla sig själv: PSY med nackdel. Lykkes det, kan du handle med 0 KP, men dödsslagene fortsetter.
-  rallySelf() {
+  // Hva som skjer mens du ligger: fiendene handler etter hva de er (uv), så blødningen, så våkner du
+  koSteps() {
     const P = G.player;
-    if (this.dr.running) return;
-    $('#btn-dr-rally').disabled = true;
-    const r = skillRoll(P.attrs.PSY, { bane: 1 + (P.hasCond('RAD') ? 1 : 0) });
-    r.skill = 'PSY';
-    G.audio.dice();
-    $('#dr-die').textContent = r.r;
-    $('#dr-die').className = 'bigdie ' + (r.drake ? 'drake' : r.demon ? 'demon' : r.success ? 'ok' : 'fail');
-    if (r.success) {
-      $('#dr-msg').textContent = `${P.name} biter tennene sammen og reiser seg. Dödsslagene fortsetter: drikk en legedrikk, eller hold ut.`;
-      setTimeout(() => {
-        P.downed = false;
-        P.dying = { s: this.dr.s, f: this.dr.f, t: 0 };
-        P.kp = 0;
-        P.invuln = 1.2;
-        G.post.desat = 0.4;
-        G.ui.hideScreens();
-        G.state = 'play';
-        this.updateDyingHud();
-        G.ui.log(`${P.name} samler seg med 0 KP. Hver skade er et misslyckat dödsslag.`);
-      }, 900);
-    } else {
-      $('#dr-msg').textContent = 'Kroppen vil ikke. Dödsslagene må slås.';
-      setTimeout(() => this.deathRollSequence(), 900);
-    }
-  }
-
-  deathRollSequence() {
-    if (this.dr.running) return;
-    this.dr.running = true;
-    $('#dr-actions').hidden = true;
-    const P = G.player;
-    const step = () => {
-      const r = skillRoll(P.attrs.FYS, { bane: this.dr.bane });
-      let die = 0;
-      const anim = setInterval(() => {
-        $('#dr-die').textContent = d(20);
-        if (++die > 8) {
-          clearInterval(anim);
-          $('#dr-die').textContent = r.r;
-          $('#dr-die').className = 'bigdie ' + (r.drake ? 'drake' : r.demon ? 'demon' : r.success ? 'ok' : 'fail');
-          G.audio.dice();
-          if (r.drake) { this.dr.s += 2; $('#dr-msg').textContent = 'Drake! To lyktes på en gang.'; G.audio.drake(); }
-          else if (r.demon) { this.dr.f += 2; $('#dr-msg').textContent = 'Demon! To feil på en gang.'; G.audio.demon(); }
-          else if (r.success) { this.dr.s++; $('#dr-msg').textContent = 'Klamrer seg fast.'; }
-          else { this.dr.f++; $('#dr-msg').textContent = 'Det blir mørkere.'; }
-          this.drPips();
-          if (this.dr.s >= 3) setTimeout(() => this.survive(), 900);
-          else if (this.dr.f >= 3) setTimeout(() => this.onDeath(), 1100);
-          else setTimeout(step, 520);
+    const steps = [];
+    const near = G.enemies.filter(e => !e.dead && e.alerted && !e.fleeing && e.pos.distanceTo(P.pos) < 16);
+    const robbers = near.filter(e => e.def.ko === 'rob');
+    const biters = near.filter(e => e.def.ko === 'bite');
+    const killers = near.filter(e => e.def.ko === 'kill');
+    if (!near.length) steps.push(() => this.koLine('Ingen fiender er i nærheten. Mørket er stille.'));
+    if (robbers.length) steps.push(() => {
+      const lost = Math.floor(P.silver / 2);
+      P.silver -= lost;
+      const vals = P.bag.filter(x => x.type === 'val');
+      const v = vals.length ? vals[Math.floor(Math.random() * vals.length)] : null;
+      if (v) P.bag.splice(P.bag.indexOf(v), 1);
+      const who = robbers[0].def.boss ? 'Rødpels' : robbers.length > 1 ? `${robbers.length} ${robbers[0].type === 'orc' ? 'orcher' : 'vätter'}` : robbers[0].def.name.toLowerCase();
+      this.koLine(`${who[0].toUpperCase() + who.slice(1)} roter gjennom lommene dine${lost ? `: ${lost} sm` : ''}${v ? ` og ${v.name.toLowerCase()}` : ''} er borte. Så går de.`, 'bad');
+      if (robbers[0].def.boss) this.koLine('«Kom tilbake når du er sprøere», sier Rødpels.');
+      for (const e of robbers) { e.alerted = false; e.fleeing = true; e.fleeT = 6; e.setState('flee'); }
+      P.recalc();
+    });
+    for (const e of biters) {
+      // rotter biter noen ganger og mister så interessen (uv)
+      const n = d(2);
+      steps.push(() => {
+        for (let i = 0; i < n && !P.dead; i++) {
+          const atk = e.def.attacks[0];
+          const r = clRoll(atk.fv + 10, atk.fv);
+          if (!r.success) continue;
+          const got = P.applyHit({ dmg: atk.dmg, roll: r, small: true, src: e });
+          this.koLine(`${e.def.name} biter (${got} skade). KP ${P.kp}.`, 'bad');
         }
-      }, 50);
-    };
-    setTimeout(step, 300);
+        if (!P.dead) { this.koLine(`${e.def.name} mister interessen.`); e.alerted = false; e.calm = 30; e.setState('idle'); }
+      });
+    }
+    if (killers.length) {
+      for (let round = 0; round < 6; round++) {
+        steps.push(() => {
+          for (const e of killers) {
+            if (P.dead || e.dead) continue;
+            const atk = e.mainAttack();
+            const r = clRoll(atk.fv + 10, atk.fv);
+            if (!r.success) { this.koLine(`${e.def.name} bommer.`); continue; }
+            const got = P.applyHit({ dmg: atk.dmg, sb: e.sb, roll: r, src: e });
+            this.koLine(`${e.def.name} slår mot deg der du ligger (${got} skade). KP ${P.kp}.`, 'bad');
+          }
+        });
+      }
+      steps.push(() => { if (!P.dead) { this.koLine('De tror du er død, og går.'); for (const e of killers) { e.alerted = false; e.setState('idle'); } } });
+    }
+    // kritisk skade i bröstkorg eller mage: svårt FYS-slag, ellers død (Bok II s. 19)
+    if (P.critVital) steps.push(() => {
+      const r = P.attrRoll('FYS', 15, { label: 'Svårt FYS-slag', noExp: true, noHero: true });
+      if (!r.success) { this.koLine(`<span class="roll fail">FYS ${r.r}/${r.cl}</span> Kroppen gir opp.`, 'bad'); this.onDeath(false, 'kritisk skade i kroppen'); return; }
+      this.koLine(`<span class="roll ok">FYS ${r.r}/${r.cl}</span> Du klamrer deg fast.`, 'good');
+      P.critVital = false;
+    });
+    // blødning mens du ligger: et normalt FYS-slag, ellers 1T3 KP før det levrer seg (uv)
+    steps.push(() => {
+      if (!P.bleeding.size || P.dead) return;
+      const r = P.attrRoll('FYS', 10, { label: 'FYS-slag', noExp: true, noHero: true });
+      if (r.success) this.koLine(`<span class="roll ok">FYS ${r.r}/${r.cl}</span> Blodet levrer seg.`, 'good');
+      else {
+        const n = d(3);
+        P.kp -= n;
+        this.koLine(`<span class="roll fail">FYS ${r.r}/${r.cl}</span> Du blør ${n} KP før det stopper. KP ${P.kp}.`, 'bad');
+        if (P.kp <= -P.attrs.FYS) { this.onDeath(false, 'blødde i hjel'); return; }
+      }
+      P.stopBleeding();
+    });
+    steps.push(() => {
+      if (P.dead) return;
+      // tiden går: 1T4 timer ved 0 totala KP, 1T100 - FYS minutter ved slag mot hodet (Bok II s. 18)
+      const head = P.loc.huvud <= 0 && P.kp > 0;
+      const hours = head ? Math.max(5, d(100) - P.attrs.FYS) / 60 : d(4);
+      G.run.clock += hours;
+      this.koLine(`Du våkner ${hours >= 1 ? `etter ${Math.round(hours)} time${Math.round(hours) === 1 ? '' : 'r'}` : `etter ${Math.round(hours * 60)} minutter`}.${P.kp <= 0 || P.loc.huvud <= 0 ? ' Du kan bare krype til du får helbredet deg.' : ''}`, 'good');
+      $('#ko-title').textContent = 'Du lever';
+      $('#btn-ko-go').disabled = false;
+      $('#btn-ko-hero').hidden = true;
+      this.ko.done = true;
+    });
+    return steps;
   }
 
-  survive() {
+  koStep() {
+    this.koTimer = null;
     const P = G.player;
-    P.downed = false;
-    P.downs++;
-    const n = d(6);
-    P.kp = n;
-    P.invuln = 2.2;
+    if (!this.ko || P.dead) return;
+    const step = this.koQueue.shift();
+    if (!step) return;
+    G.audio.dice?.();
+    step();
+    if (P.dead) return;
+    if (this.koQueue.length) this.koTimer = setTimeout(() => this.koStep(), 750);
+  }
+
+  koWake() {
+    const P = G.player;
+    if (!this.ko || !this.ko.done || P.dead) return;
+    this.ko = null;
+    P.wakeUp(false);
+    G.post.desat = P.helpless ? 0.35 : 0;
+    G.ui.hideScreens();
+    G.state = 'play';
+    G.ui.log(P.helpless ? `${P.name} kommer til seg selv, men kan bare krype. Drikk en legedrikk eller spis noe.` : `${P.name} kommer til seg selv.`);
+  }
+
+  // 1 hjältepoäng: du reiser deg med en gang (uv)
+  koHero() {
+    const P = G.player;
+    if (!this.ko || P.hjp <= 0 || P.dead) return;
+    if (this.koTimer) { clearTimeout(this.koTimer); this.koTimer = null; }
+    P.hjp--;
+    G.run.heroUsed = (G.run.heroUsed || 0) + 1;
+    this.ko = null;
+    P.wakeUp(true);
     for (const e of G.enemies) {
       if (e.dead) continue;
       tmp.set(e.pos.x - P.pos.x, 0, e.pos.z - P.pos.z);
       const dd = tmp.length();
-      if (dd < 6) { e.vel.addScaledVector(tmp.normalize(), 14); e.setState('stagger'); e.stunDur = 1; }
+      if (dd < 6) { e.vel.addScaledVector(tmp.normalize(), 14); e.stagger?.(1); }
     }
     G.fx.ring(P.pos, 6, 0xfff0c0, 0.5);
     if (P.isDuck) G.fx.burst('feather', P.pos, 16);
     G.post.desat = 0;
     G.post.flash(0xfff0c0, 0.3);
-    P.voice('up');
+    G.audio.drake?.();
     G.ui.hideScreens();
-    G.ui.log(`${P.name} er stabil igjen (+${n} KP).`);
     G.state = 'play';
-    this.severeInjuryCheck();
-  }
-
-  // Valgfri regel: svåra skador når du har vært nede på 0 KP
-  severeInjuryCheck() {
-    if (!this.settings.injuries) return;
-    const P = G.player;
-    const r = P.roll('FYS', { noArmed: true });
-    if (r.success) { G.ui.logRoll(r, 'Ingen varige skader denne gangen.'); return; }
-    const n = d(20);
-    const inj = { ...fromRange(INJURIES, n) };
-    inj.left = inj.heal || 0;
-    if (inj.newWeakness) P.sheet = { ...P.sheet, weakness: WEAKNESS[d(20) - 1] };
-    if (inj.amnesia) G.dungeon.explored.fill(0);
-    P.injuries.push(inj);
-    P.recalc();
-    G.ui.logRoll(r, `<b class="c-demon">Svår skada (${n}):</b> ${inj.name}.${inj.perm ? ' Den blir aldri helt bra.' : ` Gror etter ${inj.left} vila i trappa.`}`);
-    G.fx.float(inj.name, P.pos, 'demon', 2.4);
-  }
-
-  updateDyingHud() {
-    const P = G.player;
-    const box = $('#dying');
-    if (!P.dying) { box.hidden = true; return; }
-    box.hidden = false;
-    box.querySelector('.ok').innerHTML = [0, 1, 2].map(i => `<i class="${i < P.dying.s ? 'on' : ''}"></i>`).join('');
-    box.querySelector('.bad').innerHTML = [0, 1, 2].map(i => `<i class="${i < P.dying.f ? 'on' : ''}"></i>`).join('');
-  }
-  hideDying() {
-    $('#dying').hidden = true;
-    if (G.post) G.post.desat = 0;
+    G.ui.log(`<b class="c-drake">Hjältedåd:</b> ${P.name} reiser seg igjen med ${P.kp} KP.`);
   }
 
   feathersFor(victory) {
@@ -1386,14 +1199,14 @@ class Game {
     return r.depthReached * 5 + Math.floor(r.kills / 3) + (victory ? 30 : 0);
   }
 
-  onDeath(instant = false) {
+  onDeath(instant = false, cause = '') {
     deleteSave('auto');
     const P = G.player;
     if (P.dead) return;
     P.dead = true;
-    P.dying = null;
-    this.hideDying();
-    this.hidePush(false);
+    P.ko = null;
+    this.ko = null;
+    if (this.koTimer) { clearTimeout(this.koTimer); this.koTimer = null; }
     G.state = 'dead';
     G.audio.playMusic('death', { fast: true });
     G.post.desat = 0;
@@ -1401,6 +1214,7 @@ class Game {
     G.meta.feathers += f;
     G.meta.best = Math.max(G.meta.best, G.run.depthReached);
     saveMeta(G.meta);
+    this.deathCause = cause;
     this.showEnd(false, f, instant);
   }
 
@@ -1423,23 +1237,24 @@ class Game {
     const P = G.player;
     const mins = Math.max(1, Math.round((performance.now() - r.t0) / 60000));
     $('#end-title').textContent = win ? 'Safranen er funnet' : `${P.name} er død`;
+    const cause = this.deathCause ? ` (${this.deathCause})` : '';
     $('#end-text').textContent = win
       ? (P.isNebb
         ? 'Rødpels er beseiret. Safranen ligger i en kiste bak tronen hans, og noe av den er ikke engang spist. Far får beholde jobben. Sjefen sier ikke takk.'
-        : `Rødpels er beseiret. ${P.name} bærer safransekkene opp til herr Nansen, som får beholde jobben. Betalingen er ti silver og et brød fra i forrigårs.`)
+        : `Rødpels er beseiret. ${P.name} bærer safransekkene opp til herr Nansen, som får beholde jobben. Betalingen er hundre sm og et brød fra i forrigårs.`)
       : (P.isNebb
-        ? `Svart Nebb ble liggende i mørket under Fristaden${instant ? ' etter ett eneste, altfor hardt slag' : ''}. Mester Flansen kommer til å si at han visste det. Han kommer til å si det med munnen full av brød.`
-        : `${P.name} ble liggende i mørket under Fristaden${instant ? ' etter ett eneste, altfor hardt slag' : ''}. Herr Nansen leier en ny neste uke.`);
+        ? `Svart Nebb ble liggende i mørket under Fristaden${instant ? ' etter ett eneste, altfor hardt slag' : ''}${cause}. Mester Flansen kommer til å si at han visste det. Han kommer til å si det med munnen full av brød.`
+        : `${P.name} ble liggende i mørket under Fristaden${instant ? ' etter ett eneste, altfor hardt slag' : ''}${cause}. Herr Nansen leier en ny neste uke.`);
     $('#end-stats').innerHTML = [
       ['Nivå nådd', `${r.depthReached} av 5`],
       ['Fiender felt', r.kills],
-      ['Drake', r.drakes],
-      ['Demon', r.demons],
-      ['Pressade slag', r.pushes],
-      ['Parerat / undvikt', `${r.parries} / ${r.dodges}`],
-      ['Skade gjort', r.damageDealt],
-      ['Skade tatt', r.damageTaken],
-      ['Silver plukket', r.silver],
+      ['Perfekta slag', r.perfekt || 0],
+      ['Fummel', r.fummel || 0],
+      ['Hjältepoäng brukt', r.heroUsed || 0],
+      ['Parerat / dukket', `${r.parries || 0} / ${r.dodges || 0}`],
+      ['Skade gjort', r.damageDealt || 0],
+      ['Skade tatt', r.damageTaken || 0],
+      ['Silver plukket', `${r.silver} sm`],
       ['Tid', `${mins} min`],
     ].map(([k, v]) => `<div><span>${k}</span><b>${v}</b></div>`).join('');
     $('#end-feathers').textContent = `+${feathers} fjær til Mester Flansens dojo`;
@@ -1459,22 +1274,23 @@ class Game {
     const idep = inTown ? Math.max(1, G.run.nextDepth || 1) : G.depth + 1;
     if (!D.shopStock) {
       D.shopStock = [
-        { id: 'bread', name: 'Brød', desc: 'Helbreder 3 KP. Ferskt i forrigårs.', price: 4 },
-        { id: 'potion', name: 'Legedrikk', desc: 'Helbreder 2T6 KP.', price: 14 },
-        { id: 'stone', name: 'Bryne', desc: '+1 skade resten av løpet.', price: 28, once: true },
-        { id: 'picks', name: 'Enkla dyrkar', desc: 'Ingen nackdel på Fingerfärdighet når du dyrker opp låser.', price: 8, once: true },
-        { id: 'repair', name: 'Reparasjon', desc: 'Far fikser alt som er trasig. Han har en tang.', price: 6 },
-        { id: 'rest', name: 'Lång vila bak disken', desc: 'Sov et skift i trygghet: alle KP, VP og tillstånd. Gratis.', price: 0, once: true },
+        { id: 'bread', name: 'Brød', desc: 'Helbreder 3 KP. Ferskt i forrigårs.', price: 40 },
+        { id: 'potion', name: 'Legedrikk', desc: 'Helbreder 2T6 KP.', price: 140 },
+        { id: 'bandage', name: 'Förband', desc: '+2 på Första hjälpen så lenge du har dem.', price: 10, once: true },
+        { id: 'stone', name: 'Bryne', desc: '+1 skade resten av løpet.', price: 280, once: true },
+        { id: 'picks', name: 'Dyrkar', desc: 'Uten dyrkar er CL i Låsdyrkning halvert.', price: 150, once: true },
+        { id: 'repair', name: 'Reparasjon', desc: 'Far fikser alt som er trasig, og gir våpen og skjold full BV. Han har en tang.', price: 60 },
+        { id: 'rest', name: 'Sov bak disken', desc: 'En natts søvn i trygghet: litt KP, mye PSY. Gratis.', price: 0, once: true },
         { id: 'item', item: makeItem(idep, G.world.lootOpts({ rarity: 'magisk' })) },
         { id: 'item', item: makeItem(idep, G.world.lootOpts({ luck: 0.4 })) },
       ];
       if (inTown) D.shopStock = D.shopStock.filter(s => s.id !== 'rest');
-      for (const s of D.shopStock) if (s.item) { s.name = s.item.name; s.price = s.item.value + 10 * Math.max(0, G.depth); }
+      for (const s of D.shopStock) if (s.item) { s.name = s.item.name; s.price = s.item.value + 100 * Math.max(0, G.depth); }
       D.dadGreet = inTown ? lines.town[Math.floor(Math.random() * lines.town.length)] : lines.greet[(G.depth - 1) % lines.greet.length];
       D.barter = null;
       D.advance = false;
     }
-    if (!P.isNebb) for (const s of D.shopStock) if (s.id === 'repair') s.desc = 'Herr Nansen fikser alt som er trasig. Han har en tang.';
+    if (!P.isNebb) for (const s of D.shopStock) if (s.id === 'repair') s.desc = 'Herr Nansen fikser alt som er trasig, og gir våpen og skjold full BV. Han har en tang.';
     this.dadSay(D.dadGreet);
     this.renderShop(false);
     $('#dlg-who').innerHTML = P.isNebb ? 'Far <span>butikkbetjent, ikke kjøpmann</span>' : 'Herr Nansen <span>butikkbetjent, ikke kjøpmann</span>';
@@ -1531,17 +1347,18 @@ class Game {
     if (D.barter === 'good') mods.push('Köpslå: 20% avslag');
     if (D.barter === 'great') mods.push('Köpslå: 40% avslag');
     if (D.barter === 'bad') mods.push('Köpslå: 25% dyrere');
-    wares.innerHTML = `<div class="purse">Du har <b>${P.silver}</b> silver${mods.length ? ` <span>(${mods.join(', ')})</span>` : ''}</div>`;
+    wares.innerHTML = `<div class="purse">Du har <b>${P.silver}</b> sm${mods.length ? ` <span>(${mods.join(', ')})</span>` : ''}</div>`;
     for (const s of D.shopStock) {
       if (s.sold) continue;
-      if (s.id === 'repair' && !Object.values(P.equip).some(it => it?.broken)) continue;
+      if (s.id === 'repair' && !Object.values(P.equip).some(it => it?.broken || (it?.durMax && it.dur < it.durMax))) continue;
       if (s.id === 'picks' && P.kit.has('dyrkar')) continue;
+      if (s.id === 'bandage' && P.kit.has('forband')) continue;
       const price = this.priceOf(s);
       const row = document.createElement('div');
       row.className = 'ware';
       const nameCol = s.item ? RARITY[s.item.rarity].color : 'var(--parch)';
       const desc = s.item ? s.item.lines.join(', ') : s.desc;
-      row.innerHTML = `<div class="txt"><div class="nm" style="color:${nameCol}">${s.name}</div><div class="ds">${desc}</div></div><button class="btn small" ${P.silver < price ? 'disabled' : ''}>${price ? price + ' silver' : 'Gratis'}</button>`;
+      row.innerHTML = `<div class="txt"><div class="nm" style="color:${nameCol}">${s.name}</div><div class="ds">${desc}</div></div><button class="btn small" ${P.silver < price ? 'disabled' : ''}>${price ? price + ' sm' : 'Gratis'}</button>`;
       row.querySelector('button').onclick = () => this.buy(s, price);
       wares.appendChild(row);
     }
@@ -1556,7 +1373,7 @@ class Game {
     renderSellList($('#dlg-wares'), 'nansen', {
       mod,
       say: t => this.dadSay(t),
-      line: (e, n) => (e.type === 'val' ? (P.isNebb ? `${n} silver. Jeg sier ikke til sjefen hvor den kom fra.` : `${n} silver. Jeg spør ikke hvor den kom fra.`) : `${n} silver. Det er det den er verdt her.`),
+      line: (e, n) => (e.type === 'val' ? (P.isNebb ? `${n} sm. Jeg sier ikke til sjefen hvor den kom fra.` : `${n} sm. Jeg spør ikke hvor den kom fra.`) : `${n} sm. Det er det den er verdt her.`),
       back: () => this.renderShop(true),
     });
     this.dadSay(P.isNebb ? 'Vis meg hva du har. Og nei, jeg kjøper ikke brød tilbake til full pris.' : 'Legg det på disken. Jeg betaler det sjefen ville betalt, minus det han ikke vet om.');
@@ -1567,9 +1384,9 @@ class Game {
     const P = G.player;
     const D = G.dungeon;
     if (D.barter) { this.dadSay('Se deg om. Ikke ta på noe du ikke skal kjøpe.'); this.renderShop(true); return; }
-    P.rollPush('Köpslå', { important: true, label: 'Köpslå', noArmed: false }, r => {
-      if (r.demon) { D.barter = 'bad'; this.dadSay('Prute? Med meg? Nå ble alt litt dyrere.'); }
-      else if (r.drake) { D.barter = 'great'; this.dadSay('Du er verre enn sjefen. Greit, greit. Halv pris nesten.'); }
+    P.rollHero('Köpslå', { label: 'Köpslå' }, r => {
+      if (r.fummel) { D.barter = 'bad'; this.dadSay('Prute? Med meg? Nå ble alt litt dyrere.'); }
+      else if (r.perfekt) { D.barter = 'great'; this.dadSay('Du er verre enn sjefen. Greit, greit. Halv pris nesten.'); }
       else if (r.success) { D.barter = 'good'; this.dadSay('Hmf. Du får en rabatt. Ikke si det til noen.'); }
       else { D.barter = 'none'; this.dadSay('Prisene står på lappene. De står der av en grunn.'); }
       G.ui.logRoll(r, 'Köpslå hos butikkbetjenten.');
@@ -1582,11 +1399,11 @@ class Game {
     const D = G.dungeon;
     D.advance = true;
     if (P.curse.frog) { this.dadSay('Du åpner munnen, og en frosk hopper ut. Han ser lenge på den. Svaret er nei.'); this.renderShop(false); return; }
-    P.rollPush('Övertala', { important: true, label: 'Övertala' }, r => {
+    P.rollHero('Övertala', { label: 'Övertala' }, r => {
       if (r.success) {
-        const n = rollDice('D6') * (r.drake ? 4 : 2);
+        const n = rollDice('D6') * (r.perfekt ? 40 : 20);
         P.silver += n;
-        this.dadSay(P.isNebb ? `Her. ${n} silver. Det er av lønna mi, så ikke bruk alt på brød.` : `Et forskudd. ${n} silver. Det trekkes fra betalingen. Hvis det blir noen betaling.`);
+        this.dadSay(P.isNebb ? `Her. ${n} sm. Det er av lønna mi, så ikke bruk alt på brød.` : `Et forskudd. ${n} sm. Det trekkes fra betalingen. Hvis det blir noen betaling.`);
         G.audio.coin();
       } else this.dadSay(P.isNebb ? 'Forskudd? Jeg har ikke fått lønn siden vårsolverv.' : 'Forskudd? Du har ikke funnet noe ennå.');
       G.ui.logRoll(r, 'Övertala butikkbetjenten.');
@@ -1607,23 +1424,19 @@ class Game {
     } else if (s.id === 'potion') { giveItem(makeCons('legedrikk')); this.dadSay('Ikke drikk den på tom mage.'); }
     else if (s.id === 'stone') { P.metaMods.dmg = (P.metaMods.dmg || 0) + 1; P.recalc(); s.sold = true; this.dadSay('Brynet var bestefars. Ikke si det til sjefen.'); }
     else if (s.id === 'picks') { P.kit.add('dyrkar'); s.sold = true; this.dadSay('Til hva? Nei. Ikke svar.'); }
+    else if (s.id === 'bandage') { P.kit.add('forband'); s.sold = true; this.dadSay('Rene. Nesten. Jeg har brukt dem på kålen.'); }
     else if (s.id === 'repair') {
-      for (const it of Object.values(P.equip)) if (it?.broken) { it.broken = false; refinalize(it); }
+      for (const it of Object.values(P.equip)) if (it && (it.broken || (it.durMax && it.dur < it.durMax))) { it.broken = false; if (it.durMax) it.dur = it.durMax; refinalize(it); }
       P.recalc();
       this.dadSay('Sånn. Som nytt. Nesten.');
     } else if (s.id === 'rest') {
-      // lång vila: et skift i trygghet
-      P.kp = P.maxKP;
-      P.vp = P.maxVP;
-      P.clearConds();
-      P.floor.roundRest = false;
-      P.floor.stretchRest = false;
-      P.floor.memento = false;
+      // en natts søvn bak disken, som i trappa
+      const txt = this.sleepStairs();
       s.sold = true;
       G.fx.burst('heal', P.pos, 30);
       G.audio.heal();
       this.dadSay('Sov du. Jeg passer butikken. Det er jo det jeg gjør.');
-      G.ui.log('Lång vila: alle KP, VP og tillstånd er tilbake.');
+      if (txt) G.ui.log(`Søvn bak disken: ${txt}`);
     } else if (s.item) {
       giveItem(s.item);
       s.sold = true;
@@ -1648,8 +1461,6 @@ class Game {
     if (G.state !== 'play') return;
     G.state = 'pause';
     const P = G.player;
-    $('#btn-rest-round').disabled = !!P.floor?.roundRest;
-    $('#btn-rest-stretch').disabled = !!P.floor?.stretchRest;
     const qs = Object.entries(G.run.quests || {}).filter(([, q]) => q.state === 'active' || q.state === 'done');
     $('#pause-quests').innerHTML = qs.length ? '<h3>Oppdrag</h3>' + qs.map(([id, q]) => `<div class="qrow ${q.state}">${q.state === 'done' ? 'Fullført: ' : ''}${QUEST_TITLES[id] || id}</div>`).join('') : '';
     G.ui.show('pause');
@@ -1686,8 +1497,6 @@ class Game {
     const P = G.player;
     const inTitle = G.state === 'title' || G.state === 'splash';
     inp.allowNav = inTitle || G.state === 'dialog';
-    // pressa slag: egne taster, og tiden går sakte
-    if (this.push) this.pushKeys(inp, dt);
     const typing = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName);
     if (G.state === 'title') this.titleKeys(inp);
     else if (inp.wasPressed('Escape')) {
@@ -1720,22 +1529,19 @@ class Game {
 
     if (G.state === 'play') {
       let gdt = dt;
-      if (this.push) gdt *= 0.12;
       if (G.hitStop > 0) { G.hitStop -= dt; gdt = dt * 0.06; }
       if (G.slowmo > 0) { G.slowmo -= dt; gdt *= 0.3; }
       G.time += gdt;
       G.run.clock += gdt / 120;
       this.updateAim();
       if (inp.wasPressed('KeyE')) G.world.interact();
-      else if (inp.wasPressed('KeyX') && !this.push && G.world.nearItem?.kind === 'item') G.world.interact(true);
+      else if (inp.wasPressed('KeyX') && G.world.nearItem?.kind === 'item') G.world.interact(true);
       this.flowTimer -= gdt;
       if (this.flowTimer <= 0) { this.flowTimer = 0.25; G.dungeon.computeFlow(P.pos.x, P.pos.z); }
-      if (!this.push) P.update(gdt, inp);
-      else P.animate(gdt, 0);
+      P.update(gdt, inp);
       for (let i = G.enemies.length - 1; i >= 0; i--) {
         if (!G.enemies[i].update(gdt)) { G.enemies[i].dispose(); G.enemies.splice(i, 1); }
       }
-      G.companion?.update(gdt);
       if (G.dungeon.isTown) G.dungeon.update(gdt, P, this.townLights(gdt));
       G.world.update(gdt, G.camera);
       G.fx.update(gdt, G.camera);
@@ -1849,7 +1655,7 @@ class Game {
       cutawayUniforms.uCutR.value = innerHeight * pr * 0.17;
       return;
     }
-    const want = P.fx?.barsark > 0 || P.armed === 'vresig' ? 1 : 0;
+    const want = P.fx?.barsark ? 1 : 0;
     this.rageMix = (this.rageMix || 0) + (want - (this.rageMix || 0)) * Math.min(1, dt * 4);
     const light = P.fx?.light ? 1.6 : 1;
     this.lantern.color.setRGB(1, 0.69 - 0.4 * this.rageMix, 0.44 - 0.34 * this.rageMix);
@@ -1873,6 +1679,6 @@ class Game {
   }
 }
 
-void SKILLS; void COND_BY_ID; void rollDice;
+void rollDice; void LOC_SHORT; void SR; void Enemy; void buildRat;
 
 new Game().init();

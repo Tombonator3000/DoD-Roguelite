@@ -1,15 +1,16 @@
-import * as THREE from 'three';
 import { G, T } from './state.js';
-import { CONDITIONS, ATTR } from './rules.js';
-import { SKILLS, SKILL, HEROIC, KIN_ABILITIES, SPELLS, TRICKS, KIN, PROF, AGES, GEAR, AIDNE, baseChance, dmgBonusDie } from './dod.js';
+import {
+  SKILL, SPELLS, RACE, PROF, AGES, GEAR, AIDNE, ABILITIES, LOCS, LOC_NAME, ATTR_NAME, ATTRS, KONSTER, KONST_PARTS,
+  HJALTEFORMAGOR, skadebonus, fvCost,
+} from './dod.js';
 import { RARITY, SRC_COLOR, isRanged } from './loot.js';
 import { WALL, FLOOR, WATER, PILLAR } from './dungeon.js';
-import { tStr } from './rules.js';
+import { tStr, derived, baseCost } from './rules.js';
 import { HOUSE, FENCE, GR } from './townmap.js';
-import { bagCap } from './inventory.js';
+import { capKg, carriedKg } from './inventory.js';
 
 const $ = s => document.querySelector(s);
-const tmp = new THREE.Vector3();
+const fmtKg = v => String(Math.round(v * 10) / 10).replace('.', ',');
 
 // Ikoner (SVG-stier, 24x24)
 const ICON = {
@@ -29,11 +30,25 @@ const ICON = {
   potion: 'M9 3h6M10 3v5l-4.5 6.5A4.5 4.5 0 0 0 9.2 21h5.6a4.5 4.5 0 0 0 3.7-6.5L14 8V3M7 14h10',
   star: 'M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.5 6.7 19.4l1.2-6L3.4 9.3l6-.7z',
   spell: 'M5 19l9-9M14 4l1 3 3 1-3 1-1 3-1-3-3-1 3-1zM19 13l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6z',
+  cross: 'M10 4h4v6h6v4h-6v6h-4v-6H4v-4h6z',
+  rage: 'M12 3l2 5 5-2-2 5 4 3-5 1 1 5-5-3-5 3 1-5-5-1 4-3-2-5 5 2z',
 };
-const KIND_ICON = { fist: 'fist', knife: 'blade', sword: 'blade', great: 'blade', axe: 'axe', hammer: 'hammer', spear: 'spear', staff: 'staff', bow: 'bow', xbow: 'bow', sling: 'bow' };
+const KIND_ICON = { fist: 'fist', knife: 'blade', sword: 'blade', great: 'blade', axe: 'axe', hammer: 'hammer', spear: 'spear', staff: 'staff', bow: 'bow', xbow: 'bow', sling: 'bow', shield: 'shield' };
 const svg = k => `<svg viewBox="0 0 24 24"><path d="${ICON[k] || ICON.star}"/></svg>`;
 
 const CONS_KIND = { potion: 'Drikk', potionvp: 'Drikk', saffron: 'Krydder' };
+const SLOT_NAME = { vapen: 'våpen', vapen2: 'skjold', rustning: 'rustning', hjalm: 'hjälm', armar: 'armskydd', ben: 'benskydd', amulett: 'amulett' };
+
+// Kroppen i HUD: sju träffområden
+const DOLL = {
+  huvud: { el: 'circle', a: { cx: 30, cy: 11, r: 9 }, t: [30, 11] },
+  brost: { el: 'rect', a: { x: 19, y: 22, width: 22, height: 22, rx: 4 }, t: [30, 33] },
+  mage: { el: 'rect', a: { x: 20, y: 46, width: 20, height: 15, rx: 3 }, t: [30, 53.5] },
+  harm: { el: 'rect', a: { x: 7, y: 23, width: 10, height: 37, rx: 4 }, t: [12, 41] },
+  varm: { el: 'rect', a: { x: 43, y: 23, width: 10, height: 37, rx: 4 }, t: [48, 41] },
+  hben: { el: 'rect', a: { x: 18.5, y: 63, width: 10.5, height: 47, rx: 4 }, t: [23.75, 86] },
+  vben: { el: 'rect', a: { x: 31, y: 63, width: 10.5, height: 47, rx: 4 }, t: [36.25, 86] },
+};
 
 export class UI {
   constructor() {
@@ -47,17 +62,24 @@ export class UI {
     this.bigCtx = this.big.getContext('2d');
     this.mmTimer = 0;
     this.boss = null;
-    this.condEls = {};
-    const ce = $('#conds');
-    for (const c of CONDITIONS) {
-      const s = document.createElement('span');
-      s.textContent = c.name;
-      s.title = `${c.name} (${c.attr}): nackdel på ${ATTR[c.attr]} og ferdighetene som hører til.`;
-      ce.appendChild(s);
-      this.condEls[c.id] = s;
-    }
     this.slots = {};
     this.lastTip = null;
+    this.buildDoll();
+  }
+
+  buildDoll() {
+    const box = $('#bodydoll');
+    if (!box) return;
+    // kroppen sett forfra: din høyre arm er til venstre i bildet
+    const parts = LOCS.map(l => {
+      const d = DOLL[l];
+      const attrs = Object.entries(d.a).map(([k, v]) => `${k}="${v}"`).join(' ');
+      return `<${d.el} class="z" data-loc="${l}" ${attrs}><title>${LOC_NAME[l]}</title></${d.el}><text class="n" data-n="${l}" x="${d.t[0]}" y="${d.t[1]}"></text>`;
+    }).join('');
+    box.innerHTML = `<svg viewBox="0 0 60 112">${parts}</svg>`;
+    this.dollZ = {};
+    this.dollN = {};
+    for (const l of LOCS) { this.dollZ[l] = box.querySelector(`[data-loc="${l}"]`); this.dollN[l] = box.querySelector(`[data-n="${l}"]`); }
   }
 
   show(id) {
@@ -76,13 +98,16 @@ export class UI {
     setTimeout(() => el.classList.add('old'), 9000);
   }
 
-  // Ultima-aktig kamplogg med terningene synlige
+  // Ultima-aktig kamplogg med terningene synlige: «Dolk 7/14», «Dolk 1>3/14 Perfekt»
   logRoll(r, text, enemy = false) {
-    const dice = r.dice.length > 1 ? `${r.dice.join('|')}${r.boon ? ' F' : ' N'}` : `${r.r}`;
-    const cls = r.drake ? 'drake' : r.demon ? 'demon' : r.success ? 'ok' : 'fail';
-    const sk = r.skill ? `${r.skill === 'Slagsmål' && G.player?.isNebb ? 'Kvakk-Fu' : r.skill} ` : '';
-    const pushed = r.pushed ? ' P' : '';
-    this.log(`<span class="roll ${cls}" title="T20 mot ${r.target}${r.pushed ? ', pressat' : ''}">${sk}${dice}/${r.target}${pushed}</span> ${text}`, enemy ? 'enemy' : '');
+    if (!r) { this.log(text, enemy ? 'enemy' : ''); return; }
+    const cls = r.perfekt ? 'drake' : r.fummel ? 'demon' : r.success ? 'ok' : 'fail';
+    const name = r.label || r.skill || '';
+    const dice = r.r2 != null ? `${r.r}>${r.r2}` : `${r.r ?? '?'}`;
+    const tag = r.perfekt ? ' Perfekt' : r.fummel ? ' Fummel' : '';
+    const hero = r.hero ? ' HP' : '';
+    const cl = r.cl ?? r.target ?? '';
+    this.log(`<span class="roll ${cls}" title="1T20 lik eller under CL ${cl}${r.fv != null ? `, FV ${r.fv}` : ''}${r.bonus ? `, +${r.bonus} fra förmåga` : ''}${r.hero ? ', hjältepoäng brukt' : ''}">${name} ${dice}/${cl}${tag}${hero}</span> ${text}`, enemy ? 'enemy' : '');
   }
 
   flashDamage() {
@@ -144,25 +169,26 @@ export class UI {
       this.slots[k] = s;
     };
     const w = P.weapon();
-    add('atk', 'LMB', KIND_ICON[w.kind] || 'fist', `${isRanged(w) ? 'Skyt' : 'Anfall'} med ${w.name} (${w.skill})`);
-    add('parry', 'RMB', 'shield', 'Parera: hold inne. Slår parering mot angrep forfra.');
-    add('dash', 'SPC', 'dodge', 'Undvika: dukk unna. Angrep som lander mens du dukker gir et Undvika-slag.');
-    add('throw', 'Q', 'throw', 'Kast et kastvåpen. Plukk det opp igjen etterpå.');
-    if (P.equip.vapen2 && !P.equip.vapen2.shield) add('swap', 'Z', 'swap', 'Bytt våpen');
+    const fv = P.fvFor?.(w) ?? 0;
+    add('atk', 'LMB', KIND_ICON[w.kind] || 'fist', `${isRanged(w) ? 'Skyt' : 'Anfall'} med ${w.name}: ${w.skill || 'Slagsmål'} FV ${fv}, skade ${tStr(w.dmg)}${P.sb && !isRanged(w) ? ` + SB ${tStr(P.sb)}` : ''}.`);
+    add('parry', 'RMB', 'shield', 'Parera: hold inne. Hvert våpen og skjold parerer én gang per stridsrunde (1,5 s). Projektiler kan ikke pareres, men skjoldet tar piler mot det det dekker.');
+    add('dash', 'SPC', 'dodge', 'Dukk unna: treffer et anfall mens du dukker, slår du et normalt SMI-slag. Ikke på kne.');
+    add('throw', 'Q', 'throw', 'Kast et kastvåpen. Det når STY rutor. Plukk det opp igjen etterpå.');
+    if (P.equip.vapen2 && !P.equip.vapen2.shield) add('swap', 'Z', 'swap', 'Bytt våpen mellom hendene');
     const keys = ['R', 'G', 'T'];
     P.activeSlots().forEach((s, i) => {
       if (s.kind === 'spell') {
         const sp = SPELLS[s.id];
-        add('a' + (i + 1), keys[i], 'spell', `${sp.name} (${sp.school}). Hold inne for høyere effektgrad: 2, 4 eller 6 VP${sp.indoor ? ', dobbelt innendørs' : ''}. ${sp.game}`, sp.indoor ? '4+' : '2+');
-      } else {
-        const h = HEROIC[s.id];
-        add('a' + (i + 1), keys[i], 'star', `${h.name}: ${h.game}`, h.vp || '');
-      }
+        add('a' + (i + 1), keys[i], 'spell', `${sp.name} (${sp.school}, skolvärde ${sp.sv}${sp.f ? ', fysisk' : ''}${sp.quick ? ', kvick' : ''}). S ${P.spells[s.id]}. CL = S - 2 x (E - 1), koster E PSY. Hold for høyere E. ${sp.text}`, 'E');
+      } else if (s.id === 'Bärsärkagång') add('a' + (i + 1), keys[i], 'rage', `Bärsärkagång (FV ${P.skills[s.id]}): +1T6 skade og raskere hugg, ingen parering eller dukking. Slutter med et ferdighetsslag (Bok I s. 46).`);
+      else add('a' + (i + 1), keys[i], 'fist', `Avväpna (FV ${P.skills[s.id]}): neste treff prøver å slå våpenet ut av hånda (STY + FV mot fiendens STY).`);
     });
-    const kin = P.kinAb.find(k => !KIN_ABILITIES[k].passive);
-    if (kin) add('kin', 'F', 'kin', `${KIN_ABILITIES[kin].name}: ${KIN_ABILITIES[kin].game}`, KIN_ABILITIES[kin].vp || '');
-    add('sneak', 'SHF', 'sneak', 'Smyga. Neste angrep blir et smyganfall.');
-    add('potion', '1', 'potion', 'Legedrikk: 2T6 KP.');
+    const ab = ABILITIES[P.sheet.ability];
+    if (ab) add('abil', 'F', 'kin', `${ab.name}${ab.psy ? ` (${ab.psy} PSY)` : ''}: ${ab.text}`, ab.psy || '');
+    add('aid', 'H', 'cross', 'Första hjälpen: stopper blødning. Helbreder ingen KP. Trenger to hele armer.');
+    add('sneak', 'SHF', 'sneak', 'Smyga: halv fart. Fiender må klare Upptäcka fara minus differensvärdet ditt for å se deg. Bakfra mot en som ikke har sett deg: +7.');
+    add('potion', '1', 'potion', 'Legedrikk: 2T6 KP, fordelt på de skadde kroppsdelene.');
+    add('hero', 'V', 'star', 'Hjältepoäng: gjør klar én, så blir neste slag ett trinn bedre (Bok I s. 64).');
     this.buildTouch();
   }
 
@@ -171,35 +197,90 @@ export class UI {
     const box = $('#tbtns-dyn');
     if (!box) return;
     const keys = ['TA1', 'TA2', 'TA3'];
-    const SHORT = { foljeslagare: 'HUND', anpasslig: 'ANPASS', halsomenal: 'ÅL', langsint: 'HÄMND', inrefrid: 'MEDITERA', vresig: 'VRESIG', jaktsinne: 'JAKT', drakdrapare: 'DRAKDRÄP', mastersmed: 'SLIPA', skattjagare: 'SKATT', tvillingpil: 'TVILLING' };
-    const short = (id, name) => SHORT[id] || name.split(' ')[0].toUpperCase().slice(0, 8);
-    const labels = P.activeSlots().map(s => short(s.id, s.kind === 'spell' ? SPELLS[s.id].name : HEROIC[s.id].name));
-    const kin = P.kinAb.find(k => !KIN_ABILITIES[k].passive);
-    box.innerHTML = labels.map((l, i) => `<button class="tbtn" data-tbtn="${keys[i]}">${l}</button>`).join('')
-      + (kin ? `<button class="tbtn" data-tbtn="TKin">${short(kin, KIN_ABILITIES[kin].name)}</button>` : '')
+    const short = s => (s.kind === 'spell' ? SPELLS[s.id].name.split(' ')[0].slice(0, 8) : s.id === 'Bärsärkagång' ? 'BÄRSÄRK' : 'AVVÄPNA');
+    const ab = ABILITIES[P.sheet.ability];
+    box.innerHTML = P.activeSlots().map((s, i) => `<button class="tbtn" data-tbtn="${keys[i]}">${short(s)}</button>`).join('')
+      + (ab && !ab.passive ? `<button class="tbtn" data-tbtn="TKin">${ab.name.split(' ')[0].toUpperCase().slice(0, 8)}</button>` : '')
+      + '<button class="tbtn" data-tbtn="TRest">FÖRBAND</button>'
       + (P.equip.vapen2 && !P.equip.vapen2.shield ? '<button class="tbtn" data-tbtn="TSwap">BYTT</button>' : '');
     G.input.bindTouchButtons?.(box);
+  }
+
+  // Statuslinja over evnelinja: blødning, skräck, buffs, överlastad
+  statusChips(P) {
+    const out = [];
+    if (P.bleeding.size) out.push(['Blør', 'bad', `Blør fra ${[...P.bleeding].map(l => LOC_NAME[l].toLowerCase()).join(', ')}. 1 KP hvert 9. sekund per sår. H stopper det.`]);
+    if (P.helpless) out.push(['Kryper', 'bad', 'Totala KP under 1: du kan bare krype, drikke og spise.']);
+    else if (P.loc.brost <= 0 || P.loc.mage <= 0) out.push(['Kryper', 'bad', 'Bröstkorg eller mage på 0: du kan bare krype.']);
+    else if (P.loc.hben <= 0 || P.loc.vben <= 0) out.push(['På kne', 'bad', 'Et bein på 0 KP.']);
+    if (P.kp === 2) out.push(['Halv CL', 'bad', 'Totala KP 2: halv CL på alt.']);
+    if (P.overloaded) out.push(['Överlastad', 'bad', `${fmtKg(P.load)} av ${P.capKg} kg.`]);
+    if (P.fx.barsark) out.push(['Bärsärk', 'on', '+1T6 skade, ingen parering.']);
+    if (P.stealth) out.push([`Smyger ${P.sneakDiff}`, 'on', 'Differensvärde fra Smyga.']);
+    if (P.forced) out.push([{ paralyzed: 'Lammet', flee: 'Flykter', rage: 'Raseri', faint: 'Besvimt' }[P.forced.type] || 'Skräck', 'bad', 'Skräcktabellen.']);
+    if (P.fx.fearCL?.t > 0) out.push([`Skräck -${P.fx.fearCL.v}`, 'bad', 'Minus på anfall og parering.']);
+    if (P.fx.drunk > 0) out.push(['Full', 'bad', '-2 på CL.']);
+    if (P.fx.medBonus) out.push([`Meditation +${P.fx.medBonus}`, 'on', 'Gjelder neste slag.']);
+    if (P.fx.tjuvBonus) out.push([`Tjuvens tur +${P.fx.tjuvBonus}`, 'on', 'Gjelder neste slag.']);
+    if (P.fx.riddarslag) out.push(['Riddarslag', 'on', 'Neste treff gjør maksimal skade.']);
+    if (P.fx.avvapna > 0) out.push(['Avväpna', 'on', 'Neste treff prøver å avväpna.']);
+    if (P.heroArmed) out.push(['Hjältepoäng', 'on', 'Neste slag blir ett trinn bedre.']);
+    for (const [id, b] of Object.entries(P.buffs)) out.push([`${(SPELLS[id]?.name || id).split(' ')[0]}${b.e ? ' E' + b.e : ''}`, 'on', `${SPELLS[id]?.text || ''} ${Math.ceil(b.t)} s igjen.`]);
+    if (P.metalWorn && Object.keys(P.spells || {}).length) out.push(['Metall', 'bad', 'Inget järn mot huden: du kan ikke trylle.']);
+    return out;
   }
 
   update(dt) {
     const P = G.player;
     $('#kpv').textContent = P.kp;
     $('#kpm').textContent = P.maxKP;
-    $('#vpv').textContent = P.vp;
-    $('#vpm').textContent = P.maxVP;
-    $('.orb.kp .fill').style.height = `${(P.kp / P.maxKP) * 100}%`;
-    $('.orb.vp .fill').style.height = `${(P.vp / P.maxVP) * 100}%`;
+    $('#vpv').textContent = P.psy;
+    $('#vpm').textContent = P.maxPSY;
+    $('.orb.kp .fill').style.height = `${Math.max(0, P.kp / P.maxKP) * 100}%`;
+    $('.orb.vp .fill').style.height = `${(P.psy / P.maxPSY) * 100}%`;
     $('.orb.kp').classList.toggle('low', P.kp / P.maxKP < 0.3);
     $('#silver').textContent = P.silver;
-    const bk = `${P.bag?.length || 0}/${bagCap(P)}/${P.overloaded ? 1 : 0}`;
+    const load = carriedKg(P), cap = capKg(P);
+    const bk = `${load}/${cap}/${P.overloaded ? 1 : 0}`;
     if (this._bagKey !== bk) {
       this._bagKey = bk;
-      $('#bagn').textContent = P.bag?.length || 0;
-      $('#bagc').textContent = bagCap(P);
+      $('#bagn').textContent = fmtKg(load);
+      $('#bagc').textContent = cap;
       $('#bagchip').classList.toggle('over', !!P.overloaded);
     }
+    const hk = `${P.hjp}/${P.heroArmed}`;
+    if (this._hjpKey !== hk) {
+      this._hjpKey = hk;
+      const el = $('#hjpv');
+      if (el) { el.textContent = `${P.hjp} HP`; el.classList.toggle('armed', !!P.heroArmed); el.classList.toggle('none', !P.hjp); }
+    }
     if (G.run?.clock != null) this.setClock(G.run.clock);
-    for (const c of CONDITIONS) this.condEls[c.id].classList.toggle('on', P.hasCond(c.id));
+    // kroppen
+    const B = P.body;
+    const dk = LOCS.map(l => `${B.loc[l]}${B.bleeding.has(l) ? 'b' : ''}${B.lame.has(l) ? 'l' : ''}`).join(',') + '|' + B.locMax.huvud;
+    if (dk !== this._dollKey && this.dollZ) {
+      this._dollKey = dk;
+      for (const l of LOCS) {
+        const v = B.loc[l], m = B.locMax[l];
+        const z = this.dollZ[l];
+        let col;
+        if (B.lame.has(l) || v <= -m) col = '#3a0a08';
+        else if (v <= 0) col = '#b3221d';
+        else if (v >= m) col = '#4f5c40';
+        else { const k = 1 - v / m; col = `rgb(${Math.round(110 + 110 * k)}, ${Math.round(110 - 30 * k)}, ${Math.round(60 - 30 * k)})`; }
+        z.setAttribute('fill', col);
+        z.classList.toggle('bleed', B.bleeding.has(l));
+        z.querySelector('title').textContent = `${LOC_NAME[l]}: ${v} av ${m} KP, absorbering ${P.absAt?.(l) ?? 0}${B.bleeding.has(l) ? ', blør' : ''}${B.lame.has(l) ? ', lam' : ''}`;
+        this.dollN[l].textContent = v;
+      }
+    }
+    // status
+    const chips = this.statusChips(P);
+    const ck = chips.map(c => c[0]).join('|');
+    if (ck !== this._chipKey) {
+      this._chipKey = ck;
+      $('#conds').innerHTML = chips.map(([t, c, ti]) => `<span class="${c === 'on' || c === 'bad' ? 'on' : ''}${c === 'bad' ? ' bad' : ''}" title="${ti}">${t}</span>`).join('');
+    }
     const cdv = (k, max) => Math.min(1, (P.cd[k] || 0) / max);
     const set = (k, frac, disabled, extra, active) => {
       const s = this.slots[k];
@@ -210,30 +291,31 @@ export class UI {
       if (extra !== undefined) s.querySelector('.n').textContent = extra;
     };
     const w = P.weapon();
-    if (this.lastW !== w || this.lastOff !== P.equip.vapen2 || this.lastSlots !== P.activeSlots().map(s => s.id).join()) {
+    const slotsKey = P.activeSlots().map(s => s.id).join();
+    if (this.lastW !== w || this.lastOff !== P.equip.vapen2 || this.lastSlots !== slotsKey) {
       this.lastW = w;
       this.lastOff = P.equip.vapen2;
-      this.lastSlots = P.activeSlots().map(s => s.id).join();
+      this.lastSlots = slotsKey;
       this.buildBar();
     }
-    set('atk', isRanged(w) ? cdv('shot', 1) : 0, w.broken || (isRanged(w) && P.noAmmo > 0), w.broken ? '!' : '');
-    set('parry', cdv('parry', 0.45), !P.parryItem() || P.fx.barsark > 0, '', P.guard > 0);
-    set('dash', cdv('dodge', 0.7), P.fx.barsark > 0);
-    const thr = [P.equip.vapen, P.equip.vapen2].some(it => it && !it.shield && !isRanged(it) && it.kind !== 'fist' && (it.f.includes('thr') || (P.has('kastarm') && it.grip === 1)));
+    const able = P.canFight();
+    set('atk', isRanged(w) ? cdv('shot', 1) : 0, !able || w.broken || P.gripOf(w) === 0 || (isRanged(w) && P.noAmmo > 0), w.broken ? '!' : '');
+    set('parry', Math.min(1, Math.max(P.parryT.vapen, P.parryT.vapen2 ? P.parryT.vapen2 : 0) / 1.5), !able || !P.parryOptionsAny() || P.fx.barsark, '', P.guard > 0);
+    set('dash', cdv('dodge', 0.7), !able || P.fx.barsark || P.loc.hben <= 0 || P.loc.vben <= 0);
+    const thr = [P.equip.vapen, P.equip.vapen2].some(it => it?.thrown && !it.broken);
     set('throw', cdv('throw', 0.38), !thr);
     set('swap', cdv('swap', 0.3), false);
     P.activeSlots().forEach((s, i) => {
       const k = 'a' + (i + 1);
-      if (s.kind === 'spell') set(k, cdv(k, 0.5), P.vp < 2 && P.vp > 1, P.charge?.cdk === k ? 'EG' + P.charge.pl : '', P.charge?.cdk === k);
-      else {
-        const h = HEROIC[s.id];
-        const on = (P.fx[s.id] > 0) || (s.id === 'barsark' && P.fx.barsark > 0) || (s.id === 'tvillingpil' && P.fx.twinShot) || (s.id === 'mastersmed' && P.fx.sharpened);
-        set(k, cdv(k, 0.6), P.vp < h.vp, '', on);
-      }
+      if (s.kind === 'spell') set(k, cdv(k, 0.5), P.psy < 2 || P.metalWorn || P.curse?.mute, P.charge?.cdk === k ? 'E' + P.charge.e : '', P.charge?.cdk === k);
+      else set(k, cdv(k, 0.6), false, '', s.id === 'Bärsärkagång' ? P.fx.barsark : P.fx.avvapna > 0);
     });
-    set('kin', cdv('kin', 0.5), false, '', !!P.armed || !!P.prey);
-    set('sneak', cdv('sneak', 2), P.fx.barsark > 0, '', P.stealth > 0);
+    const ab = ABILITIES[P.sheet.ability];
+    if (ab) set('abil', cdv('abil', 0.5), ab.psy ? P.psy - ab.psy < 1 : false, P.sheet.ability === 'tjuvtur' ? `${2 - (P.floor.tjuvtur || 0)}` : '', !!(P.chan && (P.chan.kind === 'hands' || P.chan.kind === 'med')) || !!P.fx.riddarslag || !!P.fx.tjuvBonus);
+    set('aid', cdv('aid', 0.5), !P.bleeding.size, P.bleeding.size || '', P.chan?.kind === 'aid');
+    set('sneak', cdv('sneak', 1.2), P.fx.barsark, '', P.stealth);
     set('potion', cdv('potion', 1), P.potions <= 0, P.potions);
+    set('hero', 0, P.hjp <= 0, P.hjp || '', P.heroArmed);
     // spørsmål om samhandling
     const W = G.world;
     let txt = null;
@@ -246,10 +328,14 @@ export class UI {
     if (tb) tb.classList.toggle('ready', !!txt);
     this.updateTooltip(W.nearItem ? W.nearItem.item || W.nearItem.entry : null);
     if (this.boss) $('#bossbar .fill').style.width = `${Math.max(0, (this.boss.kp / this.boss.maxKP) * 100)}%`;
-    // kort vila
+    // kanalisering: Första hjälpen, Handpåläggning, Meditation
     const rb = $('#restbar');
-    if (P.chanRest) { rb.hidden = false; rb.querySelector('i').style.width = `${(P.chanRest.t / P.chanRest.dur) * 100}%`; }
-    else rb.hidden = true;
+    const c = P.chan;
+    if (c) {
+      rb.hidden = false;
+      $('#restlbl').textContent = c.kind === 'aid' ? 'Första hjälpen' : c.kind === 'hands' ? 'Handpåläggning' : 'Meditation';
+      rb.querySelector('i').style.width = `${c.kind === 'aid' ? (c.t / c.dur) * 100 : (c.tick / 1.5) * 100}%`;
+    } else rb.hidden = true;
     $('#blind').style.opacity = P.blind > 0 ? Math.min(0.92, P.blind / 2) : 0;
     this.mmTimer -= dt;
     if (this.mmTimer <= 0) {
@@ -261,12 +347,11 @@ export class UI {
 
   itemHTML(item, label, o = {}) {
     if (!item.slot) return this.entryHTML(item, label, o);
-    const r = RARITY[item.rarity];
-    const slotName = { vapen: 'våpen', vapen2: 'skjold', rustning: 'rustning', hjalm: 'hjelm', amulett: 'amulett' }[item.slot] || item.slot;
+    const r = RARITY[item.rarity] || RARITY.vanlig;
     return `<div class="it"><div class="lbl">${label}</div><div class="nm" style="color:${r.color}">${item.name}</div>
-      <div class="rar">${r.name} ${slotName}</div>
-      ${item.lines.map(l => `<div class="ln">${l}</div>`).join('')}
-      ${item.flavor ? `<div class="fl">${item.flavor}</div>` : ''}${o.price != null ? `<div class="val">Verdi ${o.price} silver</div>` : ''}</div>`;
+      <div class="rar">${r.name} ${SLOT_NAME[item.slot] || item.slot}</div>
+      ${(item.lines || []).map(l => `<div class="ln">${l}</div>`).join('')}
+      ${item.flavor ? `<div class="fl">${item.flavor}</div>` : ''}${o.price != null ? `<div class="val">Verdi ${o.price} sm</div>` : ''}</div>`;
   }
 
   // Mat, drikk og verdisaker
@@ -275,7 +360,7 @@ export class UI {
     const kind = e.type === 'val' ? 'Verdisak' : CONS_KIND[e.icon] || 'Mat';
     return `<div class="it"><div class="lbl">${label}</div><div class="nm" style="color:${r.color}">${e.name}${e.qty > 1 ? ` <span class="q">x${e.qty}</span>` : ''}</div>
       <div class="rar">${kind}</div><div class="ln">${e.desc || ''}</div>
-      <div class="val">Verdi ${o.price ?? e.value * (e.qty || 1)} silver</div></div>`;
+      <div class="val">Verdi ${o.price ?? e.value * (e.qty || 1)} sm</div></div>`;
   }
 
   updateTooltip(item) {
@@ -283,7 +368,9 @@ export class UI {
     this.lastTip = item;
     if (!item) { this.tooltip.hidden = true; return; }
     if (!item.slot) { this.tooltip.innerHTML = this.entryHTML(item, 'På bakken'); this.tooltip.hidden = false; return; }
-    const cur = G.player.equip[item.slot === 'vapen2' && !G.player.equip.vapen2 ? 'vapen2' : item.slot];
+    const P = G.player;
+    const slot = item.shield ? 'vapen2' : item.slot;
+    const cur = P.equip[slot];
     this.tooltip.innerHTML = this.itemHTML(item, 'På bakken') + (cur ? this.itemHTML(cur, 'Har på') : '<div class="it"><div class="lbl">Har på</div><div class="ln">Ingenting</div></div>');
     this.tooltip.hidden = false;
   }
@@ -341,15 +428,13 @@ export class UI {
       else if (it.kind === 'rune' && !it.read) dot(it.pos.x, it.pos.z, '#ffa040', 0.6);
     }
     for (const c of G.world.caches || []) if (!c.taken && (c.known || c.found)) dot(c.x, c.z, '#ffe080', 0.5, true);
-    const magic = P.tricks?.has('kannamagi');
-    for (const p of G.pickups) if (p.kind === 'item') dot(p.pos.x, p.pos.z, RARITY[p.item.rarity].color, magic && p.item.rarity !== 'vanlig' ? 0.7 : 0.4, magic && p.item.rarity !== 'vanlig');
-    const C = G.companion;
+    for (const p of G.pickups) if (p.kind === 'item') dot(p.pos.x, p.pos.z, RARITY[p.item.rarity].color, 0.4);
+    // MÖRKERSYN og KÄNNA FIENDSKAP viser fiender du ikke ser
+    const sense = P.buffs?.morkersyn || P.buffs?.kannafiendskap;
     for (const e of G.enemies) {
       if (e.dead) continue;
-      const spotted = e.alerted || (C?.alive && Math.hypot(e.pos.x - C.pos.x, e.pos.z - C.pos.z) < 12);
-      if (spotted || e === P.prey) dot(e.pos.x, e.pos.z, e === P.prey ? '#ff2a10' : e.def.boss ? '#ff5030' : '#c0392b', e.def.boss || e === P.prey ? 0.9 : 0.4, e === P.prey);
+      if (e.alerted || sense) dot(e.pos.x, e.pos.z, e.fleeing ? '#c0a040' : e.def.boss ? '#ff5030' : '#c0392b', e.def.boss ? 0.9 : 0.4, !!sense);
     }
-    if (C?.alive) dot(C.pos.x, C.pos.z, '#d8b080', 0.45, true);
     ctx.fillStyle = '#ffffff';
     ctx.beginPath();
     ctx.arc(ptx, ptz, mini ? 0.7 : 0.6, 0, Math.PI * 2);
@@ -425,7 +510,6 @@ export class UI {
     const dot = (wx, wz, c, r) => { ctx.fillStyle = c; ctx.beginPath(); ctx.arc(wx / T, wz / T, r, 0, Math.PI * 2); ctx.fill(); };
     if (D.grate) dot(D.grate.x, D.grate.z, '#6ab4ff', 0.9);
     for (const n of D.life?.npcs || []) if (!n.hidden) dot(n.pos.x, n.pos.z, n.mode === 'sleep' ? 'rgba(200,190,160,0.5)' : '#f0dc90', mini ? 0.45 : 0.4);
-    if (G.companion?.alive) dot(G.companion.pos.x, G.companion.pos.z, '#d8b080', 0.45);
     ctx.fillStyle = '#ffffff';
     ctx.beginPath();
     ctx.arc(P.pos.x / T, P.pos.z / T, mini ? 0.7 : 0.75, 0, Math.PI * 2);
@@ -493,69 +577,82 @@ export class UI {
     }
   }
 
-  // Rollformulär i DoD-stil
   renderSheet() {
     const P = G.player, S = P.sheet;
     $('#sheet-body').innerHTML = sheetHTML(S, P);
   }
 }
 
-// Felles for rollformulär i spillet og oppsummeringen i rollpersonsskapingen.
-// P (spilleren) er valgfri: uten den vises verdiene fra formulæret.
+// Rollformulär etter DoD91. Felles for formuläret i spillet og sammendraget i rollpersonsskapingen.
+// P (spilleren) er valgfri: uten den vises verdiene fra formuläret.
 export function sheetHTML(S, P = null) {
-  const kin = KIN[S.kin], prof = PROF[S.profession];
-  const age = AGES.find(a => a.id === S.age);
+  const race = RACE[S.kin] || RACE.manniska, prof = PROF[S.profession] || PROF.krigare;
+  const age = AGES.find(a => a.id === S.age) || AGES[1];
   const A = P ? P.attrs : S.attrs;
   const skills = P ? P.skills : S.skills;
-  const trained = new Set(S.trained);
-  const marks = P ? P.marks : new Set();
-  const attrs = Object.keys(ATTR).map(k => `<div class="attr"><div class="k">${k}</div><div class="v">${A[k]}</div><div class="n">${ATTR[k]}</div></div>`).join('');
-  const skRow = s => {
-    const v = skills[s.id];
+  const yrke = new Set(S.yrke || []);
+  const der = derived(A, S.kin, {});
+  const kp = P ? `${P.kp}/${P.maxKP}` : der.kp;
+  const psy = P ? `${P.psy}/${P.maxPSY}` : A.PSY;
+  const sb = skadebonus(A.STY + A.STO);
+  const exp = P ? P.exp : {};
+  const sheetLike = { yrke: S.yrke || [], specialFx: S.special?.fx || {}, kin: S.kin };
+  const attrs = ATTRS.map(k => `<div class="attr"><div class="k">${k}</div><div class="v">${A[k]}</div><div class="n">${ATTR_NAME[k]}</div></div>`).join('');
+  const skRow = id => {
+    const v = skills[id];
     if (v == null) return '';
-    const label = s.id === 'Slagsmål' && S.id === 'svartnebb' ? 'Slagsmål (Kvakk-Fu)' : s.id;
-    return `<div class="sk${trained.has(s.id) ? ' tr' : ''}"><span class="box ${marks.has(s.id) ? 'm' : ''}"></span><span class="nm">${label}</span><span class="at">${s.attr}</span><span class="v">${v}</span></div>`;
+    const sk = SKILL[id];
+    const ep = exp[id] || 0;
+    const next = ep && sk ? fvCost(P ? P.baseSkills[id] || 0 : v, (P ? P.baseSkills[id] || 0 : v) + 1, baseCost(id, sheetLike)) : 0;
+    return `<div class="sk${yrke.has(id) ? ' tr' : ''}" title="${sk?.use || ''}${ep ? ` ${ep} EP, neste FV koster ${next}.` : ''}"><span class="box ${ep ? 'm' : ''}"></span><span class="nm">${id}</span><span class="at">${sk?.attr || ''}${sk?.kat === 'B' ? ' B' : ''}</span><span class="v">${v}</span></div>`;
   };
-  const gen = SKILLS.filter(s => s.type === 'gen').map(skRow).join('');
-  const vap = SKILLS.filter(s => s.type === 'vap').map(skRow).join('');
-  const sek = SKILLS.filter(s => s.type === 'sek').map(skRow).join('');
-  const kp = P ? `${P.kp}/${P.maxKP}` : A.FYS;
-  const vp = P ? `${P.vp}/${P.maxVP}` : A.PSY;
-  const move = P ? P.move : kin.move + (A.SMI <= 6 ? -4 : A.SMI <= 9 ? -2 : A.SMI <= 12 ? 0 : A.SMI <= 15 ? 2 : 4);
-  const db = k => (dmgBonusDie(A[k]) ? '+' + tStr(dmgBonusDie(A[k])) : 'ingen');
+  const ids = Object.keys(skills).filter(id => SKILL[id]);
+  const byType = t => ids.filter(id => SKILL[id].type === t).sort((a, b) => a.localeCompare(b, 'sv')).map(skRow).join('');
+  const prim = byType('prim');
+  const vap = [...byType('vap'), ...byType('konst')].join('');
+  const sek = [...byType('sek'), ...byType('magi')].join('');
   const ab = (name, desc, extra = '') => `<div class="boon-s"><b>${name}</b>${extra} <span>${desc}</span></div>`;
-  const heroic = (P ? P.heroic : S.heroic).map(h => ab(HEROIC[h].name, HEROIC[h].game, HEROIC[h].vp ? ` <i>${HEROIC[h].vp} VP</i>` : '')).join('') || '<div class="ln">Ingen.</div>';
-  const kinA = S.kinAbilities.map(k => ab(KIN_ABILITIES[k].name, KIN_ABILITIES[k].game, KIN_ABILITIES[k].vp ? ` <i>${KIN_ABILITIES[k].vp} VP</i>` : '')).join('');
-  const spells = (S.spells || []).map(s => ab(SPELLS[s].name, SPELLS[s].game, ` <i>${SPELLS[s].school}</i>`)).join('');
-  const tricks = (S.tricks || []).map(t => ab(TRICKS[t].name, TRICKS[t].game)).join('');
+  const yf = ABILITIES[S.ability];
+  const ability = yf ? ab(yf.name, yf.text, yf.psy ? ` <i>${yf.psy} PSY</i>` : '') : '<div class="ln">Ingen.</div>';
+  const special = S.special ? ab(S.special.name, S.special.text) : '';
+  const konst = S.konst && KONSTER[S.konst] ? ab(S.konst, KONSTER[S.konst].parts.map(p => KONST_PARTS[p].name).join(', ') + '.', ` <i>FV ${skills[S.konst] ?? 0}</i>`) : '';
+  const spellsObj = P ? P.spells : S.spells || {};
+  const spells = Object.entries(spellsObj).map(([id, s]) => SPELLS[id] ? ab(SPELLS[id].name, SPELLS[id].text, ` <i>S ${s}, skolvärde ${SPELLS[id].sv}</i>`) : '').join('');
+  const heroic = P && P.heroic.length ? `<h3>Hjälteförmågor</h3>${P.heroic.map(h => ab(HJALTEFORMAGOR[h]?.name || h, HJALTEFORMAGOR[h]?.text || '')).join('')}` : '';
+  let body = '';
+  if (P) {
+    body = `<h3>Träffområden</h3><div class="sks">${LOCS.map(l => `<div class="sk"><span class="box ${P.bleeding.has(l) ? 'm' : ''}"></span><span class="nm">${LOC_NAME[l]}</span><span class="at">abs ${P.absAt(l)}</span><span class="v">${P.loc[l]}/${P.locMax[l]}</span></div>`).join('')}</div>`;
+  } else {
+    const lk = der.loc;
+    body = `<h3>Träffområden</h3><div class="sks">${LOCS.map(l => `<div class="sk"><span class="box"></span><span class="nm">${LOC_NAME[l]}</span><span class="at"></span><span class="v">${lk[l]}</span></div>`).join('')}</div>`;
+  }
   let eq = '';
   if (P) {
-    const names = { vapen: 'Våpen', vapen2: 'I den andre hånda', rustning: 'Rustning', hjalm: 'Hjälm', amulett: 'Amulett' };
+    const names = { vapen: 'Våpen', vapen2: 'I den andre hånda', hjalm: 'Hjälm', rustning: 'Rustning', armar: 'Armskydd', ben: 'Benskydd', amulett: 'Amulett' };
     eq = Object.keys(names).map(s => (P.equip[s] ? G.ui.itemHTML(P.equip[s], names[s]) : `<div class="it"><div class="lbl">${names[s]}</div><div class="ln">Tomt</div></div>`)).join('');
   }
-  const gear = (P ? [...P.kit] : S.gear.g || []).map(g => GEAR[g]?.name || g).join(', ');
+  const gear = (P ? [...P.kit] : S.gear?.g || []).map(g => GEAR[g]?.name || g).join(', ');
   const back = [
-    S.weakness ? `<div><span>Svaghet</span>${S.weakness}</div>` : '',
     S.appearance ? `<div><span>Utseende</span>${S.appearance}</div>` : '',
-    S.memento ? `<div><span>Minnessak</span>${S.memento}</div>` : '',
-    S.aidne != null ? `<div><span>Socialt stånd (Aidne)</span>${AIDNE[S.aidne].stand}</div>` : '',
+    S.stand ? `<div><span>Socialt stånd</span>${S.stand}</div>` : '',
+    S.aidne != null && AIDNE[S.aidne] ? `<div><span>Aidne</span>${AIDNE[S.aidne].stand}</div>` : '',
   ].join('');
   const boons = P && P.boons.length ? `<h3>Gaver</h3>${P.boons.map(b => `<div class="boon-s"><b style="color:${SRC_COLOR[b.src]}">${b.name}</b> <span>${b.desc}</span></div>`).join('')}` : '';
-  const inj = P && P.injuries.length ? `<h3>Svåra skador</h3>${P.injuries.map(i => `<div class="boon-s"><b>${i.name}</b> <span>${i.perm ? 'Varig' : `Leges etter ${i.left} vila til`}</span></div>`).join('')}` : '';
+  const inj = P && P.injuries.length ? `<h3>Kritiske skador</h3>${P.injuries.map(i => ab(`${i.name} (${LOC_NAME[i.loc]?.toLowerCase()})`, i.text)).join('')}` : '';
+  const fob = P && P.phobias.length ? `<h3>Fobier</h3>${P.phobias.map(f => `<div class="ln">${f.name}${f.mild ? ' (mild)' : ''}</div>`).join('')}` : '';
+  const epTot = Object.values(exp).reduce((a, b) => a + b, 0);
+  const hand = { hoger: 'högerhänt', vanster: 'vänsterhänt', dubbelhant: 'dubbelhänt', ambidextrios: 'ambidextriös' }[S.hand] || '';
   return `
-    <div class="sh-head"><div><div class="eyebrow">Rollformulär</div><h2>${S.name}</h2>
-      <div class="sub">${S.realName ? `Egentlig ${S.realName}. ` : ''}${kin.name}, ${prof.name.toLowerCase()}${S.school ? ` (${S.school.toLowerCase()})` : ''}, ${age.name.toLowerCase()}.</div></div>
-      <div class="pts"><div><b>${kp}</b><span>KP</span></div><div><b>${vp}</b><span>VP</span></div><div><b>${move}</b><span>Förflyttning</span></div><div><b>${P ? P.armor : '-'}</b><span>Rustning</span></div></div></div>
+    <div class="sh-head"><div><div class="eyebrow">Rollformulär, DoD91</div><h2>${S.name}</h2>
+      <div class="sub">${S.realName ? `Egentlig ${S.realName}. ` : ''}${race.name}, ${prof.name.toLowerCase()}${S.school ? ` (${S.school.toLowerCase()})` : ''}, ${age.name.toLowerCase()}${hand ? `, ${hand}` : ''}.</div></div>
+      <div class="pts"><div><b>${kp}</b><span>KP</span></div><div><b>${psy}</b><span>PSY</span></div><div><b>${der.move}</b><span>Förflyttning</span></div><div><b>${sb ? tStr(sb) : '-'}</b><span>Skadebonus</span></div>${P ? `<div><b>${P.hjp}</b><span>Hjältepoäng</span></div><div><b>${epTot}</b><span>EP</span></div>` : ''}</div></div>
     <div class="attrs">${attrs}</div>
-    <div class="dbs"><span>Skadebonus STY <b>${db('STY')}</b></span><span>Skadebonus SMI <b>${db('SMI')}</b></span><span>Grundchans brukes for ferdigheter du ikke er tränad i (fylt rute = tränad).</span></div>
+    <div class="dbs"><span>Bärförmåga <b>${A.STY} kg</b></span><span>Fylt rute: ferdigheten har EP. Lys tekst: yrkesfärdighet. B: kategori B (ingen EP fra eventyr).</span></div>
     <div class="cols3">
-      <div><h3>Färdigheter</h3><div class="sks">${gen}</div></div>
-      <div><h3>Vapenfärdigheter</h3><div class="sks">${vap}</div>${sek ? `<h3>Sekundära</h3><div class="sks">${sek}</div>` : ''}
-        <p class="hint">Fylt rute er markert og kan forbedres ved vila.</p></div>
-      <div><h3>Släktesförmåga</h3>${kinA}<h3>Hjälteförmågor</h3>${heroic}${spells ? `<h3>Besvärjelser</h3>${spells}` : ''}${tricks ? `<h3>Trolleritrick</h3>${tricks}` : ''}${boons}${inj}</div>
+      <div><h3>Primära färdigheter</h3><div class="sks">${prim}</div>${body}</div>
+      <div><h3>Vapen og stridskonst</h3><div class="sks">${vap || '<div class="ln">Ingen.</div>'}</div>${sek ? `<h3>Sekundära</h3><div class="sks">${sek}</div>` : ''}</div>
+      <div><h3>Yrkesförmåga</h3>${ability}${special ? `<h3>Särskild förmåga</h3>${special}` : ''}${konst ? `<h3>Stridskonst</h3>${konst}` : ''}${spells ? `<h3>Besvärjelser</h3>${spells}` : ''}${heroic}${boons}${inj}${fob}</div>
     </div>
     ${eq ? `<h3>Utrustning</h3><div class="eq eq-grid">${eq}</div>` : ''}
     <div class="sh-foot"><div><span>Övrigt</span>${gear || 'Ingenting'}</div>${back}</div>`;
 }
-void baseChance;
-void SKILL;

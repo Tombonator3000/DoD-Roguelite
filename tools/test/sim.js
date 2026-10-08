@@ -9,7 +9,6 @@ window.sim = (sec, fn, dt = 1 / 30) => {
       if (G.state !== 'play') { G.input.endFrame(); continue; }
       G.time += dt;
       G.run.clock += dt / 120;
-      if (G.game.push) G.game.pushKeys(G.input, dt);
       G.dungeon.computeFlow(G.player.pos.x, G.player.pos.z);
       G.player.update(dt, G.input);
       for (let k = G.enemies.length - 1; k >= 0; k--) if (!G.enemies[k].update(dt)) { G.enemies[k].dispose(); G.enemies.splice(k, 1); }

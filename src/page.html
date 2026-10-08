@@ -302,7 +302,7 @@ body.in-town .tbtn[data-tbtn="TAtk"], body.in-town .tbtn[data-tbtn="TThrow"], bo
 .pts div { min-width: 70px; padding: 8px 10px; border: 1px solid var(--gild-dim); text-align: center; font-family: var(--ui); font-variant-numeric: tabular-nums; }
 .pts b { font-size: 24px; }
 .pts span { display: block; font-size: 11px; letter-spacing: .14em; color: var(--dim); }
-.attrs { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; margin-top: 18px; }
+.attrs { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; margin-top: 18px; }
 .attr { border: 1px solid var(--gild-dim); padding: 8px 6px; text-align: center; background: rgba(0,0,0,.25); }
 .attr .k { font-family: var(--ui); font-weight: 800; font-size: 13px; letter-spacing: .14em; color: var(--gild); }
 .attr .v { font-family: var(--ui); font-weight: 800; font-size: 28px; font-variant-numeric: tabular-nums; }
@@ -356,6 +356,25 @@ body.in-town .tbtn[data-tbtn="TAtk"], body.in-town .tbtn[data-tbtn="TThrow"], bo
   #banner.on { animation-duration: .01s; opacity: 1; }
   .boon { transition: none; }
 }
+
+/* --- 0.5: DoD91 --- */
+#bodydoll { position: absolute; left: 152px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); width: 62px; height: 114px; pointer-events: auto; filter: drop-shadow(0 2px 6px rgba(0,0,0,.8)); }
+#bodydoll svg { width: 100%; height: 100%; overflow: visible; }
+#bodydoll .z { stroke: #0a0806; stroke-width: 1.4; transition: fill .2s; }
+#bodydoll .z.bleed { animation: bleedz 1s infinite; }
+@keyframes bleedz { 50% { stroke: #ff3020; stroke-width: 2.4; } }
+#bodydoll .n { font: 800 9px var(--ui); fill: #fff4dc; text-anchor: middle; dominant-baseline: middle; paint-order: stroke; stroke: #000; stroke-width: 2.2px; pointer-events: none; }
+.hjp { font-family: var(--ui); font-weight: 800; font-size: 13px; color: #f0c850; margin-left: 4px; padding: 1px 6px; border: 1px solid rgba(240,200,80,.3); background: rgba(0,0,0,.4); }
+.hjp.armed { border-color: #f0c850; box-shadow: 0 0 10px rgba(240,200,80,.6); color: #fff0b0; }
+.hjp.none { opacity: .45; }
+#ko-log { text-align: left; max-width: 540px; margin: 10px auto 6px; font-size: 15px; line-height: 1.5; min-height: 110px; }
+#ko-log div { opacity: 0; animation: koIn .35s forwards; margin: 2px 0; }
+#ko-log .bad { color: #ff9a8a; } #ko-log .good { color: #a8e8c8; }
+@keyframes koIn { to { opacity: 1; } }
+.explist { display: grid; grid-template-columns: 1fr auto auto; gap: 3px 16px; font-size: 14.5px; max-width: 520px; }
+.explist .h { color: var(--dim); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+.explist .ok { color: var(--moss); }
+@media (max-width: 760px) { #bodydoll { left: 100px; width: 40px; height: 74px; } #bodydoll .n { display: none; } }
 
 /* --- 0.3: vila, døende, pressa slag, blindhet --- */
 #restbar { position: absolute; left: 50%; bottom: calc(210px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); display: flex; align-items: center; gap: 10px; font-family: var(--ui); font-weight: 800; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--moss); }
@@ -549,12 +568,12 @@ body.inv-open #hud, body.inv-open #labels, body.inv-open #touch, body.inv-open #
 .inv-panel h3 { font-family: var(--ui); font-weight: 800; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--gild); margin: 18px 0 8px; display: flex; justify-content: space-between; gap: 8px; }
 .inv-panel h3 span { color: var(--dim); letter-spacing: .06em; font-weight: 700; text-transform: none; font-size: 12.5px; }
 .inv-panel h3 span.bad { color: #ff8a7a; }
-.doll { position: relative; display: grid; grid-template-columns: 82px 96px 82px; grid-template-areas: "w h a" "w r o"; gap: 10px 9px; justify-content: center; padding: 16px 8px 12px; border: 1px solid rgba(201,163,90,.18); background: radial-gradient(ellipse 60% 70% at 50% 45%, rgba(201,163,90,.07), transparent 70%), rgba(0,0,0,.22); }
+.doll { position: relative; display: grid; grid-template-columns: 82px 96px 82px; grid-template-areas: "w h a" "w r o" "m l o"; gap: 10px 9px; justify-content: center; padding: 16px 8px 12px; border: 1px solid rgba(201,163,90,.18); background: radial-gradient(ellipse 60% 70% at 50% 45%, rgba(201,163,90,.07), transparent 70%), rgba(0,0,0,.22); }
 .doll::before, .doll::after { content: ''; position: absolute; width: 16px; height: 16px; border: 2px solid var(--gild-dim); }
 .doll::before { top: -1px; left: -1px; border-right: 0; border-bottom: 0; }
 .doll::after { bottom: -1px; right: -1px; border-left: 0; border-top: 0; }
 .slot { min-width: 0; display: flex; flex-direction: column; align-items: stretch; gap: 4px; }
-.area-w { grid-area: w; align-self: center; } .area-h { grid-area: h; } .area-a { grid-area: a; } .area-r { grid-area: r; } .area-o { grid-area: o; align-self: center; }
+.area-w { grid-area: w; align-self: center; } .area-h { grid-area: h; } .area-a { grid-area: a; } .area-r { grid-area: r; } .area-o { grid-area: o; align-self: center; } .area-m { grid-area: m; } .area-l { grid-area: l; }
 .slot .sl { font-family: var(--ui); font-size: 11px; font-weight: 700; color: var(--dim); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: .02em; }
 .ic { position: relative; width: 100%; aspect-ratio: 1; background: radial-gradient(circle at 50% 38%, rgba(255,240,220,.05), transparent 62%), linear-gradient(#100c0c, #19120f); border: 1px solid #2e241b; box-shadow: inset 0 0 0 1px #000, inset 0 10px 22px rgba(0,0,0,.7); transition: border-color .15s, box-shadow .15s, transform .12s; touch-action: none; }
 .ic.full { cursor: grab; }
@@ -570,6 +589,8 @@ body.inv-open #hud, body.inv-open #labels, body.inv-open #touch, body.inv-open #
 .area-a .ic.empty { --sil: radial-gradient(circle at 50% 60%, transparent 0 22%, #000 24% 34%, transparent 36%); }
 .area-w .ic.empty, .area-o .ic.empty { --sil: linear-gradient(135deg, transparent 0 46%, #000 46% 54%, transparent 54%); }
 .area-r .ic.empty { --sil: radial-gradient(ellipse 50% 60% at 50% 50%, #000 0 70%, transparent 72%); }
+.area-m .ic.empty { --sil: linear-gradient(90deg, transparent 0 20%, #000 20% 38%, transparent 38% 62%, #000 62% 80%, transparent 80%); }
+.area-l .ic.empty { --sil: linear-gradient(90deg, transparent 0 24%, #000 24% 42%, transparent 42% 58%, #000 58% 76%, transparent 76%); }
 .ic .q { position: absolute; right: 4px; bottom: 2px; z-index: 2; font-style: normal; font-family: var(--ui); font-weight: 800; font-size: 13px; color: #fff; text-shadow: 0 1px 2px #000, 0 0 6px #000; }
 .ic .br { position: absolute; left: 4px; top: 3px; z-index: 2; font-style: normal; font-family: var(--ui); font-size: 10px; font-weight: 800; color: #ff8a6a; text-transform: uppercase; letter-spacing: .06em; }
 .belt { display: grid; grid-template-columns: repeat(4, 56px); gap: 10px; justify-content: start; padding: 10px 12px; background: linear-gradient(90deg, transparent, rgba(90,60,30,.25) 8%, rgba(90,60,30,.25) 92%, transparent); border-top: 1px solid rgba(201,163,90,.15); border-bottom: 1px solid rgba(201,163,90,.15); }
@@ -660,32 +681,24 @@ body.inv-open #hud, body.inv-open #labels, body.inv-open #touch, body.inv-open #
 <div id="wipe"></div>
 <canvas id="bigmap" hidden></canvas>
 <div id="blind"></div>
-<div id="pushbox" hidden>
-  <div class="eyebrow">Pressa slaget?</div>
-  <div class="ps-roll"></div>
-  <div class="ps-txt">Slå om, men ta et tillstånd. <kbd>X</kbd> tar det markerte, <kbd>1</kbd>-<kbd>6</kbd> velger, <kbd>Esc</kbd> lar det være.</div>
-  <div class="ps-conds"></div>
-  <div class="ps-foot"><button class="btn small ps-no">La det være</button><span class="ps-bar"><i></i></span></div>
-</div>
-
 <div id="hud" hidden>
   <div id="depth"><div class="eyebrow">Nivå <span id="depthNum">1</span> av 5</div><div id="depthName">Fristadens kloakker</div></div>
-  <div id="purse"><span><span id="silver">0</span> silver</span><button id="bagchip" title="Packning (I)"><span class="bg-ico"></span><b id="bagn">0</b>/<i id="bagc">0</i></button></div>
+  <div id="purse"><span><span id="silver">0</span> sm</span><button id="bagchip" title="Packning (I): kg du bærer av STY kg"><span class="bg-ico"></span><b id="bagn">0</b>/<i id="bagc">0</i> kg</button><span id="hjpv" class="hjp" title="Hjältepoäng. V gjør klar én: neste slag blir ett trinn bedre.">0 HP</span></div>
   <canvas id="minimap" width="200" height="200"></canvas>
   <div id="maphint">Tab kart · C rollformulär</div>
   <div id="bossbar" hidden><div class="name">Rødpels, revehøvdingen</div><div class="track"><div class="fill"></div></div></div>
   <div id="log"></div>
   <div id="prompt" hidden></div>
-  <div id="restbar" hidden><span>Kort vila</span><b><i></i></b></div>
-  <div id="dying" hidden><div class="eyebrow">0 KP, dödsslag hvert 5. sekund</div><div class="pips2"><span>Lyktes</span><div class="ok"></div><span>Feil</span><div class="bad"></div></div></div>
+  <div id="restbar" hidden><span id="restlbl">Första hjälpen</span><b><i></i></b></div>
   <div id="tooltip" hidden></div>
   <div id="panel-bottom">
     <div class="orb kp"><div class="fill"></div><div class="glass"></div><div class="val"><b id="kpv">14</b><span>av <i id="kpm">14</i></span><small>KP</small></div></div>
+    <div id="bodydoll" title="Kroppen: KP per träffområde"></div>
     <div id="center">
       <div id="conds"></div>
       <div id="bar"></div>
     </div>
-    <div class="orb vp"><div class="fill"></div><div class="glass"></div><div class="val"><b id="vpv">13</b><span>av <i id="vpm">13</i></span><small>VP</small></div></div>
+    <div class="orb vp"><div class="fill"></div><div class="glass"></div><div class="val"><b id="vpv">13</b><span>av <i id="vpm">13</i></span><small>PSY</small></div></div>
   </div>
 </div>
 
@@ -771,19 +784,20 @@ body.inv-open #hud, body.inv-open #labels, body.inv-open #touch, body.inv-open #
       <h2>Slik spiller du</h2>
       <div class="keys">
         <kbd>WASD</kbd><span>Gå. Sikt med musa.</span>
-        <kbd>Venstre klikk</kbd><span>Anfall med våpenet (hold for kombo). Med bue, armbrøst eller slynge skyter du.</span>
-        <kbd>Høyre klikk</kbd><span>Parera: hold inne. Angrep forfra gir et pareringsslag. Skjold tar piler.</span>
-        <kbd>Mellomrom</kbd><span>Undvika: dukk unna. Treffer et angrep mens du dukker, slår du Undvika.</span>
+        <kbd>Venstre klikk</kbd><span>Anfall med våpenet (hold for kombo). Med bue, armborst eller slunga skyter du.</span>
+        <kbd>Høyre klikk</kbd><span>Parera: hold inne. Hvert våpen og skjold parerer én gang per stridsrunde. Skjold tar piler.</span>
+        <kbd>Mellomrom</kbd><span>Dukk unna. Treffer et anfall mens du dukker, slår du et SMI-slag.</span>
         <kbd>Q / Z</kbd><span>Kast et kastvåpen / bytt våpen</span>
-        <kbd>R / G / T</kbd><span>Hjälteförmågor, eller besvärjelser (hold for høyere effektgrad)</span>
-        <kbd>F / Shift</kbd><span>Släktesförmåga / Smyga</span>
-        <kbd>X</kbd><span>Pressa slaget når du får spørsmålet</span>
-        <kbd>V / H</kbd><span>Snabb vila (T6 VP) / kort vila (T6 KP, T6 VP, ett tillstånd). Én av hver per nivå.</span>
-        <kbd>1 / E</kbd><span>Legedrikk / ta opp, åpne, snakk, gå ned</span>
-        <kbd>C / Tab / M</kbd><span>Rollformulär / kart / lyd</span>
+        <kbd>R / G / T</kbd><span>Besvärjelser (hold for høyere effektgrad), eller Bärsärkagång og Avväpna</span>
+        <kbd>F</kbd><span>Yrkesförmåga: Handpåläggning, Meditation, Riddarslag, Tjuvens tur, Bardens sång</span>
+        <kbd>H / V</kbd><span>Första hjälpen (stopper blødning) / gjør klar en hjältepoäng</span>
+        <kbd>Shift</kbd><span>Smyga. Bakfra mot en som ikke har sett deg: +7, og ingen parering.</span>
+        <kbd>1 / E / X</kbd><span>Legedrikk / ta opp, åpne, snakk, gå ned / ta på med en gang</span>
+        <kbd>I / C / Tab / M</kbd><span>Packning / rollformulär / kart / lyd</span>
       </div>
-      <p><b>Fristaden.</b> Løpet starter på torget i byen over kloakken. Trykk <kbd>E</kbd> ved folk for å snakke. NAVN, JOBB og FARVEL virker alltid, og ord i gull blir nye spørsmål du kan klikke på eller skrive (bare de fire første bokstavene teller, som i Ultima). Folk følger døgnet: butikkene stenger om kvelden, vertshuset fylles, og om natta sover de fleste. Om natta ser ikke Utu deg, så det er lettere å snike og stjele, men blir du sett, kommer vakta. Kloakkluken på torget tar deg ned, og fra trappa mellom nivåene kan du klatre opp igjen.</p>
-      <p>Hvert slag er T20 lik eller under verdien. 1 er Drake, 20 er Demon. Mislykkes et viktig slag, kan du pressa det: slå om, men ta et tillstånd. Tillstånd gir nackdel og forsvinner bare med vila. Ved 0 KP slår du dödsslag: tre lyktes før tre feil. Monstre treffer alltid hvis du står i formen deres, men kan undvikas.</p>
+      <p><b>Fristaden.</b> Løpet starter på torget i byen over kloakken. Trykk <kbd>E</kbd> ved folk for å snakke. NAVN, JOBB og FARVEL virker alltid, og ord i gull blir nye spørsmål du kan klikke på eller skrive (bare de fire første bokstavene teller, som i Ultima). Folk følger døgnet. Kloakkluken på torget tar deg ned, og fra trappa mellom nivåene kan du klatre opp igjen.</p>
+      <p><b>Reglene er Drakar och Demoner 4.0 (1991)</b> med Expert og Gigant. Hvert slag er 1T20 lik eller under CL. Slår du 1, slår du om: under FV er perfekt. Slår du 20, slår du om: over FV er fummel. Hvert treff går mot en kroppsdel med egne KP og egen rustning. En kroppsdel på 0 blør, en arm på 0 slipper våpenet, et bein på 0 setter deg på kne, og hodet på 0 slår deg ut. Totala KP på minus FYS er døden. PSY er kraften for magi og yrkesförmågor.</p>
+      <p>EP samles når du lykkes med ferdigheter, og blir bedre FV når du hviler en uke på vertshuset. Hjältepoäng får du for store dåder.</p>
       <button class="btn small back">Tilbake</button>
     </div>
 
@@ -794,8 +808,6 @@ body.inv-open #hud, body.inv-open #labels, body.inv-open #touch, body.inv-open #
       <label class="set-row" for="set-sfx">Lydeffekter<input type="range" id="set-sfx" min="0" max="100" step="5"><output id="out-sfx">100</output></label>
       <div class="set-row"><span>Grafikk</span><div class="seg" id="set-quality"><button data-q="lav">Lav</button><button data-q="middels">Middels</button><button data-q="hoy">Høy</button></div></div>
       <div class="set-row"><span>Skjermristing</span><div class="seg" id="set-shake"><button data-s="1">På</button><button data-s="0">Av</button></div></div>
-      <div class="set-row"><span>Pressa slag</span><div class="seg" id="set-push"><button data-p="viktiga">Viktige</button><button data-p="alla">Alle</button><button data-p="aldri">Aldri</button></div></div>
-      <div class="set-row"><span>Svåra skador</span><div class="seg" id="set-inj"><button data-i="1">På</button><button data-i="0">Av</button></div></div>
       <button class="btn small back">Tilbake</button>
     </div>
 
@@ -804,8 +816,8 @@ body.inv-open #hud, body.inv-open #labels, body.inv-open #touch, body.inv-open #
       <h2>Svart Nebb</h2>
       <p>Et roguelite i stil med Diablo og Hades, med regler fra Drakar och Demoner og dialog som i Ultima. Svart Nebb er en rollefigur fra en kampanje i Ereb Altor.</p>
       <p>Musikk, lyd, teksturer, fiender og effekter lages i nettleseren mens du spiller. Anda er en 3D-modell fra Magnific, krympet fra 1,15 millioner til 24 000 trekanter.</p>
-      <p>Reglene følger Drakar och Demoner (Fria Ligan, 2023) så langt sanntid tillater. Bakgrunnen fra Aidne kommer fra «Ereb Altor: Hjältar från Kopparhavet».</p>
-      <p>Laget av Tom's Happy Happy Funtimes Emporium med three.js r170. Prototype, versjon 0.4.</p>
+      <p>Reglene følger Drakar och Demoner 4.0 (1991) med Expert og Gigant, så langt sanntid tillater. Verden er Ereb Altor, og bakgrunnen fra Aidne kommer fra «Ereb Altor: Hjältar från Kopparhavet».</p>
+      <p>Laget av Tom's Happy Happy Funtimes Emporium med three.js r170. Prototype, versjon 0.5.</p>
       <button class="btn small back">Tilbake</button>
     </div>
   </div>
@@ -813,15 +825,15 @@ body.inv-open #hud, body.inv-open #labels, body.inv-open #touch, body.inv-open #
 
 <section class="screen" id="transition" hidden>
   <div class="panel">
-    <div class="eyebrow">Hvile</div>
+    <div class="eyebrow">Søvn i trappa</div>
     <h2 id="transition-title">Trappa ned</h2>
     <p id="rest-text"></p>
-    <h3>Sesjonsspørsmål</h3>
-    <p class="hint">Hvert ja gir ett kryss på en ferdighet du velger selv.</p>
-    <div id="session-list"></div>
-    <h3>Förbättringsslag</h3>
+    <h3>Erfarenhet</h3>
+    <p class="hint">Første lyckade slag i en ferdighet etter søvn gir 1 EP, perfekt 1T3+1. EP blir til FV når du hviler en uke på vertshuset i Fristaden.</p>
     <div id="improve-list"></div>
-    <div class="row" style="margin-top:8px"><button class="btn" id="btn-improve">Slå förbättringsslag</button></div>
+    <h3>Bonuspoeng</h3>
+    <p class="hint">For nivået du klarte. Velg ferdigheten poengene skal gå til.</p>
+    <div id="session-list"></div>
     <h3 id="boon-head">Velg en gave</h3>
     <div class="boons" id="boon-cards"></div>
     <div class="row"><button class="btn primary" id="btn-continue" disabled>Gå videre til <span id="transition-next"></span></button><button class="btn" id="btn-up" disabled>Klatre opp til Fristaden</button></div>
@@ -830,13 +842,11 @@ body.inv-open #hud, body.inv-open #labels, body.inv-open #touch, body.inv-open #
 
 <section class="screen" id="deathroll" hidden>
   <div class="panel">
-    <div class="eyebrow">0 KP</div>
-    <h2>Dödsslag</h2>
-    <p id="dr-target" style="margin:8px auto"></p>
-    <div class="pips"><div>LYKTES<div class="p" id="dr-ok"></div></div><div>FEIL<div class="p" id="dr-bad"></div></div></div>
-    <div class="bigdie" id="dr-die"></div>
-    <p id="dr-msg" style="margin:8px auto"></p>
-    <div class="row" id="dr-actions" style="justify-content:center"><button class="btn primary" id="btn-dr-roll">Slå dödsslag</button><button class="btn" id="btn-dr-rally">Samla dig selv (PSY med nackdel)</button></div>
+    <div class="eyebrow" id="ko-eye">Medvetslös</div>
+    <h2 id="ko-title">Det blir svart</h2>
+    <p id="ko-cause" style="margin:8px auto"></p>
+    <div id="ko-log"></div>
+    <div class="row" id="ko-actions" style="justify-content:center"><button class="btn primary" id="btn-ko-go">Fortsett</button><button class="btn" id="btn-ko-hero">Reis deg (1 hjältepoäng)</button></div>
   </div>
 </section>
 
@@ -869,17 +879,17 @@ body.inv-open #hud, body.inv-open #labels, body.inv-open #touch, body.inv-open #
     <div class="keys" style="margin-top:14px">
       <kbd>WASD</kbd><span>Gå, sikt med musa</span>
       <kbd>LMB / RMB</kbd><span>Anfall / parera (hold)</span>
-      <kbd>Mellomrom</kbd><span>Undvika</span>
+      <kbd>Mellomrom</kbd><span>Dukk unna (SMI-slag)</span>
       <kbd>Q / Z</kbd><span>Kast / bytt våpen</span>
-      <kbd>R G T / F</kbd><span>Förmågor / släktesförmåga</span>
-      <kbd>Shift / X</kbd><span>Smyga / pressa slaget</span>
-      <kbd>V / H</kbd><span>Snabb vila / kort vila</span>
-      <kbd>1 / E</kbd><span>Legedrikk / bruk</span>
+      <kbd>R G T / F</kbd><span>Besvärjelser og ferdigheter / yrkesförmåga</span>
+      <kbd>Shift / V</kbd><span>Smyga / hjältepoäng</span>
+      <kbd>H</kbd><span>Första hjälpen</span>
+      <kbd>1 / E / I</kbd><span>Legedrikk / bruk / packning</span>
       <kbd>C / Tab / M</kbd><span>Rollformulär / kart / lyd</span>
       <kbd>E + ord</kbd><span>Snakk med folk i Fristaden: skriv eller klikk</span>
     </div>
     <div id="pause-quests"></div>
-    <div class="row"><button class="btn primary" id="btn-resume">Fortsett</button><button class="btn" id="btn-save">Lagre spill</button><button class="btn" id="btn-load">Last spill</button><button class="btn" id="btn-sheet">Rollformulär</button><button class="btn" id="btn-rest-round">Snabb vila</button><button class="btn" id="btn-rest-stretch">Kort vila</button><button class="btn" id="btn-mute">Slå av lyd</button><button class="btn" id="btn-quit">Avslutt løpet</button></div>
+    <div class="row"><button class="btn primary" id="btn-resume">Fortsett</button><button class="btn" id="btn-save">Lagre spill</button><button class="btn" id="btn-load">Last spill</button><button class="btn" id="btn-sheet">Rollformulär</button><button class="btn" id="btn-mute">Slå av lyd</button><button class="btn" id="btn-quit">Avslutt løpet</button></div>
   </div>
 </section>
 

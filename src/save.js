@@ -4,8 +4,8 @@ import { G } from './state.js';
 import { FLOORS } from './dungeon.js';
 
 const KEY = 'svartnebb.saves.v1';
-export const SAVE_VERSION = 1;
-export const SAVE_RULES = 'dod2023';
+export const SAVE_VERSION = 2;
+export const SAVE_RULES = 'dod91';
 export const SLOTS = ['auto', '1', '2', '3'];
 export const SLOT_NAME = { auto: 'Autolagring', 1: 'Plass 1', 2: 'Plass 2', 3: 'Plass 3' };
 
@@ -112,7 +112,7 @@ export function describe(d) {
   return {
     title: `${m.name || 'Ukjent'}${m.depth ? `, nivå ${m.depth}` : ''}`,
     place: m.place || '',
-    sub: [time, `${m.kp}/${m.maxKP} KP`, `${m.silver} silver`, play].filter(Boolean).join(' · '),
+    sub: [time, `${m.kp}/${m.maxKP} KP`, `${m.silver} sm`, play].filter(Boolean).join(' · '),
     when,
     old,
   };
