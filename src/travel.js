@@ -1,5 +1,5 @@
 // Reisekartet over Edelfara. Åpnes fra Nordporten i Fristaden og fra veiene ut av hvert område.
-// Kartet er tegnet etter oversiktskartet i «Triangeldrama i Edelfara» (s. 15), forenklet.
+// Steder og reisetider følger «Triangeldrama i Edelfara». Bakgrunnsbildet er laget for spillet.
 import { G } from './state.js';
 import { NODES, EDGES } from './edelmap.js';
 import { fl, started } from './ivan.js';

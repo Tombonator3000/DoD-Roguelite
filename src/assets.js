@@ -3,7 +3,7 @@ import { puddleRoughness } from './gfx.js';
 import { paintedTexture } from './textures.js';
 
 // ---------------------------------------------------------------------------
-// Støy og prosedyriske teksturer (alt genereres i nettleseren, ingen bildefiler)
+// Støy og prosedyriske reserveteksturer, laget i nettleseren.
 // ---------------------------------------------------------------------------
 
 function hash2(x, y, seed) {

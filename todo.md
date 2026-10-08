@@ -6,7 +6,7 @@ Sortert etter hva som gir mest spill for minst jobb.
 
 Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når pull requesten er inne. Se AGENTS.md.
 
-- ChatGPT (`chatgpt/teksturer`, fra `claude/edelfara`): bestillingen D007, malte teksturer, reisekart, pergament og faner. Endrer towntex.js, build.mjs og teksturdelen av assets.js; små tilkoblinger i main.js, town.js, area.js, travel.js og page.html.
+- ChatGPT (`chatgpt/teksturer`, PR #5, fra `claude/edelfara`): bestillingen D007, malte teksturer, reisekart, pergament og faner. Endrer towntex.js, build.mjs og teksturdelen av assets.js; små tilkoblinger i main.js, town.js, area.js, travel.js og page.html.
 
 - Claude (`claude/edelfara`, pull request mot main): Edelfara og eventyret Triangeldrama i Edelfara (Ivanhoe). Nye filer area.js, areagrid.js, edelmap.js, edelmodels.js, edelfolk.js, arealife.js, ivan.js, travel.js. Endrer town.js, townfolk.js, main.js, weather.js, world.js, enemies.js, loot.js, ui.js, page.html, save.js, wet.js, water.js.
 

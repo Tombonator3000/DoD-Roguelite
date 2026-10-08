@@ -2,7 +2,7 @@
 
 En spillbar prototype av et roguelite i stil med Diablo og Hades, med litt Ultima i dialogen. Du spiller Svart Nebb (egentlig Nansen), anka fra Fristaden i Zorakin, eller lager din egen rollperson. Reglene under panseret er Drakar och Demoner 4.0 fra 1991, med Expert og Gigant der det trengs, tilpasset sanntid: 1T20 mot CL, perfekt og fummel, träffområden med egne KP og rustning, parering per stridsrunde, Skräcktabellen, stridsmoral, magi med PSY, erfarenhet og hjältepoäng.
 
-Laget med three.js r170. Alt annet er skrevet for hånd: teksturer, musikk, lyd, fiendemodeller og effekter genereres i nettleseren. Den eneste eksterne ressursen er 3D-modellen av anda, som er pakket inn i HTML-fila.
+Laget med three.js r170. Musikk, lyd, fiendemodeller og effekter genereres i nettleseren. Materialene har egne AI-genererte bilder i malt stil, med prosedyriske teksturer som reserve. Anda og bildesettet bygges inn i HTML-fila. Se [teksturleveransen med før-/etterbilder](docs/teksturer.md) og [kilder og lisens](assets/tex/KILDER.md).
 
 ## Nytt i 0.6: Edelfara og Triangeldrama i Edelfara
 
