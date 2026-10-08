@@ -6,14 +6,15 @@ Sortert etter hva som gir mest spill for minst jobb.
 
 Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når pull requesten er inne. Se AGENTS.md.
 
-- Claude (`main`): shadere (ild, vann, vind, våte flater), vær og flere partikler, tilt-shift og fargegradering. fx.js, post.js, town.js, world.js, dungeon.js.
 
 ## Nå
 
 - [x] Inventar med sekk, belte, 3D-ikoner og dra og slipp (0.5)
 - [x] Lagre og laste med autolagring og tre plasser (0.5)
 - [x] DoD91-regler (4.0) med Expert og Gigant: sju grundegenskaper, FV per ferdighet, träffområden med egne KP og rustning, parering per SR, magi med PSY, yrker og raser fra Bok I, Skräcktabellen, stridsmoral, fummeltabeller, EP og hjältepoäng (0.5). Lagrede spill fra 2023-reglene kan ikke lastes.
-- [ ] Shadere, vær og partikler, postprosessering (Claude, pågår).
+- [x] Ild i ett tegnekall, vann med refleksjoner og ringer, regn og lyn, våte flater og pytter, vind i gress og trær, løv, fugler, flaggermus, sporer, glør, damp, røkelse, tilt-shift og fargestemning (0.5)
+- [ ] Spilltest grafikken på ekte maskin og mobil: er regnet for tett, tilt-shift for sterk, natta for mørk i uvær?
+- [ ] Mer grafikk: tåke som ligger lavt over elva om morgenen, snø om vinteren, lysstråler gjennom vinduene i flere hus, varmeflimmer over smia, skyggen av fuglene på bakken.
 
 - [ ] Sjekke det som er merket `uv` mot bøkene: rottene (finnes ikke i Bok II), Rødpels og demonen, prisene i byen, sanntidsoversettelsene i docs/regler/IMPLEMENTERING.md.
 - [ ] Spilltest balansen på ekte maskin med flere rollpersoner. Spesielt: svake rollpersoner (FYS 6-8) på nivå 1, halvlängdsman med STY 4, ridder i plåt mot Rødpels, magiker med stav (FV 5 er lite), hvor ofte du blir medvetslös.

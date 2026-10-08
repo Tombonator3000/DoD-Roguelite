@@ -58,6 +58,20 @@ Ting som er lurt å huske neste gang noen (menneske eller AI) jobber med prosjek
 - Lagring: autolagring og tre plasser med bilde av skjermen. Nivået bygges på nytt fra frøet, og bare endringene lagres (levende fiender, åpne kister, knuste tønner, gjemmesteder, ting på bakken, sett kart, butikk). Ikke midt i en kamp. Autolagring slettes når løpet er over. SAVE_VERSION 2 og rules 'dod91': eldre lagringer kan ikke lastes.
 - Gjenstander som går til spilleren, skal gjennom giveItem (inventory.js). Skjold går til vapen2.
 
+## Versjon 0.5: grafikk og vær
+
+- fire.js (FireField): all ild er instanser av én flate med støy i fragment-shaderen. world.flame(x, y, z, farge, skala, bredde) returnerer et Flame-objekt med pos, base, phase og visible. Fyrfat og ildsteder har bredde 1,8 til 2,2. Ingen flamme-sprites lenger.
+- water.js: makeWaterMaterial (dungeon.js eksporterer den videre) og WaterFX (G.water). G.water.ripple(x, z, styrke) lager ringer, og FX.burst('splash') gjør det av seg selv. De seks første lysene i lys-poolen speiler seg. uRip, uLP og uLC er delte lister, så de må være satt før første render (ellers krasjer three på en tom uniformliste).
+- weather.js (G.weather): kind er klart, skyet, regn eller storm, og følger G.run.clock i blokker på tre timer. force(kind) til testing, snap() ved nytt nivå. cloud, rain, storm, windK, wet og flash går mykt mot målet. wind er en Vector2. Regn, plask og løv pakkes rundt kameraets mål i vertex-shaderen. Tak: en DataTexture med høyden under taket per flis (fra BUILDINGS), og uInside skjuler alt over tak når du står inne.
+- Regnstrekene har fast bredde i piksler (uPx), ellers blir de nærmeste dråpene enorme. Rain-materialet må være DoubleSide, fordi flaten snus når den bygges i skjermrommet.
+- Kameraet står 16 m over bakken. Ting høyere enn 6 til 7 m havner utenfor bildet, så fugler flyr på 4,5 til 5,5 m og følger etter spilleren.
+- wet.js: addWetness(mat, { puddles, k }) og addSway(mat, 'grass' | 'leaf' | 'flower') kjeder onBeforeCompile og customProgramCacheKey, så de virker sammen med addCutaway. Uniformene i WET og SWAY settes av været (updateWet). Skyskygger ligger i samme shader.
+- post.js: GradePass har tilt-shift (uTilt, av på lav kvalitet) og mood(biome, night, rain) med LOOKS per sted. tiltWant settes i main-løkka (0,5 i tittelen, 0 når packningen er åpen).
+- Lyd: G.audio.thunder(k) og G.audio.setRain(nivå, inne).
+- FX.burst har fått 'steam' og 'incense'. Partikler med negativ tyngde (røyk) driver med vinden.
+- Feilsøking: G.camLock (en Vector3) låser kameraets mål, nyttig for nærbilder i testriggen sammen med G.camera.fov.
+- Tegnekall: målt med én G.composer.render() og renderer.info.autoReset = false. Byen om natta omtrent 320, kloakken omtrent 160, nesten som før 0.5-grafikken.
+
 ## Regler slik de er implementert (DoD91, fra 0.5)
 
 Detaljene står i docs/regler/IMPLEMENTERING.md. Det viktigste:
@@ -104,6 +118,7 @@ Detaljene står i docs/regler/IMPLEMENTERING.md. Det viktigste:
 - stress.js starter nå i byen og tar kloakkluken ned. Medvetslös håndteres med koWake/koHero.
 - shot.mjs tar handlinger som JSON: {"t":"eval","js":"..."}, {"t":"shot"}, {"t":"key","k":"Enter"}, {"t":"wait","ms":300}. Logger skrives ut før det siste skjermbildet, som får 20 s.
 - combatfx-browser.mjs lokalt i denne sandkassen: PLAYWRIGHT_PATH=/home/claude/devenv/node_modules/playwright og CHROME=/opt/pw-browsers/chromium-1194/chrome-linux/chrome, ellers leter Playwright etter en nyere Chromium som ikke finnes.
+- stress() kjører sim(), som ikke kaller G.weather.update. Test været med en egen løkke, eller med skjermbilder (rAF-løkka kjører mellom handlingene i shot.mjs).
 - Stresstest-boten holder nesten aldri parera eller dukker, så 0 pareringer i resultatet er normalt. Test parering med et eget skript: sett P.guard = 1, P.parryT = { vapen: 0, vapen2: 0 } og P.invuln = 0 før hvert anfall (invuln 0,12 s etter et treff stopper neste anfall).
 
 ## Gotchas

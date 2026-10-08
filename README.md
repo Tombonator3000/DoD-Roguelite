@@ -15,6 +15,11 @@ Laget med three.js r170. Alt annet er skrevet for hånd: teksturer, musikk, lyd,
 - Ny rollpersonsskaping i ti steg etter Bok I, med tre sett terninger, flytting 2:1, alder, socialt stånd, yrkesval, EP-fordeling, besvärjelser, utrustning og navn.
 - Inventar med 3D-ikoner: sekk etter bärförmåga (STY kg), belte med legedrikker, sju plasser på kroppen (også armar og ben), dra og slipp, sammenligning med det du har på.
 - Lagre og laste: autolagring og tre plasser med bilde, både i byen og nede i kloakken.
+- Ild som shader: fakler, fyrfat, lykter og ildsteder har levende flammer med tunger, alle i ett tegnekall.
+- Nytt vann som speiler himmelen og lyktene, med ringer når noen går i det eller plasker.
+- Vær i Fristaden: klart, skyet, regn og uvær etter klokka. Regn med plask, lyn og torden, vind i gress og trær, løv som blåser, sølepytter som speiler himmelen, og skyskygger. Regnet holder seg utenfor husene.
+- Liv i lufta: fugler om dagen, flaggermus om natta og i hallene, sporer i kloakken, glør i smia, damp fra vannet, røkelse i tempelet og krydderrøyk hos Rødpels.
+- Tilt-shift og fargestemning per sted og tid på døgnet.
 
 ## Nytt i 0.4: Fristaden over bakken
 
@@ -116,6 +121,10 @@ src/
   world.js      prosjektiler, loot, kister, gjemmesteder, runer, trapp, butikk, lys-pool
   title.js      3D-scenen bak tittelskjermen og rollpersonen på plattformen
   ui.js         HUD, evnelinje, logg, kart, tooltip, rollformulär
+  fire.js       ild som instansiert shader
+  water.js      vann med refleksjoner og ringer
+  weather.js    vær, regn, lyn, løv, fugler og flaggermus
+  wet.js        våte flater og vind i materialene
   loot.js       gjenstander, unike, gaver
   inventory.js  sekk, belte, vekt, salg
   invui.js      inventarskjermen
@@ -126,7 +135,7 @@ src/
   combatfx.js   instansierte kampeffekter (ChatGPT)
   music.js      musikkmotor og sanger
   audio.js      prosedyrisk lyd
-  post.js       fargegradering, korn, vignett, blink
+  post.js       tilt-shift, fargestemning, korn, vignett, blink
   gfx.js        prosedyriske teksturer, lyssjakt-shader, kontaktskygger
   decor.js      pynt per etasje, tåke og støvkorn
   assets.js     teksturer, shader-tillegg, modell-dekoding, primitive fiender
