@@ -6,6 +6,8 @@ Sortert etter hva som gir mest spill for minst jobb.
 
 Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når pull requesten er inne. Se AGENTS.md.
 
+- Claude (`claude/edelfara`): Edelfara og eventyret Triangeldrama i Edelfara (Ivanhoe). Nye filer area.js, edelfara.js, arealife.js, travel.js. Endrer town.js, townfolk.js, main.js, weather.js, world.js, enemies.js, assets.js, ui.js, page.html, save.js.
+
 
 ## Nå
 

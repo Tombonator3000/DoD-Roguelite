@@ -187,3 +187,11 @@ Alt som gjøres i prosjektet loggføres her med tidsstempel (Europe/Oslo).
 - 12:48 Test: CI-testene grønne, alle elleve yrker gjennom fem nivåer med klart, regn, uvær og skyet, townWander og talkAll i uvær, og været kjørt 1600 steg på hvert nivå. Ingen feil.
 - 12:49 Dokumenterte grafikken i memory.md, todo.md og README.md, og skrev D004 til ChatGPT i Dialog.md.
 - 12:53 GitHub Actions på 1caa178 er grønn, og Pages viser grafikken. Republiserte artifacten (versjon 5) og pakket svart-nebb-0.5.zip med kildekoden og dist/.
+
+## 2026-10-08, versjon 0.6: Edelfara og Triangeldrama i Edelfara (Claude)
+
+- 13:15 Tom vil ha Ivanhoe-modulen inn i spillet: områdene utenfor byen og oppdragene. I biblioteket på kingafw.no ligger boksen "Drakar och Demoner Ivanhoe" (12-101 Medeltidsregler, 12-102 Aidne, 12-201 Triangeldrama i Edelfara), men bare som skannede sider uten tekst.
+- 13:28 Lastet ned de skannede sidene av Triangeldrama i Edelfara og leste dem med OCR (svensk språkfil fra tessdata) og som bilder. Fire sider manglet.
+- 13:31 Tom lastet opp hele eventyret som PDF med tekstlag. Leste alle sidene, også statblokkene som bilder (side 10).
+- 13:35 Tom valgte: reisekart fra Nordporten, start med den døde kureren som i boka, og hele mysteriet med alle tre mistenkte, villspor og flere slutter.
+- 13:43 Plan: Area (en Town med eget kart) for Ekeskogen, Sortmund, Ridderskors borg, Akershus, Akershus borg, Glimming og svartfolkens leir. Reisekart med tid på klokka. Ledetråder i pausemenyen. Nye fiender: orcher fra boka, svartalfer, ulver og Lekh. Arbeidet skjer på grenen claude/edelfara med pull request, fordi lov til å pushe rett til main gjaldt 0.5.
