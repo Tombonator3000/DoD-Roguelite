@@ -1,3 +1,4 @@
+import { reveal } from './worldtravel.js';
 // Folk i Fristaden. Samtaler med nøkkelord som i Ultima IV og V:
 // NAVN, JOBB og FARVEL virker alltid, og ord i [klammer] blir nye ord du kan spørre om.
 // [vist|NØKKEL] viser "vist" men lærer NØKKEL.
@@ -277,7 +278,11 @@ export const PEOPLE = [
     topics: {
       NAVN: 'Folkard. Vakt. Det er det hele.',
       JOBB: 'Jeg vokter [porten] for kong [Balian] og fogden. Mest vokter jeg at ingen går ut, fordi det er [orcher] der ute.',
-      PORTEN: 'Nordporten er stengt til fogden sier noe annet. Veien går til fjellene og [Karad Batur]. Ingen går den nå.',
+      PORTEN: 'Nordporten går ut til [kongeveien], til fjellene og [Karad Batur]. Den er stengt om natta. Om dagen holder jeg den åpen og ser sur ut.',
+      KONGEVEIEN: () => { reveal(['ardesch', 'tyndal', 'galastan', 'pendon']); return 'Kongeveien går sørvest langs Drakdjupet, forbi [Ardesch] og [Tyndal], under Aidnebergen til [Galastan], og helt ned til [Pendon]. Edelfara ligger ved Torilskogen, rett etter Galastan. Skal du dit, ta med [proviant]. Det er langt mellom vertshusene.'; },
+      PROVIANT: 'Rosmynda på Den feite gåsen selger niste til veien. Uten mat på veien går det dårlig. Jeg har sett folk komme tilbake fra Edelfara. De så ikke fornøyde ut.',
+      ARDESCH: 'En landsby under Vorgabergen, på veien sørover. De har et vertshus med en vertinne som husker alle som ikke betalte.',
+      PENDON: 'Kongens by. Stor, skitten og rik. Mest skitten.',
       ORCHER: 'De kom ned fra Aidnefjellene i fjor. Tornväktarna slo dem tilbake. De kommer igjen. Det gjør de alltid.',
       BALIAN: 'Kongen. Solens beskyddare. Jeg har aldri sett ham, men jeg har sett ansiktet hans på myntene, og det holder.',
       LOVEN: 'Stjeler du, betaler du. Kan du ikke betale, sitter du i vaktstua til morgenen. Det står ikke i loven, men det er sånn vi gjør det.',

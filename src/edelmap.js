@@ -19,7 +19,7 @@ export const AREAS = {
       west: { x: 1.6, y: 22.5, yaw: PI / 2 }, east: { x: 44.4, y: 18.5, yaw: -PI / 2 }, south: { x: 22.6, y: 44.3, yaw: PI },
     },
     exits: [
-      { x: 0.5, y: 22.5, to: 'fristaden', label: 'Veien vestover mot Fristaden' },
+      { x: 0.5, y: 22.5, to: 'fristaden', label: 'Landeveien ut av Torilskogen' },
       { x: 45.5, y: 18.5, to: 'sortmund', label: 'Veien østover mot Sortmund' },
       { x: 22.6, y: 45.5, to: 'akershus', label: 'Stien sørover mot Akershus' },
     ],
@@ -599,7 +599,7 @@ export const AREAS = {
 
 // Noder på reisekartet. x og y er prosent av kartet (s. 15, forenklet). hours: reisetid til naboene.
 export const NODES = {
-  fristaden: { name: 'Fristaden', sub: 'Nordporten', x: 8, y: 14 },
+  fristaden: { name: 'Landeveien', sub: 'ut på verdenskartet, mot Fristaden', x: 8, y: 14 },
   ekeskogen: { name: 'Ekeskogen', sub: 'Torilskogen', x: 40, y: 56 },
   sortmund: { name: 'Sortmund', sub: 'Ridderskors', x: 74, y: 52 },
   akershus: { name: 'Akershus', sub: 'Eke baroni', x: 30, y: 80 },
@@ -608,7 +608,7 @@ export const NODES = {
   pharynx: { name: 'Pharynx', sub: 'hertigens by', x: 94, y: 6, text: true },
 };
 export const EDGES = [
-  ['fristaden', 'ekeskogen', 9, 'skog'], ['ekeskogen', 'sortmund', 4, 'skog'], ['ekeskogen', 'akershus', 3, 'skog'],
+  ['fristaden', 'ekeskogen', 1, 'skog'], ['ekeskogen', 'sortmund', 4, 'skog'], ['ekeskogen', 'akershus', 3, 'skog'],
   ['sortmund', 'glimming', 5, 'vei'], ['akershus', 'lagret', 0.5, 'sti'], ['glimming', 'pharynx', 10, 'vei'],
 ];
 

@@ -12,6 +12,7 @@ import { weaponItem, makeItem, refinalize, questAmulet } from './loot.js';
 import { buildCharacter, buildWeaponMesh, HOLD } from './kinmodels.js';
 import { buildChest } from './assets.js';
 import { Enemy } from './enemies.js';
+import { hungerLevel, ate, W as worldState } from './worldtravel.js';
 
 const U = v => v * T;
 const tmp = new THREE.Vector3();
@@ -188,13 +189,15 @@ class Ally {
 // --- livet i et område -----------------------------------------------------------------------
 export class AreaLife extends TownLife {
   constructor(area, W) {
-    super(area, W, PEOPLE_BY_AREA[area.areaId] || []);
+    super(area, W, area.L.people || PEOPLE_BY_AREA[area.areaId] || []);
     this.area = area;
     this.id = area.areaId;
     this.L = area.L;
+    // områder fra mal (verdenskartet): møter, landsbyer og steder. Edelfaras regler gjelder ikke der.
+    this.fromWorld = !!(area.L.enc || area.L.site || area.L.place || area.L.wild);
     this.allies = [];
     this.exits = [];
-    this.visit.rumorList = RUMORS[this.id] || RUMORS.sortmund;
+    this.visit.rumorList = area.L.rumors || RUMORS[this.id] || RUMORS.sortmund;
     this.setup();
   }
 
@@ -239,6 +242,7 @@ export class AreaLife extends TownLife {
     const P = G.player;
     const fight = G.enemies.some(e => !e.dead && e.alerted && !e.fleeing && Math.hypot(e.pos.x - P.pos.x, e.pos.z - P.pos.z) < 7);
     if (fight) { G.ui.log('Ikke nå. Noen er rett bak deg.'); G.fx.float('Kamp', P.pos, 'miss'); return; }
+    if (ex.world) { G.audio.ui(); G.game.leaveToWorld(); return; }
     if (ex.need === 'castle_sm') {
       if (!item('lejdebrev') && !started()) {
         G.ui.log('Vaktene ved borgveien stopper deg. «Markisen tar ikke imot. Har du nyheter om mordet, eller noe med segl på, kan du komme igjen.»');
@@ -393,6 +397,7 @@ export class AreaLife extends TownLife {
 
   // --- svartfolket --------------------------------------------------------------------------------
   spawns() {
+    if (this.L.spawns) return this.L.spawns.map(s => ({ type: s.type, x: U(s.x), z: U(s.y), id: s.id, depth: s.depth || 1, setup: s.alert ? e => e.alert('bakhold') : null }));
     const out = [];
     const P = G.player;
     const add = (type, x, y, id, setup) => out.push({ type, x: U(x), z: U(y), id, depth: 1, setup });
@@ -442,6 +447,7 @@ export class AreaLife extends TownLife {
     const q = Q();
     if (e.spawnIdx != null && !q.dead[this.id].includes(e.spawnIdx)) q.dead[this.id].push(e.spawnIdx);
     const x = e.pos.x, z = e.pos.z;
+    if (this.fromWorld) { this.checkCleared(); return; }
     if (e.type === 'orc_lead') {
       this.add(x, z, 0.7, 'Gjennomsøk ledarorchen', () => this.talk.open(scene('ledare', this)));
     } else if (e.def.group === 'svartfolk' && e.type.startsWith('orc') && !fl('fangeDone') && !fl('fangeSpot')) {
@@ -463,6 +469,28 @@ export class AreaLife extends TownLife {
       this.checkPeace();
     }
     if (this.id === 'lagret') this.checkPeace();
+  }
+
+  // Møter og steder fra verdenskartet: når alle er borte, er veien fri, og stedene gir fra seg det de gjemmer
+  checkCleared() {
+    if (this.clearedDone) return;
+    const alive = G.enemies.filter(o => !o.dead && !o.escaped);
+    if (alive.length) return;
+    this.clearedDone = true;
+    const L = this.L;
+    if (L.site) {
+      worldState().cleared[L.place] = true;
+      const r = L.reward;
+      if (r) {
+        const [x, y] = r.at;
+        G.world.spawnPickup('item', U(x), U(y), { item: makeItem(r.depth) });
+        G.world.spawnPickup('silver', U(x) + 1.2, U(y) + 0.6, { value: r.silver });
+        G.player.addHjp?.(1, `${L.name} er tatt`);
+      }
+      G.ui.log(`<b class="c-mark">${L.name}.</b> Det er stille nå. Noe ligger igjen der de var.`);
+    } else if (L.enc) {
+      G.ui.log('Veien er fri. Du kan gå videre når du vil.');
+    }
   }
 
   checkPeace() {
@@ -601,6 +629,7 @@ export class AreaLife extends TownLife {
 
   // --- fristen og stormingen av Akershus ------------------------------------------------------------
   checkStorm(onLoad = false) {
+    if (this.fromWorld) return;
     const q = Q();
     if (q.deadline == null || fl('truce') || fl('storm')) return;
     if (G.run.clock < q.deadline) return;
@@ -708,9 +737,9 @@ export class AreaLife extends TownLife {
     } else if (act === 'ed_meal' || act === 'ed_meal2') {
       const cheap = act === 'ed_meal2';
       const refresh = () => talk.wares([
-        { name: cheap ? 'Stor porsjon husmannskost' : 'Husmannskost', desc: `Kålstuing, flesk og poteter. Helbreder 1T6+${cheap ? 3 : 2} KP.`, price: price(cheap ? 25 : 35), buy: () => { const got = P.heal(d(6) + (cheap ? 3 : 2)); fx('heal', 12); return got ? `Det smaker hjemme. +${got} KP.` : 'Du er mett, men du spiser opp likevel.'; } },
-        { name: 'Brød og ost', desc: 'Helbreder 3 KP.', price: price(20), buy: () => { const got = P.heal(3 + (P.mods?.breadHeal || 0)); return got ? `+${got} KP.` : 'Du er allerede mett.'; } },
-        { name: 'Niste til veien', desc: 'Et brød i sekken.', price: price(15), buy: () => { giveItem(makeCons('brod')); return 'Pakket inn i en klut. Ikke sett deg på den.'; } },
+        { name: cheap ? 'Stor porsjon husmannskost' : 'Husmannskost', desc: `Kålstuing, flesk og poteter. Helbreder 1T6+${cheap ? 3 : 2} KP, og du er mett et døgn.`, price: price(cheap ? 25 : 35), buy: () => { const got = P.heal(d(6) + (cheap ? 3 : 2)); ate(); fx('heal', 12); return got ? `Det smaker hjemme. +${got} KP.` : 'Du er mett, men du spiser opp likevel.'; } },
+        { name: 'Brød og ost', desc: 'Helbreder 3 KP, og du er mett et døgn.', price: price(20), buy: () => { const got = P.heal(3 + (P.mods?.breadHeal || 0)); ate(); return got ? `+${got} KP.` : 'Mett for et døgn.'; } },
+        { name: 'Proviant til veien', desc: 'Mat for et døgn på reise.', price: price(15), buy: () => { giveItem(makeCons('proviant')); return 'Pakket inn i en klut. Ikke sett deg på den.'; } },
       ], { note: this.priceNote(id), refresh, barter: this.barterFn(id, talk, () => refresh()) });
       refresh();
       talk.say(cheap ? 'Store porsjoner, lav pris. Ingen klager. Ikke høyt.' : 'Maten er god og ølet bedre.');
@@ -758,6 +787,45 @@ export class AreaLife extends TownLife {
       this.returnChest(talk);
     } else if (act === 'ed_convince') {
       this.convince(talk);
+    } else if (act === 'w_proviant' || act === 'w_hunter') {
+      // proviant til veien: ett døgn per pakke
+      const hunter = act === 'w_hunter';
+      const each = price(hunter ? 10 : 15);
+      const refresh = () => talk.wares([
+        { name: hunter ? 'Tørket kjøtt' : 'Proviant', desc: 'Mat for et døgn på reise. Spises av seg selv når det er tid.', price: each, buy: () => { giveItem(makeCons('proviant')); return hunter ? 'Hjort. Eller noe i den retningen.' : 'Pakket i en klut.'; } },
+        { name: hunter ? 'Tørket kjøtt for tre døgn' : 'Proviant for tre døgn', desc: 'Tre pakker. Litt billigere.', price: each * 3 - 5, buy: () => { giveItem(makeCons('proviant', 3)); return 'Tre pakker. Ikke spis alt den første dagen.'; } },
+      ], { note: this.priceNote(id), refresh });
+      refresh();
+      talk.say(hunter ? 'Kjøtt holder seg. Folk gjør ikke det.' : 'Til veien? Ett døgn per pakke. Ta heller en for mye.');
+    } else if (act === 'w_trade') {
+      const refresh = () => talk.wares([
+        { name: 'Proviant', desc: 'Mat for et døgn på reise.', price: price(16), buy: () => { giveItem(makeCons('proviant')); return 'En pakke.'; } },
+        { name: 'Proviant for tre døgn', desc: 'Tre pakker.', price: price(44), buy: () => { giveItem(makeCons('proviant', 3)); return 'Tre pakker.'; } },
+        { name: 'Legedrikk', desc: 'Helbreder 2T6 KP. Går i beltet.', price: price(160), buy: () => { giveItem(makeCons('legedrikk')); return 'Rød som den skal være.'; } },
+        { name: 'Brød', desc: 'Helbreder 2 KP, eller mat for et døgn.', price: price(10), buy: () => { giveItem(makeCons('brod')); return 'I sekken.'; } },
+      ], { note: this.priceNote(id), refresh, barter: this.barterFn(id, talk, () => refresh()) });
+      refresh();
+      talk.say('Dette er det jeg har. Det er mer enn de fleste.');
+    } else if (act === 'w_farm') {
+      const refresh = () => talk.wares([
+        { name: 'Kål og et brød', desc: 'Mat for et døgn. Kål er mat. Spør Baron.', price: price(8), buy: () => { giveItem(makeCons('proviant')); return 'Kålen er fersk. Brødet var det i går.'; } },
+      ], { note: this.priceNote(id), refresh });
+      refresh();
+      talk.say('Kål! Billigste mat i Zorakin.');
+    } else if (act === 'w_share') {
+      if (once('share')) { talk.say('Vi har delt det vi hadde. Utu ser at du er mett.'); return; }
+      mark('share');
+      ate();
+      fx('heal', 10);
+      talk.say('Sett deg. Brød, ost og en slurk vann. Utu deler med alle som spør, og vi gjør som han. Du er mett for et døgn.');
+    } else if (act === 'w_munk') {
+      const w = worldState();
+      if (w.done.munkLesson) { talk.say('Du har lært det du kan lære av meg. Resten må du sitte deg til.'); return; }
+      w.done.munkLesson = true;
+      P.addHjp?.(1, 'Mester Kvakkvald');
+      P.gainPSY(P.maxPSY);
+      fx('will', 24);
+      talk.say('Sitt. Nei, ikke sånn. Sånn. Pust. Ikke tenk på brød. Du tenker på brød. Slutt med det. Godt. Nå vet du det Flansen aldri lærte: kraften er i stillheten mellom to kvakk. Gå nå. Jeg skal sove.');
     } else super.service(act, talk, npc);
   }
 
@@ -833,11 +901,12 @@ export class AreaLife extends TownLife {
     const P = G.player;
     void where;
     this.passTime(1, () => {
-      const got = P.heal(d(3));
+      const hungry = hungerLevel() > 0;
+      const got = hungry ? 0 : P.heal(d(3));
       P.gainPSY(P.maxPSY);
       G.fx.burst('heal', P.pos, 24);
       G.audio.heal();
-      G.ui.log(`Du sover på vertshuset. ${got ? `+${got} KP og ` : ''}all PSY.`);
+      G.ui.log(`Du sover på vertshuset. ${got ? `+${got} KP og ` : ''}all PSY.${hungry ? ' Du er for sulten til at sårene gror.' : ''}`);
       G.ui.log(`Klokka er sju. ${this.L.name} våkner.`);
       this.checkStorm();
     });

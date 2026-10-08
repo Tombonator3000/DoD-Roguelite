@@ -8,6 +8,7 @@ import { WALL, FLOOR, WATER, PILLAR } from './dungeon.js';
 import { tStr, derived, baseCost } from './rules.js';
 import { HOUSE, FENCE, GR } from './townmap.js';
 import { capKg, carriedKg } from './inventory.js';
+import { hungerLevel } from './worldtravel.js';
 
 const $ = s => document.querySelector(s);
 const fmtKg = v => String(Math.round(v * 10) / 10).replace('.', ',');
@@ -96,6 +97,12 @@ export class UI {
     this.logEl.appendChild(el);
     while (this.logEl.children.length > 7) this.logEl.firstChild.remove();
     setTimeout(() => el.classList.add('old'), 9000);
+    // verdenskartet dekker HUD-en, så loggen vises der også
+    if (this.mirror) {
+      const m = el.cloneNode(true);
+      this.mirror.appendChild(m);
+      while (this.mirror.children.length > 4) this.mirror.firstChild.remove();
+    }
   }
 
   // Ultima-aktig kamplogg med terningene synlige: «Dolk 7/14», «Dolk 1>3/14 Perfekt»
@@ -225,6 +232,9 @@ export class UI {
     if (P.forced) out.push([{ paralyzed: 'Lammet', flee: 'Flykter', rage: 'Raseri', faint: 'Besvimt' }[P.forced.type] || 'Skräck', 'bad', 'Skräcktabellen.']);
     if (P.fx.fearCL?.t > 0) out.push([`Skräck -${P.fx.fearCL.v}`, 'bad', 'Minus på anfall og parering.']);
     if (P.fx.drunk > 0) out.push(['Full', 'bad', '-2 på CL.']);
+    const hl = hungerLevel();
+    if (hl === 2) out.push(['Utsultet', 'bad', 'To døgn uten mat: 1 KP hvert 12. time, og søvn leger ingenting.']);
+    else if (hl === 1) out.push(['Sulten', 'bad', 'Et døgn uten mat: søvn gir ingen KP, og PSY kommer ikke tilbake av seg selv.']);
     if (P.fx.medBonus) out.push([`Meditation +${P.fx.medBonus}`, 'on', 'Gjelder neste slag.']);
     if (P.fx.tjuvBonus) out.push([`Tjuvens tur +${P.fx.tjuvBonus}`, 'on', 'Gjelder neste slag.']);
     if (P.fx.riddarslag) out.push(['Riddarslag', 'on', 'Neste treff gjør maksimal skade.']);

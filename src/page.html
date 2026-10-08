@@ -801,6 +801,62 @@ body:not(.touch) .only-touch, .touch .no-touch { display: none !important; }
 #dlg-kw .kw { counter-increment: kw; }
 body:not(.touch) #dlg-kw .kw:nth-child(-n+9)::before { content: counter(kw); margin-right: 6px; font-size: 10px; letter-spacing: 0; color: var(--dim); }
 @media (prefers-reduced-motion: reduce) { .pmi, .pmi::before { transition: none; } }
+
+/* --- 0.7: verdenskartet --- */
+#world .panel.worldp { width: min(1320px, 100%); padding: 16px 20px 18px; max-height: calc(100vh - 32px); overflow-y: auto; }
+#world .w-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 10px; }
+#world .w-head h2 { margin: 2px 0 0; font-size: 34px; }
+.w-stats { display: flex; gap: 6px; flex-wrap: wrap; }
+.w-stats div { display: flex; flex-direction: column; padding: 5px 10px 6px; border: 1px solid rgba(107,90,62,.45); background: rgba(0,0,0,.18); min-width: 74px; }
+.w-stats span { font-family: var(--ui); font-weight: 700; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--dim); }
+.w-stats b { font-family: var(--ui); font-size: 15px; color: var(--parch); white-space: nowrap; }
+.w-stats .bad b, .w-info .bad { color: #b0301f; }
+.w-body { display: grid; grid-template-columns: minmax(0, 1fr) 290px; gap: 16px; align-items: start; }
+.w-col { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.w-log { display: flex; flex-direction: column; gap: 2px; min-height: 3.2em; font-size: calc(13.5px * var(--txt)); line-height: 1.4; color: var(--parch); }
+.w-log .line:not(:last-child) { opacity: .62; }
+.w-log .roll { font-family: var(--ui); font-weight: 800; letter-spacing: .04em; margin-right: 4px; }
+.w-log .roll.ok, .w-log .roll.drake { color: #3d6b2a; }
+.w-log .roll.fail, .w-log .roll.demon { color: #9a1c16; }
+.w-mapwrap { position: relative; width: 100%; max-width: calc((100vh - 150px) * 1.6667); justify-self: center; border: 1px solid var(--gild-dim); box-shadow: inset 0 0 40px rgba(60,40,20,.5); }
+#world-map { display: block; width: 100%; height: auto; cursor: crosshair; touch-action: manipulation; }
+.w-side { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.w-side h3 { margin: 6px 0 0; }
+.w-here { display: flex; flex-direction: column; gap: 2px; padding-bottom: 8px; border-bottom: 1px solid rgba(107,90,62,.35); }
+.w-here b, .w-info b { font-family: var(--ui); font-size: 17px; letter-spacing: .06em; color: var(--gild); }
+.w-here span, .w-info span { font-size: calc(14.5px * var(--txt)); color: var(--dim); line-height: 1.4; }
+.w-info { display: flex; flex-direction: column; gap: 3px; min-height: 64px; }
+.w-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.w-btns .btn { padding: 10px 10px; font-size: 13.5px; text-align: center; }
+.w-btns .btn:first-child { grid-column: 1 / -1; }
+.w-btns .btn:disabled { opacity: .45; cursor: default; }
+.w-places { display: flex; flex-direction: column; gap: 4px; max-height: 300px; overflow-y: auto; padding-right: 2px; }
+.w-place { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; text-align: left; padding: 6px 10px; color: var(--parch); background: rgba(0,0,0,.16); border: 1px solid rgba(107,90,62,.35); cursor: pointer; font-family: var(--body); }
+.w-place b { font-family: var(--ui); font-size: 15px; }
+.w-place span { font-size: 13px; color: var(--dim); font-style: italic; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.w-place:hover, .w-place:focus-visible { border-color: var(--gild); outline: none; }
+.w-place.on { border-color: #9a1c16; box-shadow: inset 3px 0 0 #9a1c16; }
+.w-place.here span { color: var(--gild); font-style: normal; }
+.w-enc { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(460px, calc(100% - 24px)); padding: 16px 18px 16px; color: #e9ddc4; background: linear-gradient(180deg, rgba(26,19,18,.97), rgba(14,10,11,.97)); border: 1px solid #a3302a; box-shadow: 0 0 0 1px #000, 0 18px 50px rgba(0,0,0,.75); }
+.w-enc[hidden] { display: none; }
+.w-enc .eyebrow { color: #c9a35a; }
+.w-enc p { margin: 6px 0 12px; color: #e9ddc4; line-height: 1.45; }
+.w-enc .row { display: flex; flex-wrap: wrap; gap: 8px; }
+.w-enc .btn { color: #e9ddc4; background: linear-gradient(#2a1d15, #160f0b); padding: 10px 14px; font-size: 14px; }
+.w-enc .btn.primary { background: linear-gradient(#7a1a14, #3e0b08); }
+.malt-pergament #world .panel { --parch: #30271e; --dim: #665444; --gild: #773e22; --gild-dim: #ad9365; color: var(--parch); background-color: #e4d6b5; background-image: var(--pergament); background-size: 512px 512px; }
+.malt-pergament #world .w-side .btn, .malt-pergament #world .w-place { color: #30271e; background: linear-gradient(#f2e6c7, #d7c29b); }
+.malt-pergament #world .w-side .btn.primary { color: #f8ead0; background: linear-gradient(#7a1a14, #3e0b08); }
+.malt-pergament #world .w-stats div { background: rgba(255,249,226,.4); }
+.malt-pergament #world .w-mapwrap { border-color: #947348; }
+@media (max-width: 900px) {
+  #world { padding: 8px; }
+  #world .panel.worldp { padding: 12px 12px 14px; max-height: none; }
+  .w-body { grid-template-columns: minmax(0, 1fr); }
+  .w-mapwrap { max-width: none; }
+  .w-stats div { min-width: 0; flex: 1 1 22%; padding: 4px 7px 5px; }
+  .w-places { max-height: none; }
+}
 </style>
 
 <div id="stage"></div>
@@ -1091,6 +1147,30 @@ body:not(.touch) #dlg-kw .kw:nth-child(-n+9)::before { content: counter(kw); mar
     <h2>Edelfara</h2>
     <div id="travel-wrap"><canvas id="travel-map" width="900" height="620"></canvas></div>
     <div id="travel-go"><div id="travel-info"></div><button class="btn primary" id="btn-travel-go">Reis</button><button class="btn" id="btn-travel-stay">Bli her</button></div>
+  </div>
+</section>
+
+<section class="screen" id="world" hidden>
+  <div class="panel worldp">
+    <div class="w-head">
+      <div><div class="eyebrow" id="w-region">Zorakin</div><h2>Aidne og Drakdjupet</h2></div>
+      <div class="w-stats" id="w-stats"></div>
+    </div>
+    <div class="w-body">
+      <div class="w-col"><div class="w-mapwrap"><canvas id="world-map" width="900" height="540"></canvas><div class="w-enc" id="w-enc" hidden></div></div><div class="w-log" id="w-log"></div></div>
+      <aside class="w-side">
+        <div class="w-here" id="w-here"></div>
+        <div class="w-info" id="w-info"></div>
+        <div class="w-btns">
+          <button class="btn primary" id="btn-w-go">Reis</button>
+          <button class="btn" id="btn-w-enter">Se deg om</button>
+          <button class="btn" id="btn-w-camp">Slå leir</button>
+          <button class="btn" id="btn-w-forage">Let etter mat</button>
+        </div>
+        <h3>Steder du kjenner</h3>
+        <div class="w-places" id="w-places"></div>
+      </aside>
+    </div>
   </div>
 </section>
 
