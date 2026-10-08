@@ -287,7 +287,7 @@ input[type=range]:focus-visible { box-shadow: 0 0 0 2px rgba(201,163,90,.5); }
 #pause-quests .qrow.clue.svart { border-left-color: #8a3a2a; }
 #pause-quests .qrow.clue.falsk { border-left-color: #4a5a7a; color: #c8c0b0; }
 #pause .panel { max-height: calc(100vh - 48px); overflow-y: auto; }
-#travel .panel { width: min(980px, 100%); padding: 20px 22px 22px; }
+#travel .panel { width: min(980px, calc(100% - 44px), 86.11vh); padding: 20px 22px 22px; max-height: calc(100vh - 48px); overflow-y: auto; }
 #travel-wrap { position: relative; width: 100%; border: 1px solid var(--gild-dim); box-shadow: inset 0 0 40px rgba(60,40,20,.5); }
 #travel-map { display: block; width: 100%; height: auto; }
 #travel-go { display: flex; align-items: center; gap: 14px; margin-top: 12px; flex-wrap: wrap; }
@@ -295,6 +295,25 @@ input[type=range]:focus-visible { box-shadow: 0 0 0 2px rgba(201,163,90,.5); }
 #travel-info { flex: 1 1 320px; display: flex; flex-direction: column; gap: 2px; font-size: 14.5px; color: var(--parch); }
 #travel-info b { font-family: var(--ui); letter-spacing: .1em; text-transform: uppercase; color: var(--gild); }
 #travel-info span { color: var(--dim); }
+/* Malte pergamentflater får mørkt blekk. Reservestilen brukes uten bildesettet. */
+.malt-pergament #dialog .panel, .malt-pergament #travel .panel, .malt-pergament #pause-quests {
+  --parch: #30271e; --dim: #665444; --gild: #773e22; --gild-dim: #ad9365;
+  color: var(--parch); background-color: #e4d6b5; background-image: var(--pergament);
+  background-size: 512px 512px;
+}
+.malt-pergament #pause-quests { padding: 14px 16px; border: 1px solid #a78b5b; }
+.malt-pergament #pause-quests:empty { display: none; }
+.malt-pergament #pause-quests .qrow.dl { color: #843822; }
+.malt-pergament #pause-quests .qrow.clue.falsk { color: #4a5262; }
+.malt-pergament #dialog .kw { background: rgba(255,249,226,.55); }
+.malt-pergament #dialog .kw.svc { color: #34495c; border-color: #637887; }
+.malt-pergament #dialog .kw.svc:hover { color: #1d3447; border-color: #34495c; }
+.malt-pergament #dialog .btn, .malt-pergament #travel .btn { color: #30271e; background: linear-gradient(#f2e6c7, #d7c29b); }
+.malt-pergament #travel .btn.primary { color: #f8ead0; background: linear-gradient(#7a1a14, #3e0b08); }
+.malt-pergament #dlg-input { background: rgba(255,249,226,.6); }
+.malt-pergament #dlg-text .kwl:hover { color: #9b391c; }
+.malt-pergament #dlg-wares .purse { color: #30271e; }
+.malt-pergament #travel-wrap { border-color: #947348; }
 .floater.say { color: #f2e6c8; font-family: var(--body); font-style: italic; font-weight: 600; font-size: 15px; text-shadow: 0 1px 3px #000, 0 0 8px rgba(0,0,0,.9); }
 #clock { color: var(--parch); opacity: .85; }
 @media (max-width: 700px) { #depth .ebp { display: none; } #depth .eyebrow { max-width: 58vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } }

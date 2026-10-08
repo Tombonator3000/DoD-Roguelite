@@ -17,6 +17,7 @@ import { SKILL, RACE, PROF, SR, LOC_SHORT, fvCost, spellBaseCost, SPELLS } from 
 import { boonChoices, SRC_COLOR, makeItem, RARITY, setNebbCheck, refinalize, weaponItem, armorItem } from './loot.js';
 import { baseCost } from './rules.js';
 import { Gfx } from './gfx.js';
+import { loadTextureImages } from './textures.js';
 import { GradePass } from './post.js';
 import { Ambient } from './decor.js';
 import { TitleScene } from './title.js';
@@ -1817,4 +1818,5 @@ class Game {
 
 void rollDice; void LOC_SHORT; void SR; void Enemy; void buildRat;
 
-new Game().init();
+// Materialene får ferdig dekodede bilder. Manglende bilder bruker de gamle fabrikkene.
+loadTextureImages().then(() => new Game().init());

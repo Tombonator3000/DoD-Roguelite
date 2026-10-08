@@ -30,8 +30,15 @@ jobs:
       - run: npm run build
       - run: node --test tools/test/combatfx.test.mjs
       - run: node tools/test/combatfx-browser.mjs dist/combatfx-test
+      - run: node tools/test/texture-fallback.mjs
+      - run: node tools/test/texture-browser.mjs dist/index.html dist/teksturer/etter
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: kampeffekter-test
           path: dist/combatfx-test
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: teksturer-test
+          path: dist/teksturer/etter

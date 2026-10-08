@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { puddleRoughness } from './gfx.js';
+import { paintedTexture } from './textures.js';
 
 // ---------------------------------------------------------------------------
 // Støy og prosedyriske teksturer (alt genereres i nettleseren, ingen bildefiler)
@@ -636,14 +637,14 @@ export class SharedAssets {
     if (this.biomeCache[id]) return this.biomeCache[id];
     let floor, wall;
     if (id === 'kloakk') {
-      floor = stoneTextures({ style: 'cobble', cells: 7, base: [92, 98, 88], mortar: [22, 28, 24], vari: 0.22, moss: 0.7, seed: 11 });
-      wall = stoneTextures({ style: 'brick', cells: 8, base: [104, 84, 66], mortar: [30, 26, 22], vari: 0.2, moss: 0.8, seed: 23 });
+      floor = paintedTexture('kloakk_gulv') || stoneTextures({ style: 'cobble', cells: 7, base: [92, 98, 88], mortar: [22, 28, 24], vari: 0.22, moss: 0.7, seed: 11 });
+      wall = paintedTexture('kloakk_vegg') || stoneTextures({ style: 'brick', cells: 8, base: [104, 84, 66], mortar: [30, 26, 22], vari: 0.2, moss: 0.8, seed: 23 });
     } else if (id === 'dverg') {
-      floor = stoneTextures({ style: 'flag', cells: 3, base: [118, 104, 86], mortar: [30, 24, 20], vari: 0.15, cracks: true, seed: 37 });
-      wall = stoneTextures({ style: 'brick', cells: 5, base: [100, 92, 82], mortar: [28, 24, 20], vari: 0.12, seed: 41, normalStrength: 4 });
+      floor = paintedTexture('dverg_gulv') || stoneTextures({ style: 'flag', cells: 3, base: [118, 104, 86], mortar: [30, 24, 20], vari: 0.15, cracks: true, seed: 37 });
+      wall = paintedTexture('dverg_vegg') || stoneTextures({ style: 'brick', cells: 5, base: [100, 92, 82], mortar: [28, 24, 20], vari: 0.12, seed: 41, normalStrength: 4 });
     } else {
-      floor = stoneTextures({ style: 'flag', cells: 4, base: [96, 62, 52], mortar: [24, 14, 12], vari: 0.2, cracks: true, seed: 53 });
-      wall = stoneTextures({ style: 'brick', cells: 6, base: [84, 58, 50], mortar: [22, 14, 12], vari: 0.18, seed: 59 });
+      floor = paintedTexture('rev_gulv') || stoneTextures({ style: 'flag', cells: 4, base: [96, 62, 52], mortar: [24, 14, 12], vari: 0.2, cracks: true, seed: 53 });
+      wall = paintedTexture('rev_vegg') || stoneTextures({ style: 'brick', cells: 6, base: [84, 58, 50], mortar: [22, 14, 12], vari: 0.18, seed: 59 });
     }
     // våte sølepytter i kloakken, polert stein hos dvergene (ruhetskart på uv1, større skala)
     const rough = puddleRoughness(id === 'kloakk' ? 5 : 9, id === 'kloakk');
