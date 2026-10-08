@@ -233,3 +233,9 @@ Alt som gjøres i prosjektet loggføres her med tidsstempel (Europe/Oslo).
 - 19:19 Test: skjermbilder av alle skjermene på PC og mobil etter endringene, Escape fra innstillingene tilbake til pausen og videre til spillet, tallvalg i samtalen, to trykk for Til tittelskjermen, og innstillingene lagres. Fire kampeffekt-tester, combatfx-browser mot combatfx-test og pages-test, texture-fallback og texture-browser grønne, uten feil i konsollen. Bilder og oversikt i docs/menyer.md.
 - 19:20 Pull request #6 mot main fra claude/menyer. Avhenger av PR #4 og PR #5, som må flettes først. PR-nummeret ført inn i D010.
 - 19:28 GitHub Actions er grønn på b541e16. Republiserte artifacten (versjon 7) fra claude/menyer, med Edelfara, ChatGPTs teksturer og de nye menyene, så Tom kan prøve alt før PR #4, #5 og #6 er flettet.
+
+## 2026-10-08, versjon 0.6: innfletting (Claude)
+
+- 19:50 Tom sa: flett alt. Flettet PR #4 (Edelfara), PR #5 (ChatGPTs teksturer) og PR #6 (menyene) inn i main i den rekkefølgen, med vanlige flettecommits så grenene som bygger på hverandre, går rent inn (9da29d0, de8103c, 9dc065d). Alle tre var grønne i GitHub Actions før fletting.
+- 19:50 Bygg og publiser er grønn på 9dc065d (bygget før var avbrutt av det neste, som vanlig). Pages viser 0.6 med Edelfara, de malte teksturene og de nye menyene; sjekket at siden inneholder reisekartet, bildesettet og den nye pausemenyen.
+- 19:50 Ryddet "Hvem jobber med hva" i todo.md, siden alle tre pull requestene er inne, og skrev D011 til ChatGPT. Denne loggcommiten går rett til main, fordi Tom ba om å flette alt.
