@@ -479,6 +479,7 @@ export class AreaLife extends TownLife {
     G.player.addHjp?.(2, 'svartfolket er drevet tilbake');
     G.audio.drake?.();
     if (this.battle) { this.battle = false; this.area.peaceful = false; }
+    G.audio.playMusic?.('explore');
   }
 
   // --- Lekh flykter på ulven (s. 9) -----------------------------------------------------------------
@@ -502,7 +503,7 @@ export class AreaLife extends TownLife {
     lekh.dispose();
     G.enemies.splice(G.enemies.indexOf(lekh), 1);
     G.fx.burst('dust', { x, y: 0.5, z }, 16);
-    G.ui.log('<b class="c-boss">Lekh</b> plystrer skarpt. En svær ulv bryter ut av hagen, og Lekh svinger seg opp på ryggen. Han rir mot sørøst!');
+    G.ui.log(this.id === 'lagret' ? '<b class="c-boss">Lekh</b> plystrer skarpt. En svær ulv bryter ut av hagen, og Lekh svinger seg opp på ryggen. Han rir mot sørøst!' : '<b class="c-boss">Lekh</b> plystrer skarpt. En svær ulv kommer løpende fra skogkanten, og Lekh svinger seg opp på ryggen. Han rir mot skogen i sør!');
     const e = new Enemy('lekh_ulv', x, z, 1);
     e.spawnIdx = 'lekh';
     e.body.kp = Math.min(e.maxKP, kp + 4);

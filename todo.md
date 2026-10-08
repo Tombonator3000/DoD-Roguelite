@@ -6,7 +6,7 @@ Sortert etter hva som gir mest spill for minst jobb.
 
 Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når pull requesten er inne. Se AGENTS.md.
 
-- Claude (`claude/edelfara`): Edelfara og eventyret Triangeldrama i Edelfara (Ivanhoe). Nye filer area.js, edelfara.js, arealife.js, travel.js. Endrer town.js, townfolk.js, main.js, weather.js, world.js, enemies.js, assets.js, ui.js, page.html, save.js.
+- Claude (`claude/edelfara`, pull request mot main): Edelfara og eventyret Triangeldrama i Edelfara (Ivanhoe). Nye filer area.js, areagrid.js, edelmap.js, edelmodels.js, edelfolk.js, arealife.js, ivan.js, travel.js. Endrer town.js, townfolk.js, main.js, weather.js, world.js, enemies.js, loot.js, ui.js, page.html, save.js, wet.js, water.js.
 
 
 ## Nå
@@ -15,6 +15,11 @@ Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når p
 - [x] Lagre og laste med autolagring og tre plasser (0.5)
 - [x] DoD91-regler (4.0) med Expert og Gigant: sju grundegenskaper, FV per ferdighet, träffområden med egne KP og rustning, parering per SR, magi med PSY, yrker og raser fra Bok I, Skräcktabellen, stridsmoral, fummeltabeller, EP og hjältepoäng (0.5). Lagrede spill fra 2023-reglene kan ikke lastes.
 - [x] Ild i ett tegnekall, vann med refleksjoner og ringer, regn og lyn, våte flater og pytter, vind i gress og trær, løv, fugler, flaggermus, sporer, glør, damp, røkelse, tilt-shift og fargestemning (0.5)
+- [x] Edelfara utenfor Nordporten: reisekart med tid, sju områder (Ekeskogen, Sortmund, Ridderskors borg, Akershus, Akershus borg, Glimming, Lekhs leir) og hele eventyret Triangeldrama i Edelfara med tre mistenkte, ledetråder, villspor, frist på sju dager, allierte, Lekh på ulven og fire slutter i Pharynx (0.6)
+- [ ] Spilltest Edelfara: holder sju dager, eller er det for romslig? Er leiren for hard alene og for lett med grevens soldater? Finner folk fram til Ulfmar og bevisene uten journalen?
+- [ ] Rida: hester i Sortmund og Akershus som korter ned reisetida på kartet, med et Rida-slag.
+- [ ] Pharynx som eget område med hertigens vaktkaptein, i stedet for bare en rapport.
+- [ ] Resten av Ivanhoe-boksen (Medeltidsregler og Aidne) er ikke brukt. Se om noe passer, for eksempel turnering i Sortmund.
 - [ ] Spilltest grafikken på ekte maskin og mobil: er regnet for tett, tilt-shift for sterk, natta for mørk i uvær?
 - [ ] Mer grafikk: tåke som ligger lavt over elva om morgenen, snø om vinteren, lysstråler gjennom vinduene i flere hus, varmeflimmer over smia, skyggen av fuglene på bakken.
 
@@ -34,7 +39,7 @@ Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når p
 
 - [ ] Hjälteförmågor som ikke er i koden ennå: Tålig, Stålblick, Fint, Hjältesprång, Giftskydd, Sköldkrossare. De står i HJALTEFORMAGOR, men Jehanne selger dem ikke.
 - [ ] Flere besvärjelser fra Bok III og Expert Magi, og lære fra formelsamlinger i kloakken.
-- [ ] Bruk for ferdigheter som ikke gjør noe ennå: Rida, Sjökunnighet, Spåra, Geologi og flere kunskapsferdigheter.
+- [ ] Bruk for ferdigheter som ikke gjør noe ennå: Rida, Sjökunnighet, Geologi og flere kunskapsferdigheter. Spåra brukes fra 0.6 til sporet etter svartfolket i Akershus.
 - [ ] Mat og sult, fakler som brenner ut, guld- og kopparmynt i tillegg til silver.
 - [ ] Gift og sykdom med styrke mot FYS på Motståndstabellen.
 - [ ] Flere monstre fra Bok II og Monsterboken med egne anfall (troll som gror, jättespindel med nett, gast med skräck).

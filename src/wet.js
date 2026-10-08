@@ -110,6 +110,10 @@ export function addSway(mat, mode = 'grass') {
         }
         mvPosition = modelViewMatrix * mvPosition;
         gl_Position = projectionMatrix * mvPosition;`);
+    // gresstuster lyses som bakken (normal rett opp), ellers blir baksidene svarte
+    if (mode === 'grass') sh.fragmentShader = sh.fragmentShader.replace('#include <normal_fragment_begin>', `float faceDirection = 1.0;
+        vec3 normal = normalize((viewMatrix * vec4(0.0, 1.0, 0.0, 0.0)).xyz);
+        vec3 nonPerturbedNormal = normal;`);
   });
 }
 

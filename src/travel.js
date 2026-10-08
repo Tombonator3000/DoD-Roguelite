@@ -113,13 +113,14 @@ export class Travel {
 
   // Markøren går langs ruten før neste område lastes
   animate(path, done) {
-    this.anim = { path, t: 0, dur: Math.min(2.2, 0.7 + path.length * 0.45), done };
+    this.anim = { path, t: 0, t0: performance.now(), dur: Math.min(2.2, 0.7 + path.length * 0.45), done };
     $('#travel-go').hidden = true;
     G.ui.show('travel');
+    // tiden regnes fra klokka, ikke fra antall bilder, så reisen tar like lang tid på en treg maskin
     const step = () => {
       const a = this.anim;
       if (!a) return;
-      a.t += 1 / 60;
+      a.t = (performance.now() - a.t0) / 1000;
       this.draw();
       if (a.t >= a.dur) { this.anim = null; done(); return; }
       requestAnimationFrame(step);

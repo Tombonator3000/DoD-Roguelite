@@ -150,8 +150,10 @@ export class Area extends Town {
     this.M = M;
     if (!M.forestFloor) {
       const TX = townTextures();
-      M.forestFloor = new THREE.MeshStandardMaterial({ map: TX.grass.map, roughness: 1, color: 0x6f7c56 });
-      M.hill = new THREE.MeshStandardMaterial({ map: TX.grass.map, roughness: 1, color: 0x8c9a6c });
+      // Gressteksturen er mørk i seg selv (bakken i byen får lys fra vertex-fargene),
+      // så fargen her må ligge nær hvit, ellers blir kullen nesten svart.
+      M.forestFloor = new THREE.MeshStandardMaterial({ map: TX.grass.map, roughness: 1, color: 0x9aa682 });
+      M.hill = new THREE.MeshStandardMaterial({ map: TX.grass.map, normalMap: TX.grass.normalMap, roughness: 1, color: 0xdce4c8 });
       M.rock = new THREE.MeshStandardMaterial({ map: TX.stone.map, normalMap: TX.stone.normalMap, roughness: 0.95, color: 0x8a867c, flatShading: true });
       M.tent = new THREE.MeshStandardMaterial({ roughness: 0.95, vertexColors: true, side: THREE.DoubleSide });
       M.spruce = new THREE.MeshStandardMaterial({ roughness: 0.9, flatShading: true });
@@ -459,8 +461,9 @@ export class Area extends Town {
     const mound = new THREE.Mesh(geo, M.hill);
     const cx = U(h.x), cz = U(h.y);
     mound.position.set(cx, 0, cz);
+    // haugen er slak og trenger ikke kaste skygge, da slipper vi skyggestriper på skråningen
     mound.receiveShadow = true;
-    mound.castShadow = true;
+    mound.castShadow = false;
     this.group.add(mound);
     // sti opp: en lys stripe i bakken langs skråningen
     if (h.path != null) {

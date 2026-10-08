@@ -1314,7 +1314,8 @@ export class Town extends Dungeon {
       p.set(x, 0, z);
       m4.compose(p, q, s);
       tufts.setMatrixAt(i, m4);
-      c.setHSL(0.22 + r * 0.06, 0.4, 0.42 + r * 0.12);
+      // fargen ganges med teksturen, som allerede er grønn. Nesten hvit her, ellers blir tustene svarte.
+      c.setHSL(0.2 + r * 0.08, 0.35, 0.78 + r * 0.16);
       tufts.setColorAt(i, c);
     });
     tufts.receiveShadow = true;
