@@ -107,3 +107,12 @@ Ting som er lurt å huske neste gang noen (menneske eller AI) jobber med prosjek
 - Backspace og Escape i tittelen går tilbake, men ikke når du skriver i navnefeltet.
 - SphereGeometry med delvis kule må lages med HEMI() i kinmodels.js. SPH() i assets.js ignorerer ekstra argumenter.
 - Skjold i hånda til figurer med armer trenger rotation.x = 1.55, ellers ligger det flatt når albuen er bøyd.
+
+## Kampeffektlag (ChatGPT, 2026-10-08)
+
+- `CombatFX` i `src/combatfx.js` arver `FX` og importeres som FX i main.js. Én endret importlinje. Claudes `fx.js` er beholdt, inkludert `spark()` for gjenstander.
+- `src/combatfx-pool.js` har to instanslag: maks 128 glødeffekter og 96 småbiter. Ingen nye eksterne ressurser. `slash()` og `ring()` har egne shadere; øvrige overstyrte metoder kaller grunnlaget først.
+- `clearLevel()` nullstiller også grunnlagets hugg, ringer og partikkel-tegneområder før neste frame. Samlingene må fortsatt hete slashes/rings dersom grunnlaget endres.
+- Nye tester: `node --test tools/test/combatfx.test.mjs` og `node tools/test/combatfx-browser.mjs dist/combatfx-test`. Sistnevnte krever Playwright og et ferdig bygg; TEST_SOURCE=1 kjører kildemodulene direkte. CHROME og PLAYWRIGHT_PATH er valgfrie lokale stier.
+- Lokalt på Chrome 154/SwiftShader: fire regresjonstester bestått, `stress('tjuv', 20)` gjennom fem nivåer uten feil, åtte umiddelbare oppryddinger med null gjenværende effekter. Testet sammen med inventar/lagring fra 26cddf7. GitHub Actions på b1520fa har også bygget den selvstendige HTML-fila og bestått alle regresjons- og nettlesertestene.
+- Ingen DoD-regler eller lore er endret. Se `docs/kampeffekter.md` for metodegrensene ved videre grafikkarbeid.

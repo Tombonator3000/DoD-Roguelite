@@ -58,6 +58,8 @@ Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når p
 
 ## Teknisk
 
+- [x] Instansierte kampeffekter og opprydding ved nivåbytte, ChatGPT i PR #1. Tester og overlevering følger med.
+
 - [ ] Instansiere fiendedeler for færre draw calls hvis det blir mange fiender.
 - [ ] Flytte partikler til GPU om det trengs.
 - [x] Repo på GitHub (Tombonator3000/DoD-Roguelite) med AGENTS.md og bygg til GitHub Pages.
