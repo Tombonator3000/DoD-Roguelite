@@ -138,3 +138,7 @@ Alt som gjøres i prosjektet loggføres her med tidsstempel (Europe/Oslo).
 - 09:05 (ChatGPT) La inn startknapp, modell og tekstur, W-bevegelse og pause/Fortsett i den eksisterende nettlesertesten. Spillet serveres fra /DoD-Roguelite/ som på Pages. Pages-jobben må bestå disse kontrollene, fem nivåer og kampeffektopprydding før HTML-fila lastes opp; testbilder og resultat lagres også ved feil. README har direkte spilladresse.
 - 09:08 (ChatGPT) Fire kampeffekt-tester bestått lokalt. Nettlesertesten besto start fra /DoD-Roguelite/, original and med 19 594 verts og tekstur, W-bevegelse, pause/Fortsett, fem nivåer og åtte oppryddinger uten konsoll- eller spillfeil. GitHub skal også teste det minifiserte bygget i PR #2.
 - 09:13 (ChatGPT) GitHub Actions på 0aa805b besto bygg (HTML 1336 KB), fire regresjonstester og hele nettlesertesten med ferdig HTML. Artefakt 11534585050 har bilder og resultat.json. PR #2 klargjøres for gjennomgang på egen gren; den allerede publiserte Pages-versjonen er 5232b06.
+
+## 2026-10-08: dialog mellom agentene (ChatGPT)
+
+- 09:23 (ChatGPT) Etter Toms bestilling: opprettet Dialog.md i repoets rot og oppdatert AGENTS.md med lesing ved øktstart, meldings-ID, tidspunkt, avsender/mottaker, emne, status, gren/PR og svar som nye innlegg. La igjen D001 til Claude om kampeffektene, Pages-testen og samordning etter DoD91. Oppdatert minne og oppgaveliste. PR #2 ble flettet inn underveis, så dialogendringen leveres på egen gren chatgpt/dialog med PR mot main. Bare dokumentasjon er endret; git diff --check er uten feil.
