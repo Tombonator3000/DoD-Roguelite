@@ -37,6 +37,7 @@ function coverTexture() {
 const COVER = `
 uniform sampler2D uCover;
 uniform float uCoverOn;
+uniform float uInside;
 float coverAt(vec3 p){
   if (uCoverOn < 0.5) return 0.0;
   vec2 uv = p.xz / vec2(${(TW * T).toFixed(1)}, ${(TH * T).toFixed(1)});
@@ -65,7 +66,7 @@ function makeRain(count, cover) {
     uniforms: {
       uTime: { value: 0 }, uCenter: { value: new THREE.Vector3() }, uBox: { value: new THREE.Vector3(40, 12, 40) },
       uAmount: { value: 0 }, uWind: { value: new THREE.Vector2() }, uLen: { value: 1.05 }, uPx: { value: 0.002 }, uAspect: { value: 1.7 },
-      uColor: { value: new THREE.Color(0.62, 0.68, 0.76) }, uCover: { value: cover }, uCoverOn: { value: 1 },
+      uColor: { value: new THREE.Color(0.62, 0.68, 0.76) }, uCover: { value: cover }, uCoverOn: { value: 1 }, uInside: { value: 0 },
     },
     vertexShader: `${COVER}
       attribute vec4 aSeed;
@@ -83,7 +84,7 @@ function makeRain(count, cover) {
         p.x = mod(p.x - uCenter.x + uBox.x * 0.5, uBox.x) - uBox.x * 0.5 + uCenter.x;
         p.z = mod(p.z - uCenter.z + uBox.z * 0.5, uBox.z) - uBox.z * 0.5 + uCenter.z;
         float cov = coverAt(p);
-        vA = (cov > 0.0 && p.y < cov) ? 0.0 : 1.0;
+        vA = (cov > 0.0 && (p.y < cov || uInside > 0.5)) ? 0.0 : 1.0;
         vA *= smoothstep(0.0, 2.0, fall) * step(0.0, p.y);
         vec3 dir = normalize(vec3(drift.x * 1.6, -1.0, drift.z * 1.6));
         vec3 tail = p - dir * uLen * (0.7 + aSeed.x * 0.6);
@@ -121,7 +122,7 @@ function makeSplashes(count, cover) {
     uniforms: {
       uTime: { value: 0 }, uCenter: { value: new THREE.Vector3() }, uBox: { value: new THREE.Vector3(30, 1, 30) },
       uAmount: { value: 0 }, uScale: { value: 400 }, uColor: { value: new THREE.Color(0.7, 0.76, 0.84) },
-      uCover: { value: cover }, uCoverOn: { value: 1 },
+      uCover: { value: cover }, uCoverOn: { value: 1 }, uInside: { value: 0 },
     },
     vertexShader: `${COVER}
       attribute vec4 aSeed;
@@ -165,7 +166,7 @@ function makeLeaves(count, cover) {
     uniforms: {
       uTime: { value: 0 }, uCenter: { value: new THREE.Vector3() }, uBox: { value: new THREE.Vector3(44, 9, 44) },
       uAmount: { value: 0 }, uScale: { value: 400 }, uWind: { value: new THREE.Vector2() }, uLight: { value: 1 },
-      uCover: { value: cover }, uCoverOn: { value: 1 },
+      uCover: { value: cover }, uCoverOn: { value: 1 }, uInside: { value: 0 },
     },
     vertexShader: `${COVER}
       attribute vec4 aSeed;
@@ -183,7 +184,7 @@ function makeLeaves(count, cover) {
         p.x = mod(p.x - uCenter.x + uBox.x * 0.5, uBox.x) - uBox.x * 0.5 + uCenter.x;
         p.z = mod(p.z - uCenter.z + uBox.z * 0.5, uBox.z) - uBox.z * 0.5 + uCenter.z;
         float cov = coverAt(p);
-        vA = (cov > 0.0 && p.y < cov) ? 0.0 : 1.0;
+        vA = (cov > 0.0 && (p.y < cov || uInside > 0.5)) ? 0.0 : 1.0;
         vA *= smoothstep(0.0, 0.4, p.y) * (1.0 - smoothstep(uBox.y * 0.8, uBox.y, p.y));
         vRot = t * (1.5 + aSeed.x * 3.0) + aSeed.z * 6.28;
         vec3 c1 = vec3(0.42, 0.36, 0.08), c2 = vec3(0.6, 0.26, 0.05), c3 = vec3(0.22, 0.3, 0.06);
@@ -246,7 +247,7 @@ class Flock {
       side: THREE.DoubleSide,
       fog: true,
       uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib.fog, {
-        uTime: { value: 0 }, uFlap: { value: bat ? 16 : 7 }, uColor: { value: new THREE.Color(bat ? 0x0c0808 : 0x22201e) },
+        uTime: { value: 0 }, uFlap: { value: bat ? 16 : 7 }, uColor: { value: new THREE.Color(bat ? 0x0c0808 : 0x2e2a26) },
       }]),
       vertexShader: `attribute float aWing; attribute float aPhase; uniform float uTime, uFlap; varying float vFogDepth;
         void main(){
@@ -295,7 +296,7 @@ class Flock {
     if (!this.mesh.visible) return;
     this.mat.uniforms.uTime.value = time;
     this.t += dt;
-    const s = this.bat ? 1 : 1.25;
+    const s = this.bat ? 1 : 0.8;
     for (let i = 0; i < this.n; i++) {
       const b = this.birds[i];
       let x, y, z, yaw;
@@ -406,9 +407,10 @@ export class Weather {
     this.spores.material.uniforms.uColor.value.setHex(D?.depth === 2 ? 0xc8ff5a : 0x7affa0);
     this.embers.material.uniforms.uColor.value.setHex(biome === 'rev' ? 0xff4a20 : 0xff8a30);
     if (D?.isTown) {
-      const cx = TW * T / 2, cz = TH * T / 2;
-      this.birds[0].start('circle', new THREE.Vector3(cx - 8, 0, cz - 6), { radius: 16, height: 9.5, speed: 0.22 });
-      this.birds[1].start('circle', new THREE.Vector3(cx + 14, 0, cz + 10), { radius: 11, height: 8.5, speed: -0.3 });
+      // kameraet ser skrått ned fra 16 meter, så fuglene må fly lavt for å synes
+      const P = G.player.pos;
+      this.birds[0].start('circle', new THREE.Vector3(P.x - 4, 0, P.z - 3), { radius: 9, height: 5.2, speed: 0.32 });
+      this.birds[1].start('circle', new THREE.Vector3(P.x + 6, 0, P.z + 5), { radius: 7, height: 4.6, speed: -0.4 });
     }
   }
 
@@ -459,9 +461,11 @@ export class Weather {
       if (th.t <= 0) { G.audio?.thunder?.(th.k); this.thunders.splice(i, 1); }
     }
     G.audio?.setRain?.(town ? this.rain : 0, !!D?.insideId);
-    updateWet(this, time, G.game?.sky);
+    updateWet(this, time, G.game?.sky, dt);
     // regn, plask og løv følger kameraets mål
     const sc = G.fx?.add?.uniforms?.uScale?.value || 400;
+    const inside = town && D.insideId ? 1 : 0;
+    for (const o of [this.rainMesh, this.splash, this.leaves]) o.material.uniforms.uInside.value = inside;
     const ru = this.rainMesh.material.uniforms;
     ru.uTime.value = time;
     ru.uCenter.value.set(center.x, center.y || 0, center.z);
@@ -487,9 +491,14 @@ export class Weather {
     this.leaves.visible = town;
     // fugler om dagen når det ikke regner, flaggermus om natta og i hallene
     const birdsOn = town && night < 0.5 && this.rain < 0.3;
-    for (const b of this.birds) {
+    for (const [i, b] of this.birds.entries()) {
       if (birdsOn && !b.mode) b.start('circle', b.center, { radius: b.radius, height: b.height, speed: b.speed });
       if (!birdsOn && b.mode) b.stop();
+      if (b.mode === 'circle') {
+        const ox = i ? 6 : -4, oz = i ? 5 : -3;
+        b.center.x += (center.x + ox - b.center.x) * Math.min(1, dt * 0.15);
+        b.center.z += (center.z + oz - b.center.z) * Math.min(1, dt * 0.15);
+      }
       b.update(dt, time);
     }
     this.batT -= dt;

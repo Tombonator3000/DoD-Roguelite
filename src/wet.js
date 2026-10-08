@@ -15,6 +15,8 @@ export const WET = {
   uWetTime: { value: 0 },
   uWetSky: { value: new THREE.Color(0.4, 0.45, 0.55) },
   uWetSkyH: { value: new THREE.Color(0.3, 0.32, 0.36) },
+  uCloudSh: { value: 0 },
+  uCloudOff: { value: new THREE.Vector2() },
 };
 
 export const SWAY = {
@@ -33,7 +35,8 @@ function chain(mat, key, fn) {
 }
 
 const WET_PARS = `
-uniform float uWet, uWetRain, uWetTime;
+uniform float uWet, uWetRain, uWetTime, uCloudSh;
+uniform vec2 uCloudOff;
 uniform vec3 uWetSky, uWetSkyH;
 varying vec3 vWetW;
 float wh(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
@@ -74,6 +77,12 @@ export function addWetness(mat, o = {}) {
           vec3 sky = mix(uWetSkyH, uWetSky, 0.55);
           float ring = uWetRain > 0.05 ? wetRing(vWetW.xz) : 0.0;
           outgoingLight += sky * (0.2 + fr) * (puddle * (1.0 + ring * 2.5) + damp * 0.1);
+          // skyggene av skyer som driver over byen
+          if (uCloudSh > 0.01) {
+            vec2 cp = vWetW.xz * 0.03 + uCloudOff;
+            float cs = smoothstep(0.42, 0.72, wn(cp) * 0.7 + wn(cp * 2.3 + 1.7) * 0.3);
+            outgoingLight *= 1.0 - cs * uCloudSh;
+          }
         }
         #include <opaque_fragment>`);
   });
@@ -105,7 +114,7 @@ export function addSway(mat, mode = 'grass') {
 }
 
 // Settes av været hvert bilde.
-export function updateWet(weather, time, sky) {
+export function updateWet(weather, time, sky, dt = 0) {
   WET.uWet.value = weather.wet;
   WET.uWetRain.value = weather.rain;
   WET.uWetTime.value = time;
@@ -113,6 +122,11 @@ export function updateWet(weather, time, sky) {
     WET.uWetSky.value.copy(sky.sky).multiplyScalar(1 - weather.cloud * 0.4);
     WET.uWetSkyH.value.copy(sky.fog);
   }
+  // skyskygger: mest når det er delvis skyet om dagen
+  const day = sky ? Math.max(0, 1 - sky.night * 1.5) : 0;
+  WET.uCloudSh.value = day * Math.max(0, 1 - Math.abs(weather.cloud - 0.55) / 0.45) * 0.38;
+  WET.uCloudOff.value.x -= weather.wind.x * dt * 0.012;
+  WET.uCloudOff.value.y -= weather.wind.y * dt * 0.012;
   SWAY.uSwayTime.value = time;
   SWAY.uWind.value.copy(weather.wind);
 }

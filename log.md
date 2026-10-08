@@ -182,3 +182,6 @@ Alt som gjøres i prosjektet loggføres her med tidsstempel (Europe/Oslo).
 - 12:44 post.js: tilt-shift (uskarpt øverst og nederst) og fargestemning per sted: grønnkalde skygger i kloakken, varmt i hallene, rødt hos Rødpels, og dag, skumring, natt og regn i byen. Av på lav kvalitet, svakere på middels, og av når packningen er åpen.
 - 12:48 Lysstråle gjennom taket i tempelet når du står inne om dagen, røkelse fra fyrfatene der og krydderrøyk hos Rødpels. Røyk driver med vinden.
 - 12:55 Tegnekall målt med én composer-render: byen om natta 320 før, 322 nå (uvær 321), kloakken 155 før, 160 nå. CI-testene er grønne med det nye.
+- 13:08 Regnet falt inn i huset når du sto inne (taket er da gjennomsiktig). Nå skjules regn og løv over alle tak når du er inne. Fuglene fløy for høyt til å synes fra kameraet; de flyr nå lavt og følger sakte etter deg.
+- 13:12 Skyskygger som driver over bakken når det er delvis skyet om dagen. Klokka i HUD-en går ikke over to linjer på mobil.
+- 12:48 Test: CI-testene grønne, alle elleve yrker gjennom fem nivåer med klart, regn, uvær og skyet, townWander og talkAll i uvær, og været kjørt 1600 steg på hvert nivå. Ingen feil.

@@ -283,7 +283,7 @@ input[type=range]:focus-visible { box-shadow: 0 0 0 2px rgba(201,163,90,.5); }
 #pause-quests .qrow.done { color: var(--dim); text-decoration: line-through; }
 .floater.say { color: #f2e6c8; font-family: var(--body); font-style: italic; font-weight: 600; font-size: 15px; text-shadow: 0 1px 3px #000, 0 0 8px rgba(0,0,0,.9); }
 #clock { color: var(--parch); opacity: .85; }
-@media (max-width: 700px) { #depth .ebp { display: none; } #depth .eyebrow { max-width: 58vw; } }
+@media (max-width: 700px) { #depth .ebp { display: none; } #depth .eyebrow { max-width: 58vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } }
 body.in-town .tbtn[data-tbtn="TAtk"], body.in-town .tbtn[data-tbtn="TThrow"], body.in-town .tbtn[data-tbtn="TParry"], body.in-town #tbtns-dyn { display: none; }
 .kw { font-family: var(--ui); font-weight: 800; font-size: 13px; letter-spacing: .12em; color: var(--parch); background: rgba(0,0,0,.35); border: 1px solid var(--gild-dim); padding: 6px 10px; cursor: pointer; }
 .kw:hover, .kw:focus-visible { border-color: var(--gild); color: var(--gild); outline: none; }
