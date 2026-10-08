@@ -124,6 +124,19 @@ Detaljene står i docs/regler/IMPLEMENTERING.md. Det viktigste:
 - Telt du kan gå inn i stenger bare side- og bakveggene, og walkBlock legges under hele teltet så npcPath går rundt. Lekhs telt har eget gjennomsiktig materiale som tones ut når du er inne.
 - Gressteksturen (towntex.js) er mørk i seg selv, snitt omtrent (58, 90, 37). Bakken i byen får lyset fra vertex-fargene. Et materiale med denne teksturen og en vanlig grønn farge blir nesten svart, så bruk farge nær hvit (kullene 0xdce4c8). Samme med gresstustene: fargen må være lys.
 
+## Versjon 0.6: menyer og brukerflate (Claude)
+
+- Pausemenyen (#pause) har knappene som `.pmi` i `.pz-menu` og løpet i `#pz-run`, som `pause()` i main.js fyller hver gang. Fanene Journal og Taster byttes med `pauseTab(id)`. Knappenes id-er er de samme som før (btn-resume, btn-save, btn-load, btn-sheet, btn-quit), og testene klikker på dem. `#btn-mute` finnes ikke lenger; lyd av og på ligger i innstillingene og på M.
+- Til tittelskjermen krever to trykk: klassen `armed` på #btn-quit og teksten i #pz-warn. Begge nullstilles i `pause()`.
+- Innstillingene i spillet (#opts): `openOpts()` flytter `#set-rows` fra tittelens #settings inn i #opts-rows, og `closeOpts()` legger dem tilbake foran `.back`. Da finnes det bare ett sett med kontroller og hendelser. Escape i løkka sjekker #opts før pausen.
+- Nye innstillinger i svartnebb.settings.v1: `tilt` (1 eller 0, tilt-shift; alltid av på lav grafikk) og `text` (1, 1,15 eller 1,3). `applySettings()` setter CSS-variabelen `--txt` på html, og loggen, samtalene, journalen, hjelpen og panelene regner skriftstørrelsen med `calc(... * var(--txt))` i 0.6-blokka nederst i stilarket.
+- `.only-touch` og `.no-touch` viser og skjuler innhold etter `body.touch`. Brukt i hjelpen og i Taster-fanen.
+- Lange paneler i tittelen får klassen `tscroll` og en `.tp-body` som ruller, så Tilbake står fast nederst.
+- Grunnmur i 0.6-blokka: `box-sizing: border-box` på panelene, inputfeltene og lagringsradene, og `button, select, input { font-family: inherit }`. Uten den siste står knapper uten egen skrift i systemskriften.
+- Samtaler: tallene 1 til 9 i det tomme skrivefeltet klikker ord nummer n i #dlg-kw (talk.js). Tallet foran ordet er en CSS-teller og står ikke i textContent, så `kws()` i testriggen er uendret.
+- Journalen (ivan.js) viser fargen for fakta, svart og villspor først når `reported` er satt.
+- Testriggen med ekte skrifter: Google Fonts nås ikke fra sandkassen, så skjermbilder viser reserveskriftene. `npm install @fontsource/grenze-gotisch @fontsource/alegreya @fontsource/alegreya-sans-sc` i en egen mappe og svar på forespørslene til fonts.googleapis.com og fonts.gstatic.com med CSS og woff2 derfra (page.route i Playwright), så ser bildene ut som i en vanlig nettleser.
+
 ## Testing
 
 - Testriggen ligger i tools/test. shot.mjs åpner siden i headless Chromium med SwiftShader og ruter three.js til lokal node_modules (stien THREE_DIR må peke riktig). NOANIM=1 slår av CSS-animasjoner (de står på 0 fordi hvert bilde tar over et sekund), LOWQ=1 setter lav grafikk og stille lyd, INIT="$(cat sim.js)" legger inn hjelpere, VW/VH/TOUCH for mobil.

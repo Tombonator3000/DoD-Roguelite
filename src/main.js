@@ -125,7 +125,7 @@ function saveMeta(m) {
   try { localStorage.setItem('svartnebb.meta.v1', JSON.stringify(m)); } catch (e) { /* ignorer */ }
 }
 function loadSettings(touch) {
-  const def = { music: 70, sfx: 100, quality: touch ? 'middels' : 'hoy', shake: 1 };
+  const def = { music: 70, sfx: 100, quality: touch ? 'middels' : 'hoy', shake: 1, tilt: 1, text: 1 };
   try {
     const s = localStorage.getItem('svartnebb.settings.v1');
     if (s) return { ...def, ...JSON.parse(s) };
@@ -387,6 +387,7 @@ class Game {
     G.ui.hud.hidden = true;
     $('#touch').hidden = true;
     G.ui.show('splash');
+    if (G.touch) $('.sp-press').textContent = 'Trykk på skjermen';
     this.applyViewOffset();
     const go = e => {
       if (G.state !== 'splash') return;
@@ -548,7 +549,8 @@ class Game {
     G.ambient.setEnabled(q !== 'lav', q !== 'lav');
     G.world?.fire?.setQuality(q);
     G.weather?.setQuality(q);
-    G.post.setTilt(q === 'lav' ? 0 : q === 'middels' ? 0.7 : 1);
+    G.post.setTilt(q === 'lav' || !st.tilt ? 0 : q === 'middels' ? 0.7 : 1);
+    document.documentElement.style.setProperty('--txt', String(st.text || 1));
     this.resize();
   }
 
@@ -563,6 +565,32 @@ class Game {
     }
     document.querySelectorAll('#set-quality button').forEach(b => b.classList.toggle('on', b.dataset.q === st.quality));
     document.querySelectorAll('#set-shake button').forEach(b => b.classList.toggle('on', +b.dataset.s === st.shake));
+    document.querySelectorAll('#set-tilt button').forEach(b => b.classList.toggle('on', +b.dataset.t === st.tilt));
+    document.querySelectorAll('#set-text button').forEach(b => b.classList.toggle('on', +b.dataset.x === st.text));
+    document.querySelectorAll('#set-mute button').forEach(b => b.classList.toggle('on', (b.dataset.m === '1') === !!G.audio.muted));
+  }
+
+  // Innstillingene fra pausemenyen: radene flyttes fra tittelens panel og tilbake igjen,
+  // så det finnes bare ett sett med kontroller.
+  openOpts() {
+    if (G.state !== 'pause') return;
+    this.syncSettingsUI();
+    $('#opts-rows').appendChild($('#set-rows'));
+    G.ui.show('opts');
+    $('#opts .seg button.on')?.focus({ preventScroll: true });
+  }
+
+  closeOpts() {
+    if ($('#opts').hidden) return;
+    $('#settings').insertBefore($('#set-rows'), $('#settings .back'));
+    if (G.state === 'pause') { G.ui.show('pause'); $('#btn-opts').focus({ preventScroll: true }); }
+    else G.ui.hideScreens();
+  }
+
+  pauseTab(id) {
+    document.querySelectorAll('.pz-tabs button').forEach(b => b.classList.toggle('on', b.dataset.pt === id));
+    $('#pz-journal').hidden = id !== 'journal';
+    $('#pz-keys').hidden = id !== 'keys';
   }
 
   buyUpgrade(u) {
@@ -608,9 +636,33 @@ class Game {
     }));
     seg('#set-quality', 'quality', 'q', false);
     seg('#set-shake', 'shake', 's', true);
+    seg('#set-tilt', 'tilt', 't', true);
+    seg('#set-text', 'text', 'x', true);
+    document.querySelectorAll('#set-mute button').forEach(b => (b.onclick = () => {
+      G.audio.init();
+      G.audio.setMuted(b.dataset.m === '1');
+      this.syncSettingsUI();
+      G.audio.menuTick?.(67);
+    }));
     $('#btn-resume').onclick = () => this.resume();
-    $('#btn-mute').onclick = () => { G.audio.setMuted(!G.audio.muted); $('#btn-mute').textContent = G.audio.muted ? 'Slå på lyd' : 'Slå av lyd'; };
-    $('#btn-quit').onclick = () => { G.ui.hideBoss(); this.endRunCleanup(); this.titleScene(); };
+    // to trykk: det som ikke er lagret, går tapt (autolagringen blir liggende)
+    $('#btn-quit').onclick = () => {
+      const b = $('#btn-quit');
+      if (!b.classList.contains('armed')) {
+        b.classList.add('armed');
+        $('#pz-warn').hidden = false;
+        G.audio.menuTick?.(52);
+        return;
+      }
+      G.ui.hideBoss();
+      this.endRunCleanup();
+      this.titleScene();
+    };
+    $('#btn-inv').onclick = () => { this.resume(); if (G.state === 'play') G.inv.open(); };
+    $('#btn-opts').onclick = () => this.openOpts();
+    $('#btn-opts-back').onclick = () => this.closeOpts();
+    $('#btn-sheet-x').onclick = () => this.resume();
+    document.querySelectorAll('.pz-tabs button').forEach(b => (b.onclick = () => this.pauseTab(b.dataset.pt)));
     $('#btn-again').onclick = () => this.wipe(() => this.startRun());
     $('#btn-totitle').onclick = () => this.titleScene();
     $('#btn-sheet-close').onclick = () => this.resume();
@@ -1597,8 +1649,23 @@ class Game {
     G.state = 'pause';
     const P = G.player;
     const qs = Object.entries(G.run.quests || {}).filter(([, q]) => q.state === 'active' || q.state === 'done');
-    $('#pause-quests').innerHTML = (qs.length ? '<h3>Oppdrag</h3>' + qs.map(([id, q]) => `<div class="qrow ${q.state}">${q.state === 'done' ? 'Fullført: ' : ''}${QUEST_TITLES[id] || id}</div>`).join('') : '') + journalHTML();
+    const journal = (qs.length ? '<h3>Oppdrag</h3>' + qs.map(([id, q]) => `<div class="qrow ${q.state}">${q.state === 'done' ? 'Fullført: ' : ''}${QUEST_TITLES[id] || id}</div>`).join('') : '') + journalHTML();
+    $('#pause-quests').innerHTML = journal || `<div class="pz-empty">Ingen oppdrag ennå. ${G.dungeon.isTown && !G.dungeon.isArea ? 'Oppslagstavla på torget har arbeid, og folk i byen vet ting.' : 'Folk i Fristaden har arbeid, og oppslagstavla på torget henger fullt.'}</div>`;
+    // løpet i korte trekk
+    const D = G.dungeon;
+    const place = D.isArea ? D.L.name : D.isTown ? 'Fristaden' : FLOORS[G.depth]?.name || '';
+    const c = G.run.clock, h = ((c % 24) + 24) % 24;
+    const when = `Dag ${Math.floor(c / 24) + 1}, ${String(Math.floor(h)).padStart(2, '0')}.${String(Math.floor((h % 1) * 6) * 10).padStart(2, '0')}`;
+    const cells = [['Sted', place], ['Tid', when], ['Silver', `${P.silver} sm`], ['Hjältepoäng', P.hjp ?? 0]];
+    if (D.isTown && !D.isArea) cells.push(['Rykte', (G.run.rykte || 0) > 0 ? `+${G.run.rykte}` : String(G.run.rykte || 0)]);
+    else if (!D.isTown) cells.push(['Nivå', `${G.depth} av 5`]);
+    else cells.push(['Fiender felt', G.run.kills || 0]);
+    $('#pz-run').innerHTML = cells.map(([k, v]) => `<div><span>${k}</span><b title="${v}">${v}</b></div>`).join('');
+    $('#btn-quit').classList.remove('armed');
+    $('#pz-warn').hidden = true;
+    this.pauseTab('journal');
     G.ui.show('pause');
+    $('#btn-resume').focus({ preventScroll: true });
   }
   openSheet() {
     if (G.state !== 'play' && G.state !== 'pause') return;
@@ -1638,6 +1705,7 @@ class Game {
       if (G.state === 'inventory') G.inv.close();
       else if (G.state === 'travel') G.travel.close();
       else if (!$('#saves').hidden) this.closeSaves();
+      else if (!$('#opts').hidden) this.closeOpts();
       else if (G.state === 'play') this.pause();
       else if (G.state === 'dialog') this.closeShop();
       else this.resume();
