@@ -119,6 +119,7 @@ export function journalHTML() {
   const q = Q();
   if (q.stage < 1) return '';
   const ids = Object.keys(q.clues).sort((a, b) => q.clues[a] - q.clues[b]);
-  const rows = ids.map(id => `<div class="qrow clue ${CLUES[id].kind}">${CLUES[id].t}</div>`).join('');
+  // hva som er villspor, vises først når saken er rapportert. Før det ser alle ledetrådene like ut.
+  const rows = ids.map(id => `<div class="qrow clue ${fl('reported') ? CLUES[id].kind : ''}">${CLUES[id].t}</div>`).join('');
   return `<h3>Triangeldrama i Edelfara</h3><div class="qrow goal">${goal()}</div>${fl('reported') ? '' : `<div class="qrow dl">${deadlineText()}</div>`}${rows}`;
 }

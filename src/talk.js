@@ -39,6 +39,11 @@ export class Talk {
       e.stopPropagation();
       if (e.key === 'Enter') { e.preventDefault(); go(); }
       if (e.key === 'Escape') { e.preventDefault(); inp.blur(); this.close(); }
+      // tallene 1 til 9 velger et ord når feltet er tomt (ingen ord begynner med et tall)
+      if (/^[1-9]$/.test(e.key) && !inp.value) {
+        e.preventDefault();
+        document.querySelectorAll('#dlg-kw .kw')[+e.key - 1]?.click();
+      }
     };
     $('#dlg-text').onclick = e => {
       const k = e.target.closest('[data-k]');

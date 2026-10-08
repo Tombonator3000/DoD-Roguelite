@@ -13,6 +13,9 @@ Laget med three.js r170. Musikk, lyd, fiendemodeller og effekter genereres i net
 - Nye fiender etter statblokkene: orcher på veien, ledarorchen, elitorcher, orcher med armborst, svartalfer, ulver og Lekh med arbalest. Lekh flykter på en ulv hvis det går dårlig.
 - Overtal grevens riddarkapten med bevisene, så slutter greven og baronen fred og følger deg mot leiren. Eller gå inn alene. Kisten kan bæres tilbake til markisen, eller brytes opp.
 - Fire slutter når du rapporterer til hertigens vaktkaptein i Pharynx, etter hva som skjedde med Akershus, freden og kisten.
+- Ny pausemeny med journal, løpet i korte trekk og en fane med tastene (eller berøringsknappene på mobil). Innstillingene kan endres midt i spillet, og Til tittelskjermen spør først.
+- Nye innstillinger: lyd av og på, uskarpe kanter (tilt-shift) av og på, og større tekst i loggen, samtalene, journalen og hjelpen.
+- I samtaler velger tallene 1 til 9 et ord. Loggen har en mørk stripe bak linjene, og menyene passer på mobil. Se `docs/menyer.md`.
 
 ## Nytt i 0.5: DoD91, inventar og lagring
 
@@ -101,11 +104,11 @@ GitHub Pages publiseres fra `main` etter at bygg, regresjonstester og nettlesert
 | Shift | Smyga. Bakfra mot en som ikke har sett deg: +7, og ingen parering |
 | 1 | Legedrikk |
 | E / X | Ta opp, åpne, snakk, gå ned trappa / ta på med en gang |
-| Skriv + Enter | Spør om et ord i samtaler |
+| Skriv + Enter | Spør om et ord i samtaler. Tallene 1 til 9 velger et av ordene. |
 | I / C | Packning / rollformulär |
 | Tab | Stort kart |
 | M | Lyd av/på |
-| Esc | Pause, lagre og laste |
+| Esc | Meny: journal, lagre og laste, innstillinger. Lukker også vinduer. |
 
 På mobil vises en virtuell stikke og knapper. Angrep sikter automatisk på nærmeste fiende.
 

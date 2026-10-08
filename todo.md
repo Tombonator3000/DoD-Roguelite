@@ -6,6 +6,8 @@ Sortert etter hva som gir mest spill for minst jobb.
 
 Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når pull requesten er inne. Se AGENTS.md.
 
+- Claude (`claude/menyer`, fra `chatgpt/teksturer`): menyer og brukerflate. Endrer page.html, main.js (meny, pause, innstillinger), ui.js, creation.js, saveui.js.
+
 - ChatGPT (`chatgpt/teksturer`, PR #5, fra `claude/edelfara`): bestillingen D007, malte teksturer, reisekart, pergament og faner. Endrer towntex.js, build.mjs og teksturdelen av assets.js; små tilkoblinger i main.js, town.js, area.js, travel.js og page.html.
 
 - Claude (`claude/edelfara`, pull request mot main): Edelfara og eventyret Triangeldrama i Edelfara (Ivanhoe). Nye filer area.js, areagrid.js, edelmap.js, edelmodels.js, edelfolk.js, arealife.js, ivan.js, travel.js. Endrer town.js, townfolk.js, main.js, weather.js, world.js, enemies.js, loot.js, ui.js, page.html, save.js, wet.js, water.js.
@@ -23,6 +25,9 @@ Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når p
 - [ ] Pharynx som eget område med hertigens vaktkaptein, i stedet for bare en rapport.
 - [ ] Resten av Ivanhoe-boksen (Medeltidsregler og Aidne) er ikke brukt. Se om noe passer, for eksempel turnering i Sortmund.
 - [x] Malte teksturer og grafikk fra D007: 22 materialpar, reisekart, pergament og fire faner. ChatGPT på chatgpt/teksturer, testet lokalt, se docs/teksturer.md. Innfletting gjenstår.
+- [x] Menyer og brukerflate (0.6): ny pausemeny med journal og taster, innstillinger i spillet, tekststørrelse og tilt-shift av og på, tallvalg i samtaler, mobilrettelser. Claude på claude/menyer, se docs/menyer.md.
+- [ ] Spilltest menyene på ekte mobil: er knappene i pausemenyen store nok, og er tekststørrelsen Størst for mye i loggen?
+- [ ] Pilnavigering (opp og ned) i pausemenyen som i tittelen.
 - [ ] Spilltest grafikken på ekte maskin og mobil: er regnet for tett, tilt-shift for sterk, natta for mørk i uvær?
 - [ ] Mer grafikk: tåke som ligger lavt over elva om morgenen, snø om vinteren, lysstråler gjennom vinduene i flere hus, varmeflimmer over smia, skyggen av fuglene på bakken.
 

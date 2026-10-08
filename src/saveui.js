@@ -16,7 +16,8 @@ export class SaveUI {
       const canWrite = mode === 'save' && slot !== 'auto' && chk.ok;
       const canRead = mode === 'load' && data && !d.old;
       const thumb = data?.thumb ? `style="background-image:url(${data.thumb})"` : '';
-      return `<div class="srow ${data ? '' : 'empty'} ${d.old ? 'old' : ''}" data-slot="${slot}">
+      // tomme plasser er bare en linje når du skal laste: det er ingenting å se på
+      return `<div class="srow ${data ? '' : 'empty'} ${d.old ? 'old' : ''} ${!data && mode === 'load' ? 'compact' : ''}" data-slot="${slot}">
         <div class="sthumb ${data?.thumb ? 'has' : ''}" ${thumb}><span>${slot === 'auto' ? 'A' : slot}</span></div>
         <div class="stxt"><div class="sname">${esc(SLOT_NAME[slot])}${data ? ` <em>${esc(d.when)}</em>` : ''}</div>
           ${data ? `<div class="stitle">${esc(d.title)}${d.place ? ` <span>${esc(d.place)}</span>` : ''}</div><div class="ssub">${esc(d.sub)}</div>` : `<div class="ssub">${slot === 'auto' ? 'Lagres av seg selv når du går ned luka eller til et nytt nivå.' : 'Tom plass'}</div>`}
