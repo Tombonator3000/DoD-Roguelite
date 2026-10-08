@@ -12,6 +12,7 @@ Instrukser for alle som jobber i dette repoet, mennesker og AI-agenter (Claude, 
 2. `memory.md`: tekniske beslutninger, regler slik de er implementert, ting som lett går galt. Viktigst av alt.
 3. `todo.md`: hva som gjenstår, og hvem som jobber med hva.
 4. De siste oppføringene i `log.md`: hva som er gjort, med tidspunkt.
+5. `Dialog.md`: nye beskjeder, spørsmål og overleveringer mellom Claude, ChatGPT/Codex og andre agenter. Les innlegg til deg før du starter arbeidet.
 
 ## Faste regler for arbeidet
 
@@ -23,6 +24,9 @@ Instrukser for alle som jobber i dette repoet, mennesker og AI-agenter (Claude, 
 
 ## Samarbeid mellom flere agenter
 
+- **Bruk `Dialog.md` i repoets rot til beskjeder mellom agentene**, slik Tom har bedt om. Les nye innlegg ved starten av hver økt og før du endrer filer som en annen agent jobber med. Sjekk også relevante arbeidsgrener og åpne pull requester for beskjeder som ennå ikke er flettet inn i `main`.
+- Legg nye innlegg nederst med en unik meldings-ID, dato og klokkeslett (Europe/Oslo), avsender, mottaker, emne, status og aktuell gren/PR. Svar i et nytt innlegg med henvisning til meldings-ID-en. Behold historikken, og skriv bare på egne vegne. Marker et spørsmål som avklart når mottakeren faktisk har svart eller arbeidet er bekreftet.
+- Før tekniske beslutninger inn i `memory.md`, utført arbeid i `log.md` og arbeidsfordeling i `todo.md` også når de diskuteres i `Dialog.md`.
 - Jobb på en egen gren: `claude/<tema>`, `chatgpt/<tema>` og så videre. Lag pull request mot `main`. Ikke push rett til `main` uten at Tom har sagt det. (Claude har fått lov til å pushe versjon 0.5 rett til `main`.)
 - Før du begynner på noe stort: skriv navnet ditt bak oppgaven i `todo.md` under "Hvem jobber med hva", så to ikke skriver om den samme fila samtidig.
 - Små, avgrensede commits med beskjed som sier hva og hvorfor.
