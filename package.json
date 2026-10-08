@@ -1,0 +1,20 @@
+{
+  "name": "svart-nebb",
+  "version": "0.4.0",
+  "private": true,
+  "type": "module",
+  "description": "Roguelite dungeon crawler med Svart Nebb og Drakar och Demoner-regler. three.js r170.",
+  "scripts": {
+    "build": "node build.mjs --min",
+    "build:dev": "node build.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0",
+    "three": "0.170.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tombonator3000/DoD-Roguelite"
+  },
+  "license": "MIT"
+}

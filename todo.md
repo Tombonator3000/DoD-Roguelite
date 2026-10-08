@@ -1,0 +1,60 @@
+# Todo
+
+Sortert etter hva som gir mest spill for minst jobb.
+
+## Hvem jobber med hva
+
+Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når pull requesten er inne. Se AGENTS.md.
+
+- Claude (`main`, versjon 0.5): inventar med sekk og bärförmåga, 3D-ikoner, lagre/laste-meny med lagringsplasser, shadere (ild, vann, vind, våte flater), vær og flere partikler, tilt-shift og fargegradering. Rører mest inventory.js, itemmodels.js, icons.js, save.js, world.js, player.js, main.js, ui.js, page.html, fx.js, post.js, town.js.
+
+## Nå
+
+- [ ] Sjekke de uverifiserte verdiene (`uv: true` i src/dod.js) mot grunnboka: WP-kostnader og krav for hjälteförmågor, svenske navn, tabellen for svåra skador, noen våpen. Lista står i memory.md.
+- [ ] Spilltest balansen på ekte maskin med flere rollpersoner. Spesielt: svake rollpersoner (FYS 6-8) på nivå 1, ridder i plåt mot Rødpels, magiker uten våpen, hvor ofte pressa-boksen dukker opp.
+- [ ] Rigge anda (Tripo har auto-rigging, ellers Mixamo) og bytte vagge-animasjonen med ekte gange, angrep, dukk og fall.
+- [ ] Bedre modeller for de andre släktene (samme pipeline som anda), eller i det minste kontur og hender.
+- [x] Musikk, fancy startmeny, bedre grafikk og effekter (0.2)
+- [x] Egen rollperson etter DoD-reglene, med Aidne-bakgrunn fra Ereb Altor (0.3)
+- [x] Parera og undvika som slag, pressa slag, drakvalg, missöden, vila, dödsslag med Samla sig, skräck, magi (0.3)
+- [x] Fristaden over bakken med folk, døgnrytme, nøkkelordsamtaler, tjenester, oppdrag og tyveri (0.4)
+- [ ] Spilltest byen: er prisene riktige mot det du finner i kloakken? Er natta mørk nok, eller for mørk? Er det for lett å stjele?
+- [ ] Lyd for fotsteg (plask i vann, tasse på stein), og egne stemmer for hver släkt (nå er det grynt for alle unntatt anka).
+- [ ] Ytelsestest på svakere bærbar og mobil.
+
+## DoD-regler som mangler
+
+- [ ] Flere hjälteförmågor: Stridsrop, Kattfot, Förklädnad, Örnöga, Gott läkekött, Järngrepp, Blixtsnabb, Magisk talang, Massivt slag, Mästerkock, Mästerbesvärjare, Monsterjägare, Stigfinnare, Kvartermästare, Ynkrygg, Parera pilar.
+- [ ] Allmän magi (Skingra, Beskyddare, Magisk sköld), besvärjelser på rang 2 og 3, lære nye fra grimoire eller lærer, grensen for preparerte besvärjelser.
+- [ ] Bruk for ferdigheter som ikke gjør noe ennå: Hoppa & klättra (hull og avsatser), Bluffa (vakter), Vildmarksvana (mat), Simma (dypt vann), Rida, Sjökunnighet, Observation, Taktik. (Jakt & fiske, Uppträda, Fingerfärdighet og Köpslå brukes i byen fra 0.4.)
+- [ ] Belastning (STY/2 gjenstander), mat og sult, fakler som brenner ut, gull og kopper i tillegg til silver.
+- [ ] Sykdom og gift med virulens og styrke som motstridige slag.
+- [ ] Flere monstre fra boka med egne angrepstabeller (troll som regenererer, kjempeedderkopp med nett, gast med skräck).
+
+## Snart
+
+- [x] Hub i Fristaden: dojoen, fars butikk og oppslagstavla med oppdrag finnes i byen (0.4).
+- [ ] Flere oppdrag i byen, gjerne med valg: Gaspard som smugler, Hvass som skylder penger, Pimpa som forsvinner i kloakken.
+- [ ] Låste dører om natta (Fingerfärdighet eller dyrkar), og at folk reagerer hvis du står inne hos dem mens de sover.
+- [ ] Lagre byens tilstand (oppdrag, rykte, klokke) sammen med resten av løpet.
+- [ ] Lyd for dører, steg på planker og stein i byen, og stemmer for byfolk (korte grynt og hmm som i Ultima VII).
+- [ ] Flere romtyper: fellerom (Upptäcka fara, Hoppa & klättra), skattekammer, rom med fanger å befri (Övertala).
+- [ ] Følgesvenner du kan leie på Den feite gåsen, så evner som Livvakt og Tonkonst får noe å gjøre.
+- [ ] Lagre løp midt i (etasje, utstyr, gaver) slik at man kan fortsette senere.
+- [ ] Gamepad-støtte (Gamepad API, venstre stikke går, høyre sikter).
+- [ ] Vise slaget (T20 mot verdi) som liten terning ved siden av skadetallet når det er Drake eller Demon.
+
+## Senere
+
+- [ ] Flere regioner fra "Hjältar från Kopparhavet" (Arkipelagen, Mindre Akrogal, Tolan og Jorien, Norra Samkarna, Norra Soluna) i bakgrunnssteget.
+- [ ] Oververden i Ultima-stil: kart over Zorakin med Fristaden, Karad Batur og Ereno.
+- [x] Samtaler med nøkkelord som i Ultima IV og V (0.4). Neste: ord som låses opp av ting du har sett i kloakken.
+- [ ] Samarbeidsspill for to (Rune som spilleder?).
+
+## Teknisk
+
+- [ ] Instansiere fiendedeler for færre draw calls hvis det blir mange fiender.
+- [ ] Flytte partikler til GPU om det trengs.
+- [x] Repo på GitHub (Tombonator3000/DoD-Roguelite) med AGENTS.md og bygg til GitHub Pages.
+- [x] Testriggen kan kjøres med THREE_DIR og CHROME, three ligger i devDependencies.
+- [ ] Playwright som valgfri avhengighet for testriggen, og en npm-kommando for stresstesten.

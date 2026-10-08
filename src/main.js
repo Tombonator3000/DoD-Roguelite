@@ -1,0 +1,1737 @@
+import * as THREE from 'three';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { G } from './state.js';
+import { SharedAssets, decodeDuck, cutawayUniforms, buildRat } from './assets.js';
+import { Dungeon, FLOORS } from './dungeon.js';
+import { Player } from './player.js';
+import { World } from './world.js';
+import { FX } from './fx.js';
+import { UI } from './ui.js';
+import { Sound } from './audio.js';
+import { Input } from './input.js';
+import { skillRoll, d, rollDice, svartNebb, meetsReq, randomChoices, buildSheet } from './rules.js';
+import { CONDITIONS, COND_BY_ID, COND_BY_ATTR, SKILL, SKILLS, KIN, PROF, HEROIC, HEROIC_REWARDS, INJURIES, fromRange, WEAKNESS, ATTR_NAME } from './dod.js';
+import { boonChoices, SRC_COLOR, makeItem, RARITY, setNebbCheck, refinalize } from './loot.js';
+import { Gfx } from './gfx.js';
+import { GradePass } from './post.js';
+import { Ambient } from './decor.js';
+import { TitleScene } from './title.js';
+import { Creator } from './creation.js';
+import { Companion } from './companion.js';
+import { Enemy } from './enemies.js';
+import { Town, skyAt } from './town.js';
+import { hourOf, QUEST_TITLES } from './townfolk.js';
+
+const $ = s => document.querySelector(s);
+const CAM_OFF = new THREE.Vector3(10.4, 15.6, 10.4);
+const tmp = new THREE.Vector3();
+const tmp2 = new THREE.Vector3();
+
+const UPGRADES = [
+  { id: 'trening', name: 'Hard trening', desc: '+1 på den beste tränade vapenfärdigheten i alle fremtidige løp.', cost: 15, max: 3 },
+  { id: 'seig', name: 'Seig kropp', desc: '+2 maks KP.', cost: 20, max: 3 },
+  { id: 'vilje', name: 'Indre ro', desc: '+2 maks VP.', cost: 20, max: 2 },
+  { id: 'niste', name: 'Fars niste', desc: 'Start med en ekstra legedrikk.', cost: 15, max: 2 },
+  { id: 'slip', name: 'Slipestein', desc: '+1 skade på alle treff.', cost: 30, max: 2 },
+];
+
+const FLOOR_INTRO = {
+  0: 'Fristaden. Bymuren holder orchene ute, og kloakken holder det verste nede. Det meste av tiden.',
+  1: 'Kloakkene under Fristaden. Det lukter rotte, råtten fisk og noe som er verre. Sporet etter safranen går nedover.',
+  2: 'Rennene blir dypere. Noen har tegnet en rev på veggen. Med krone.',
+  3: 'Under kloakkene ligger Karad Baturs gamle haller. Dvergene dro for lenge siden. Noe annet bor her nå.',
+  4: 'Smia er kald, men noen har fyrt opp i fyrfatene. Orcher snorker i mørket.',
+  5: 'Revehiet. Det lukter våt pels og stjålne krydder.',
+};
+
+// Far snakker til sønnen sin. Herr Nansen snakker til en fremmed han har leid.
+const DAD = {
+  town: [
+    'Nansen! Du er hjemme. Har du spist? Nei, ikke svar. Kjøp et brød.',
+    'Der er du. Sjefen spør etter safranen hver time. Jeg sier at du er på saken. Er du på saken?',
+  ],
+  greet: [
+    'Nansen! Gutten min. Hva gjør du i kloakken? Nei, ikke svar. Jeg vil ikke vite det.',
+    'Der er du igjen. Du har blod på nebbet. Er det ditt?',
+    'Jeg har holdt av et brød til deg. Det koster fortsatt penger, men jeg holdt det av.',
+  ],
+  NAVN: 'Du vet godt hva jeg heter. Jeg er faren din. Herr Nansen, hvis du skal kjøpe noe.',
+  JOBB: 'Jeg er butikkbetjent. Ikke kjøpmann. Kjøpmannen eier butikken, jeg står i den. Forskjellen er lønna. Sjefen sendte meg ned hit fordi han mener det finnes et marked blant folk som har gått seg vill. Han har dessverre rett.',
+  SAFRAN: 'Hele safranlageret er borte, og sjefen sier det er min feil. Han sier det hver dag. Finner du det, får jeg kanskje beholde jobben. Kanskje.',
+  FLANSEN: 'Den gamle anda med tøflene? Han lærte deg å slåss, sier du. Jeg har aldri sett ham slåss. Jeg har sett ham spise tre brød på en gang.',
+  KARAD: 'Fristaden var en handelspost for dvergene i Karad Batur før Zorakin tok den. Hallene deres ligger rett under oss. De dro, men de tok ikke med seg alt.',
+  REVEN: 'Det sies at en rev har tatt over de gamle dvergehallene. Rødpels. Han har visst krone. Ikke stol på en rev med krone.',
+  FARVEL: 'Spis ordentlig. Og ikke bare brød.',
+};
+const NANSEN = {
+  town: [
+    'Velkommen til Hvass handel. Den ekte butikken, ikke den i kloakken. Prisene er de samme, men lukten er bedre.',
+    'Å, det er du. Leiesvennen. Kjøp noe, så ser det ut som jeg jobber.',
+  ],
+  greet: [
+    'Å, det er du. Den jeg leide. Har du funnet safranen? Nei? Vil du kjøpe noe, da?',
+    'Du lever fortsatt. Bra. Sjefen betaler ikke for døde leiesvenner, og ikke for levende heller, egentlig.',
+    'Velkommen til butikken. Den er mindre her nede, men prisene er de samme.',
+  ],
+  NAVN: 'Herr Nansen. Butikkbetjent. Ikke kjøpmann, det er en annen. Sønnen min kaller seg Svart Nebb, men det skal du ikke bry deg om.',
+  JOBB: 'Jeg står bak disken. Kjøpmannen eier butikken. Han sendte meg ned hit for å selge til folk som har gått seg vill. Og så sendte han deg ned for å finne safranen. Vi er visst i samme båt.',
+  SAFRAN: 'Hele lageret er borte. Sjefen gir meg skylden. Finner du det, skal du få ... noe. Jeg vet ikke hva ennå. Rabatt, kanskje.',
+  FLANSEN: 'Mester Flansen? En gammel and med tøfler som lærer bort Kvakk-Fu. Sønnen min trente hos ham. Jeg har aldri skjønt hva det går ut på.',
+  KARAD: 'Fristaden var en handelspost for dvergene i Karad Batur før Zorakin tok den. Hallene deres ligger rett under oss.',
+  REVEN: 'En rev med krone. Rødpels, kaller de ham. Ikke stol på en rev med krone. Ikke på en uten heller.',
+  FARVEL: 'Ikke dø. Det er dårlig for forretningene.',
+};
+
+function loadMeta() {
+  try {
+    const s = localStorage.getItem('svartnebb.meta.v1');
+    if (s) return { feathers: 0, levels: {}, runs: 0, best: 0, wins: 0, ...JSON.parse(s) };
+  } catch (e) { /* lagring er valgfri */ }
+  return { feathers: 0, levels: {}, runs: 0, best: 0, wins: 0 };
+}
+function saveMeta(m) {
+  try { localStorage.setItem('svartnebb.meta.v1', JSON.stringify(m)); } catch (e) { /* ignorer */ }
+}
+function loadSettings(touch) {
+  const def = { music: 70, sfx: 100, quality: touch ? 'middels' : 'hoy', shake: 1, push: 'viktiga', injuries: 1 };
+  try {
+    const s = localStorage.getItem('svartnebb.settings.v1');
+    if (s) return { ...def, ...JSON.parse(s) };
+  } catch (e) { /* valgfritt */ }
+  return def;
+}
+function saveSettings(s) {
+  try { localStorage.setItem('svartnebb.settings.v1', JSON.stringify(s)); } catch (e) { /* ignorer */ }
+}
+function loadChars() {
+  try {
+    const s = localStorage.getItem('svartnebb.chars.v1');
+    if (s) return JSON.parse(s).filter(c => c && c.v === 1);
+  } catch (e) { /* valgfritt */ }
+  return [];
+}
+function saveChars(list) {
+  try { localStorage.setItem('svartnebb.chars.v1', JSON.stringify(list.slice(0, 8))); } catch (e) { /* ignorer */ }
+}
+
+const BIOME_LOOK = {
+  kloakk: { mist: 0x5a7a72, motes: 0xbfe8d0, density: 1 },
+  dverg: { mist: 0x7a6a5a, motes: 0xffd0a0, density: 0.8 },
+  rev: { mist: 0x7a4a42, motes: 0xffa080, density: 1 },
+  stad: { mist: 0x9aa0b0, motes: 0xfff2c0, density: 0.12 },
+};
+const MENU_NOTES = [62, 65, 69, 72, 74];
+
+class Game {
+  constructor() {
+    G.game = this;
+    window.G = G; // praktisk for feilsøking i konsollen
+    G.dev = { randomChoices, buildSheet };
+    this.upgrades = UPGRADES;
+    this.sky = {};
+  }
+
+  persist() {
+    saveMeta(G.meta);
+  }
+
+  // Kjøp hos Mester Flansen i byen: virker med en gang, og i alle senere løp
+  buyUpgradeNow(u) {
+    const lv = G.meta.levels[u.id] || 0;
+    G.meta.levels[u.id] = lv + 1;
+    saveMeta(G.meta);
+    const P = G.player;
+    const mm = P.metaMods;
+    if (u.id === 'trening') {
+      const S = P.sheet;
+      const best = S.trained.filter(k => SKILL[k]?.type === 'vap').sort((a, b) => S.skills[b] - S.skills[a])[0] || 'Slagsmål';
+      mm['skill:' + best] = (mm['skill:' + best] || 0) + 1;
+    } else if (u.id === 'seig') mm.maxKP = (mm.maxKP || 0) + 2;
+    else if (u.id === 'vilje') mm.maxVP = (mm.maxVP || 0) + 2;
+    else if (u.id === 'slip') mm.dmg = (mm.dmg || 0) + 1;
+    else if (u.id === 'niste') P.potions = Math.min(4, P.potions + 1);
+    P.recalc();
+    if (u.id === 'seig') P.kp = Math.min(P.maxKP, P.kp + 2);
+    if (u.id === 'vilje') P.vp = Math.min(P.maxVP, P.vp + 2);
+    G.fx.burst('feather', P.pos, 18);
+    G.audio.drake?.();
+    G.ui.log(`Mester Flansen lærer deg <b>${u.name}</b>.`);
+    return ['Bra. Du står litt mindre skjevt nå.', 'Igjen. Nei, det holder. Det var bra.', 'Svømmeføttene først. Alltid svømmeføttene først.'][Math.floor(Math.random() * 3)];
+  }
+
+  init() {
+    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.15;
+    $('#stage').appendChild(renderer.domElement);
+    G.renderer = renderer;
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x050405);
+    scene.fog = new THREE.Fog(0x0a1210, 30, 64);
+    G.scene = scene;
+    const cam = new THREE.PerspectiveCamera(33, innerWidth / innerHeight, 0.5, 120);
+    G.camera = cam;
+    this.camTarget = new THREE.Vector3();
+    this.hemi = new THREE.HemisphereLight(0x6f8f88, 0x0b0806, 0.55);
+    scene.add(this.hemi);
+    this.key = new THREE.SpotLight(0xffe0bc, 110, 30, 0.62, 0.65, 1.6);
+    this.key.castShadow = true;
+    this.key.shadow.mapSize.set(1536, 1536);
+    this.key.shadow.camera.near = 3;
+    this.key.shadow.camera.far = 24;
+    this.key.shadow.bias = -0.0004;
+    this.key.shadow.normalBias = 0.035;
+    scene.add(this.key, this.key.target);
+    this.fill = new THREE.DirectionalLight(0x8aa0c0, 0.22);
+    this.fill.position.set(10, 14, 10);
+    scene.add(this.fill);
+    this.lantern = new THREE.PointLight(0xffb070, 9, 8, 2);
+    scene.add(this.lantern);
+    const composer = new EffectComposer(renderer);
+    this.renderPass = new RenderPass(scene, cam);
+    composer.addPass(this.renderPass);
+    this.bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth / 2, innerHeight / 2), 0.65, 0.6, 0.78);
+    composer.addPass(this.bloom);
+    composer.addPass(new OutputPass());
+    G.post = new GradePass();
+    composer.addPass(G.post);
+    G.composer = composer;
+
+    G.gfx = new Gfx();
+    G.assets = new SharedAssets();
+    try {
+      if (window.DUCK_B64) {
+        G.assets.duckGeo = decodeDuck(window.DUCK_B64);
+        const tex = new THREE.TextureLoader().load(window.DUCK_TEX);
+        tex.colorSpace = THREE.SRGBColorSpace;
+        tex.anisotropy = 4;
+        G.assets.duckTex = tex;
+      }
+    } catch (e) {
+      console.warn('Kunne ikke laste andemodellen, bruker reserve', e);
+      G.assets.duckGeo = null;
+    }
+    G.fx = new FX(scene);
+    G.ambient = new Ambient(scene);
+    G.ui = new UI();
+    G.audio = new Sound();
+    G.input = new Input(renderer.domElement);
+    G.world = new World();
+    G.meta = loadMeta();
+    this.chars = loadChars();
+    try { this.selectedId = localStorage.getItem('svartnebb.lastchar') || 'svartnebb'; } catch (e) { this.selectedId = 'svartnebb'; }
+    G.player = new Player();
+    setNebbCheck(() => G.player.isNebb);
+    scene.add(G.player.root);
+    G.run = this.freshRun();
+    G.player.setSheet(this.selectedSheet());
+    G.player.newRun(G.meta);
+    G.touch = matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window;
+    this.settings = loadSettings(G.touch);
+    this.title = new TitleScene();
+    this.title.setCharacter(this.selectedSheet());
+    this.creator = new Creator(this);
+    if (G.touch) {
+      G.input.setupTouch($('#touch'));
+      document.body.classList.add('touch');
+    }
+    this.raycaster = new THREE.Raycaster();
+    this.ground = new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.5);
+    G.aim = new THREE.Vector3();
+    this.flowTimer = 0;
+    this.bindUI();
+    addEventListener('resize', () => this.resize());
+    addEventListener('blur', () => this.pause());
+    document.addEventListener('visibilitychange', () => { if (document.hidden) this.pause(); });
+    this.applySettings();
+    this.resize();
+    this.showSplash();
+    this.last = performance.now();
+    requestAnimationFrame(t => this.loop(t));
+  }
+
+  freshRun() {
+    return {
+      kills: 0, killsByType: {}, drakes: 0, demons: 0, rolls: 0, pushes: 0, dodges: 0, parries: 0, damageDealt: 0, damageTaken: 0, silver: 0, depthReached: 1, t0: performance.now(), known: new Set(),
+      // Fristaden
+      clock: 17, nextDepth: 1, quests: {}, rykte: 0, offenses: 0, runesRead: 0, cacheHint: 0, blessing: false, sharpen: false,
+    };
+  }
+
+  // --- rollpersoner -----------------------------------------------------------
+
+  allSheets() {
+    return [svartNebb(), ...this.chars];
+  }
+  selectedSheet() {
+    return this.allSheets().find(s => s.id === this.selectedId) || svartNebb();
+  }
+  saveCharacter(sheet) {
+    const i = this.chars.findIndex(c => c.id === sheet.id);
+    if (i >= 0) this.chars[i] = sheet; else this.chars.unshift(sheet);
+    saveChars(this.chars);
+    this.selectChar(sheet.id);
+  }
+  selectChar(id) {
+    this.selectedId = id;
+    try { localStorage.setItem('svartnebb.lastchar', id); } catch (e) { /* valgfritt */ }
+    this.title.setCharacter(this.selectedSheet());
+    this.refreshTitleInfo();
+  }
+  deleteChar(id) {
+    this.chars = this.chars.filter(c => c.id !== id);
+    saveChars(this.chars);
+    if (this.selectedId === id) this.selectChar('svartnebb');
+    this.refreshPick();
+  }
+
+  refreshPick() {
+    const list = $('#pick-list');
+    list.innerHTML = '';
+    for (const s of this.allSheets()) {
+      const kin = KIN[s.kin], prof = PROF[s.profession];
+      const row = document.createElement('div');
+      row.className = 'pick' + (s.id === this.selectedId ? ' on' : '');
+      const A = s.attrs;
+      row.innerHTML = `<button class="pick-main"><div class="nm">${s.name}${s.premade ? ' <i>ferdig rollperson</i>' : ''}</div>
+        <div class="ds">${kin.name}, ${prof.name.toLowerCase()}${s.school ? ` (${s.school.toLowerCase()})` : ''}. ${['STY', 'FYS', 'SMI', 'INT', 'PSY', 'KAR'].map(k => `${k} ${A[k]}`).join(' · ')}</div></button>
+        ${s.premade ? '' : '<button class="btn small edit">Endre</button><button class="btn small del" title="Slett">Slett</button>'}`;
+      row.querySelector('.pick-main').onclick = () => { this.selectChar(s.id); this.refreshPick(); G.audio.menuTick?.(67); };
+      row.querySelector('.pick-main').ondblclick = () => this.startWith(s);
+      row.querySelector('.edit')?.addEventListener('click', () => { this.showView('tv-create'); this.creator.open({ ...s.choices, id: s.id }); });
+      row.querySelector('.del')?.addEventListener('click', () => {
+        if (row.dataset.confirm) this.deleteChar(s.id);
+        else { row.dataset.confirm = '1'; row.querySelector('.del').textContent = 'Sikker?'; }
+      });
+      list.appendChild(row);
+    }
+    const S = this.selectedSheet();
+    $('#pick-blurb').textContent = S.blurb || `${KIN[S.kin].name}, ${PROF[S.profession].name.toLowerCase()}. ${S.appearance ? S.appearance + '. ' : ''}${S.weakness ? 'Svaghet: ' + S.weakness.toLowerCase() + '.' : ''}`;
+  }
+
+  startWith(sheet) {
+    this.selectChar(sheet.id);
+    G.player.setSheet(sheet);
+    this.beginRun();
+  }
+
+  resize() {
+    const w = innerWidth, h = innerHeight;
+    G.renderer.setSize(w, h);
+    G.composer.setSize(w, h);
+    this.bloom.resolution.set(w / 2, h / 2);
+    G.camera.aspect = w / h;
+    G.camera.fov = w < 700 ? 44 : 33;
+    G.camera.updateProjectionMatrix();
+    const sc = (h * G.renderer.getPixelRatio()) / (2 * Math.tan((G.camera.fov * Math.PI) / 360));
+    G.fx.setScale(h * G.renderer.getPixelRatio(), G.camera.fov);
+    G.ambient.setScale(sc);
+    this.title.setScale(sc);
+    G.post.uniforms.uRes.value.set(w * G.renderer.getPixelRatio(), h * G.renderer.getPixelRatio());
+    this.applyViewOffset();
+  }
+
+  applyViewOffset() {
+    const w = innerWidth, h = innerHeight;
+    const t = G.state === 'title' || G.state === 'splash';
+    const wide = this.view === 'tv-create' || this.view === 'tv-pick';
+    if (t && w > 820) G.camera.setViewOffset(w, h, -w * (wide ? Math.min(0.3, 0.12 + 380 / w) : 0.19), 0, w, h);
+    else if (t) G.camera.setViewOffset(w, h, 0, h * (wide ? 0.32 : 0.26), w, h);
+    else G.camera.clearViewOffset();
+  }
+
+  // --- splash og tittel ------------------------------------------------------
+
+  showSplash() {
+    G.state = 'splash';
+    G.ui.hud.hidden = true;
+    $('#touch').hidden = true;
+    G.ui.show('splash');
+    this.applyViewOffset();
+    const go = e => {
+      if (G.state !== 'splash') return;
+      if (e && e.type === 'keydown' && (e.metaKey || e.ctrlKey || e.altKey)) return;
+      removeEventListener('keydown', go);
+      removeEventListener('pointerdown', go);
+      this.dismissSplash();
+    };
+    addEventListener('keydown', go);
+    addEventListener('pointerdown', go);
+  }
+
+  dismissSplash() {
+    G.audio.init();
+    G.audio.setVolumes(this.settings.music / 100, this.settings.sfx / 100);
+    G.audio.playMusic('title');
+    G.audio.menuSelect?.();
+    G.input.pressed.clear();
+    this.titleReadyAt = performance.now() + 900;
+    const sp = $('#splash');
+    sp.classList.add('out');
+    setTimeout(() => { sp.hidden = true; sp.classList.remove('out'); }, 1300);
+    this.enterTitle(false);
+  }
+
+  enterTitle(quick) {
+    G.state = 'title';
+    G.audio.setBiome?.('meny');
+    G.ui.hud.hidden = true;
+    $('#touch').hidden = true;
+    G.ui.hideBoss();
+    this.hideDying();
+    this.hidePush(false);
+    const t = $('#title');
+    document.querySelectorAll('.screen').forEach(x => { if (x.id !== 'title' && x.id !== 'splash') x.hidden = true; });
+    t.hidden = false;
+    t.classList.add('go');
+    t.classList.toggle('quick', !!quick);
+    this.title.leave = 0;
+    this.title.setCharacter(this.selectedSheet());
+    this.showView('tv-menu');
+    this.refreshTitleInfo();
+    this.applyViewOffset();
+  }
+
+  refreshTitleInfo() {
+    G.ui.renderDojo(G.meta, UPGRADES, u => this.buyUpgrade(u));
+    $('#title-stats').textContent = G.meta.runs ? `${G.meta.runs} forsøk, ${G.meta.wins} seire, beste nivå ${G.meta.best || 1}` : 'Første gang ned i mørket';
+    $('#mi-feathers').textContent = `${G.meta.feathers} fjær`;
+    const S = this.selectedSheet();
+    $('#mi-char').textContent = S.name;
+    $('#statline').innerHTML = ['STY', 'FYS', 'SMI', 'INT', 'PSY', 'KAR'].map(k => `<div><b>${S.attrs[k]}</b><span>${k}</span></div>`).join('');
+  }
+
+  showView(id) {
+    document.querySelectorAll('#title .tview').forEach(v => (v.hidden = v.id !== id));
+    this.view = id;
+    $('#title').classList.toggle('wide', id === 'tv-create' || id === 'tv-pick');
+    this.applyViewOffset();
+    if (id === 'tv-menu') this.selectMenu(this.menuSel ?? 0, true, false);
+    else if (id !== 'tv-create') {
+      const first = $('#' + id + ' input, #' + id + ' .seg button, #' + id + ' button');
+      first?.focus({ preventScroll: true });
+    }
+  }
+
+  menuItems() {
+    return [...document.querySelectorAll('#menu .mi')];
+  }
+
+  selectMenu(i, silent, focus = true) {
+    const items = this.menuItems();
+    i = (i + items.length) % items.length;
+    if (i !== this.menuSel && !silent) G.audio.menuTick?.(MENU_NOTES[i % MENU_NOTES.length]);
+    this.menuSel = i;
+    items.forEach((m, k) => m.classList.toggle('sel', k === i));
+    if (focus && document.activeElement !== items[i]) items[i].focus({ preventScroll: true });
+  }
+
+  menuAction(act) {
+    G.audio.menuSelect?.();
+    if (act === 'start') { this.refreshPick(); this.showView('tv-pick'); }
+    else if (act === 'quick') this.startWith(this.selectedSheet());
+    else if (act === 'dojo') { this.refreshTitleInfo(); this.showView('dojo'); }
+    else if (act === 'help') this.showView('help');
+    else if (act === 'settings') { this.syncSettingsUI(); this.showView('settings'); }
+    else if (act === 'about') this.showView('about');
+  }
+
+  backToMenu() {
+    $('#title').classList.add('quick');
+    G.audio.menuTick?.(57);
+    this.title.setCharacter(this.selectedSheet());
+    this.showView('tv-menu');
+  }
+
+  wipe(mid, dur = 0.55) {
+    if (this.wiping) return;
+    this.wiping = true;
+    const el = $('#wipe');
+    const t0 = performance.now();
+    const closeStep = now => {
+      const p = Math.min(1, (now - t0) / (dur * 1000));
+      el.style.setProperty('--r', `${150 * (1 - p * p)}vmax`);
+      if (p < 1) return requestAnimationFrame(closeStep);
+      el.style.setProperty('--r', '-6vmax');
+      mid();
+      const t1 = performance.now() + 120;
+      const openStep = n2 => {
+        const q = Math.max(0, Math.min(1, (n2 - t1) / (dur * 1000 * 1.3)));
+        el.style.setProperty('--r', `${150 * (1 - Math.pow(1 - q, 3)) - 6 * (1 - q)}vmax`);
+        if (q < 1) requestAnimationFrame(openStep);
+        else this.wiping = false;
+      };
+      requestAnimationFrame(openStep);
+    };
+    requestAnimationFrame(closeStep);
+  }
+
+  beginRun() {
+    if (this.wiping) return;
+    this.title.leaving = true;
+    this.wipe(() => this.startRun(), 0.7);
+  }
+
+  titleScene() {
+    this.wipe(() => {
+      G.audio.playMusic('title');
+      this.enterTitle(true);
+    });
+  }
+
+  // --- innstillinger --------------------------------------------------------
+
+  applySettings() {
+    const st = this.settings;
+    G.audio.setVolumes(st.music / 100, st.sfx / 100);
+    G.shakeMul = st.shake ? 1 : 0;
+    const q = st.quality;
+    const dpr = devicePixelRatio || 1;
+    G.renderer.setPixelRatio(q === 'lav' ? 1 : q === 'middels' ? Math.min(dpr, 1.25) : Math.min(dpr, 2));
+    this.bloom.enabled = q !== 'lav';
+    const shadows = q !== 'lav';
+    const size = q === 'hoy' ? 2048 : 1024;
+    for (const l of [this.key, this.title.spot]) {
+      l.castShadow = shadows;
+      if (l.shadow.mapSize.x !== size) {
+        l.shadow.mapSize.set(size, size);
+        l.shadow.map?.dispose();
+        l.shadow.map = null;
+      }
+    }
+    G.post.uniforms.uGrain.value = q === 'lav' ? 0 : 0.045;
+    G.post.uniforms.uCA.value = q === 'lav' ? 0 : 0.0025;
+    G.ambient.setEnabled(q !== 'lav', q !== 'lav');
+    this.resize();
+  }
+
+  syncSettingsUI() {
+    const st = this.settings;
+    const m = $('#set-music'), f = $('#set-sfx');
+    m.value = st.music;
+    f.value = st.sfx;
+    for (const [inp, out] of [[m, '#out-music'], [f, '#out-sfx']]) {
+      inp.style.setProperty('--v', inp.value + '%');
+      $(out).textContent = inp.value;
+    }
+    document.querySelectorAll('#set-quality button').forEach(b => b.classList.toggle('on', b.dataset.q === st.quality));
+    document.querySelectorAll('#set-shake button').forEach(b => b.classList.toggle('on', +b.dataset.s === st.shake));
+    document.querySelectorAll('#set-push button').forEach(b => b.classList.toggle('on', b.dataset.p === st.push));
+    document.querySelectorAll('#set-inj button').forEach(b => b.classList.toggle('on', +b.dataset.i === st.injuries));
+  }
+
+  buyUpgrade(u) {
+    const lv = G.meta.levels[u.id] || 0;
+    const cost = u.cost * (lv + 1);
+    if (lv >= u.max || G.meta.feathers < cost) return;
+    G.meta.feathers -= cost;
+    G.meta.levels[u.id] = lv + 1;
+    saveMeta(G.meta);
+    G.audio.init();
+    G.audio.coin();
+    this.refreshTitleInfo();
+  }
+
+  bindUI() {
+    this.menuItems().forEach((m, i) => {
+      m.addEventListener('mouseenter', () => this.selectMenu(i));
+      m.addEventListener('focus', () => this.selectMenu(i, false, false));
+      m.addEventListener('click', () => this.menuAction(m.dataset.act));
+    });
+    document.querySelectorAll('#title .back').forEach(b => (b.onclick = () => this.backToMenu()));
+    $('#btn-pick-start').onclick = () => this.startWith(this.selectedSheet());
+    $('#btn-pick-new').onclick = () => { this.showView('tv-create'); this.creator.open(null); };
+    const vol = (id, out, key) => {
+      const inp = $(id);
+      inp.addEventListener('input', () => {
+        inp.style.setProperty('--v', inp.value + '%');
+        $(out).textContent = inp.value;
+        this.settings[key] = +inp.value;
+        G.audio.setVolumes(this.settings.music / 100, this.settings.sfx / 100);
+        saveSettings(this.settings);
+      });
+      inp.addEventListener('change', () => { if (key === 'sfx') G.audio.quack(1, 0.8); });
+    };
+    vol('#set-music', '#out-music', 'music');
+    vol('#set-sfx', '#out-sfx', 'sfx');
+    const seg = (sel, key, attr, num) => document.querySelectorAll(sel + ' button').forEach(b => (b.onclick = () => {
+      this.settings[key] = num ? +b.dataset[attr] : b.dataset[attr];
+      saveSettings(this.settings);
+      this.applySettings();
+      this.syncSettingsUI();
+      G.audio.menuTick?.(67);
+    }));
+    seg('#set-quality', 'quality', 'q', false);
+    seg('#set-shake', 'shake', 's', true);
+    seg('#set-push', 'push', 'p', false);
+    seg('#set-inj', 'injuries', 'i', true);
+    $('#btn-resume').onclick = () => this.resume();
+    $('#btn-mute').onclick = () => { G.audio.setMuted(!G.audio.muted); $('#btn-mute').textContent = G.audio.muted ? 'Slå på lyd' : 'Slå av lyd'; };
+    $('#btn-quit').onclick = () => { G.ui.hideBoss(); this.endRunCleanup(); this.titleScene(); };
+    $('#btn-again').onclick = () => this.wipe(() => this.startRun());
+    $('#btn-totitle').onclick = () => this.titleScene();
+    $('#btn-sheet-close').onclick = () => this.resume();
+    $('#btn-sheet').onclick = () => this.openSheet();
+    $('#btn-rest-round').onclick = () => { this.resume(); G.player.roundRest(); };
+    $('#btn-rest-stretch').onclick = () => { this.resume(); G.player.startStretchRest(); };
+    $('#btn-continue').onclick = () => this.nextFloor();
+    $('#btn-up').onclick = () => this.goUpToTown();
+    $('#btn-improve').onclick = () => this.rollImprovements();
+    $('#btn-dr-roll').onclick = () => this.deathRollSequence();
+    $('#btn-dr-rally').onclick = () => this.rallySelf();
+    $('#tbtn-pause').addEventListener('touchstart', e => { e.preventDefault(); this.pause(); }, { passive: false });
+    $('#tbtn-use').addEventListener('touchstart', e => { e.preventDefault(); if (G.state === 'play') G.world.interact(); }, { passive: false });
+  }
+
+  endRunCleanup() {
+    if (G.companion) { G.companion.dispose(); G.companion = null; }
+  }
+
+  startRun() {
+    document.activeElement?.blur?.();
+    G.audio.init();
+    G.audio.ui();
+    G.meta.runs++;
+    saveMeta(G.meta);
+    G.run = this.freshRun();
+    this.endRunCleanup();
+    G.player.newRun(G.meta);
+    G.depth = 1;
+    G.ui.hideScreens();
+    G.ui.hideBoss();
+    this.hideDying();
+    G.ui.logEl.innerHTML = '';
+    G.ui.hud.hidden = false;
+    $('#touch').hidden = !G.touch;
+    G.state = 'play';
+    this.view = null;
+    this.applyViewOffset();
+    this.title.leaving = false;
+    $('#title').hidden = true;
+    G.depth = 0;
+    this.loadFloor(0, null, false, 'start');
+    G.ui.buildBar();
+    G.audio.playMusic('town');
+    const P = G.player;
+    G.ui.log(P.isNebb
+      ? 'Noen har stjålet hele safranlageret fra Hvass handel, der far står bak disken, og sjefen gir ham skylden. Sporet går ned i kloakken.'
+      : `Herr Nansen, butikkbetjent hos Hvass handel i Fristaden, har leid ${P.name} for å finne det stjålne safranlageret. Sporet går ned i kloakken.`);
+    G.ui.log('Kloakkluken ligger på torget. Snakk med folk først: trykk <kbd>E</kbd>, og skriv eller klikk på ord. Ord i gull blir nye spørsmål.');
+  }
+
+  // fra kloakkluken i byen og ned
+  enterSewers() {
+    if (G.state !== 'play' || this.wiping) return;
+    const n = Math.max(1, G.run.nextDepth || 1);
+    G.state = 'transition';
+    G.audio.ui();
+    this.wipe(() => {
+      G.ui.hideScreens();
+      G.state = 'play';
+      this.loadFloor(n);
+      G.ui.buildBar();
+      G.audio.playMusic('explore');
+      if (n > 1) G.ui.log('Du klatrer ned gjennom kloakken og finner veien tilbake dit du snudde.');
+    });
+  }
+
+  // fra trappa og opp til byen
+  goUpToTown() {
+    document.activeElement?.blur?.();
+    this.applyPendingBoon();
+    G.run.nextDepth = G.depth + 1;
+    G.run.clock += 1;
+    this.wipe(() => {
+      G.ui.hideScreens();
+      G.state = 'play';
+      this.loadFloor(0, null, false, 'grate');
+      G.ui.buildBar();
+      G.audio.playMusic('town');
+      G.ui.log(`Du klatrer opp gjennom kloakken og løfter på luken. Fristaden. Kloakkluken tar deg tilbake til nivå ${G.run.nextDepth} når du vil.`);
+    });
+  }
+
+  loadFloor(depth, seed, title = false, arrival = 'start') {
+    if (G.dungeon) G.dungeon.dispose();
+    G.fx.clearLevel();
+    G.ui.hideBoss();
+    G.depth = depth;
+    const town = depth === 0;
+    G.dungeon = town ? new Town(seed ?? 1, arrival) : new Dungeon(depth, seed ?? Math.floor(Math.random() * 1e9));
+    G.dungeon.build(G.assets);
+    this.setTownLighting(town);
+    G.world.buildLevel(G.dungeon);
+    const info = FLOORS[depth];
+    G.scene.fog.color.setHex(info.fog);
+    G.scene.background.setHex(0x040304);
+    this.hemi.color.setHex(info.ambient);
+    const P = G.player;
+    P.pos.set(G.dungeon.start.x, 0, G.dungeon.start.z);
+    P.vel.set(0, 0, 0);
+    P.yaw = town ? Math.PI * 0.5 : Math.PI * 0.25;
+    P.onFloor();
+    if (!town) {
+      P.fx.utu = false;
+      if (G.run.blessing) { G.run.blessing = false; P.fx.utu = true; P.fx.light = true; G.ui.log('Utus velsignelse følger deg ned: sterkere lys og fördel mot skräck.'); }
+      if (G.run.sharpen) { G.run.sharpen = false; P.fx.sharpened = true; G.ui.log('Bataars slipte egg biter gjennom rustning på dette nivået.'); }
+    }
+    if (title) {
+      for (const e of G.enemies) e.dispose();
+      G.enemies.length = 0;
+    }
+    // jegerens hund følger med ned
+    if (G.companion) { G.companion.dispose(); G.companion = null; }
+    if (P.has('foljeslagare')) G.companion = new Companion(P.pos.x - 1.2, P.pos.z - 0.8);
+    G.dungeon.computeFlow(P.pos.x, P.pos.z);
+    this.camTarget.copy(P.pos);
+    G.camera.position.copy(P.pos).add(CAM_OFF);
+    G.audio.setBiome(info.biome);
+    const look = BIOME_LOOK[info.biome];
+    G.ambient.setLook(look.mist, look.motes, look.density);
+    this.townNight = null;
+    if (!title) {
+      if (!town) G.run.depthReached = Math.max(G.run.depthReached, depth);
+      G.ui.setDepth(depth, info.name);
+      G.ui.log(FLOOR_INTRO[depth]);
+    }
+  }
+
+  // Lys for byen (sol og måne) eller for kloakken (lykt)
+  setTownLighting(town) {
+    const k = this.key;
+    this.inTown = town;
+    if (town) {
+      k.decay = 0;
+      k.distance = 0;
+      k.angle = 0.62;
+      k.penumbra = 0.35;
+      k.shadow.camera.near = 6;
+      k.shadow.camera.far = 95;
+      k.shadow.bias = -0.0006;
+      k.shadow.normalBias = 0.05;
+    } else {
+      k.decay = 1.6;
+      k.distance = 30;
+      k.angle = 0.62;
+      k.penumbra = 0.65;
+      k.intensity = 110;
+      k.color.setHex(0xffe0bc);
+      k.shadow.camera.near = 3;
+      k.shadow.camera.far = 24;
+      k.shadow.bias = -0.0004;
+      k.shadow.normalBias = 0.035;
+      this.hemi.groundColor.setHex(0x0b0806);
+      this.hemi.intensity = 0.55;
+      this.fill.color.setHex(0x8aa0c0);
+      this.fill.intensity = 0.22;
+      G.scene.fog.near = 30;
+      G.scene.fog.far = 64;
+      if (G.audio.music) { G.audio.music.night = false; G.audio.music.inn = false; }
+    }
+    k.shadow.camera.updateProjectionMatrix();
+  }
+
+  townLights(dt) {
+    const P = G.player;
+    const sky = skyAt(hourOf(G.run.clock), this.sky);
+    const k = this.key;
+    k.position.set(P.pos.x + sky.dir.x, sky.dir.y, P.pos.z + sky.dir.z);
+    k.target.position.set(P.pos.x, 0, P.pos.z);
+    k.target.updateMatrixWorld();
+    k.color.copy(sky.sun);
+    k.intensity = sky.sunI * 1.15;
+    this.hemi.color.copy(sky.sky);
+    this.hemi.groundColor.copy(sky.ground);
+    this.hemi.intensity = sky.hemiI * 1.4;
+    this.fill.color.copy(sky.sky);
+    this.fill.intensity = 0.22 + (1 - sky.night) * 0.3;
+    this.fill.position.set(P.pos.x - 10, 14, P.pos.z + 12);
+    this.fill.target.position.copy(P.pos);
+    this.fill.target.updateMatrixWorld();
+    const n = sky.night;
+    this.lantern.color.setRGB(1, 0.72, 0.46);
+    this.lantern.intensity = 7 * Math.max(0, (n - 0.3) / 0.7) * (P.fx?.light ? 1.5 : 1);
+    this.lantern.distance = 9;
+    this.lantern.position.set(P.pos.x + 1.0, 2.3, P.pos.z + 1.0);
+    G.scene.fog.color.copy(sky.fog);
+    G.scene.background.copy(sky.fog);
+    G.scene.fog.near = 44 - n * 14;
+    G.scene.fog.far = 105 - n * 30;
+    const night = n > 0.6;
+    G.audio.townNight = night;
+    if (G.audio.music) {
+      G.audio.music.night = night;
+      G.audio.music.inn = G.dungeon.insideId === 'inn';
+    }
+    if (night !== this.townNight) {
+      this.townNight = night;
+      if (night) G.ambient.setLook(0x2a3448, 0xd8ff7a, 0.5);
+      else G.ambient.setLook(0x9aa0b0, 0xfff2c0, 0.12);
+    }
+    void dt;
+    return sky;
+  }
+
+  applyPendingBoon() {
+    const P = G.player;
+    const b = this.pendingBoon;
+    if (b) {
+      if (b.heroic) {
+        P.heroic.push(b.heroic);
+        G.ui.log(`Ny hjälteförmåga: <b style="color:${SRC_COLOR['Hjältedåd']}">${b.name}</b>.`);
+      } else {
+        P.boons.push(b);
+        if (b.silver) P.silver += b.silver;
+        if (b.potion) P.potions = Math.min(4, P.potions + b.potion);
+        G.ui.log(`Gave fra ${b.src}: <b style="color:${SRC_COLOR[b.src]}">${b.name}</b>.`);
+      }
+      P.recalc();
+    }
+    this.pendingBoon = null;
+  }
+
+  companionAction() {
+    const P = G.player;
+    const C = G.companion;
+    if (!C || !C.alive) {
+      if (C) C.dispose();
+      G.companion = new Companion(P.pos.x - 1, P.pos.z - 1);
+      G.fx.burst('dust', G.companion.pos, 10);
+      G.ui.log('Du plystrer, og hunden kommer.');
+      return;
+    }
+    const t = P.aimedEnemy(16) || P.nearestEnemy(12);
+    if (!t) { P.vp += 3; G.fx.float('Ingen å angripe', P.pos, 'miss'); return; }
+    C.order(t);
+  }
+
+  // Bakhold og Bestiologi når en flokk får øye på deg
+  onEnemiesAlerted(flock, cause) {
+    const P = G.player;
+    if (G.state !== 'play' || P.downed) return;
+    for (const e of flock) {
+      if (G.run.known.has(e.type) || e.def.boss) continue;
+      G.run.known.add(e.type);
+      if (!e.def.lore) continue;
+      const r = P.roll('Bestiologi', { noArmed: true });
+      if (r.success) { G.ui.logRoll(r, `<b class="c-mark">Bestiologi:</b> ${e.def.lore}`); P.floorStats.lore = (P.floorStats.lore || 0) + 1; }
+    }
+    if (cause !== 'sight' || flock.some(e => e.def.boss || e.ambushDone)) return;
+    flock.forEach(e => (e.ambushDone = true));
+    let boon = 0;
+    if (P.tricks.has('fagelsang') && P.vp >= 1) { P.vp -= 1; boon = 1; }
+    P.rollPush('Upptäcka fara', { important: false, boon, label: 'Upptäcka fara' }, r => {
+      if (r.success) {
+        for (const e of flock) if (!e.dead) e.surprised = 1.3;
+        G.ui.logRoll(r, `${P.name} ser dem først. De er overrasket.`);
+        G.fx.float('Overrasket!', flock[0].pos, 'sneak');
+      } else if (r.demon) {
+        G.ui.logRoll(r, 'Bakhold! De kommer over deg før du skjønner noe.');
+        P.lock = 0.8;
+        for (const e of flock) e.cd = 0;
+      } else G.ui.logRoll(r, 'Fiender!');
+    });
+  }
+
+  summonDemon() {
+    const P = G.player;
+    for (let k = 0; k < 12; k++) {
+      const a = Math.random() * Math.PI * 2;
+      const x = P.pos.x + Math.cos(a) * 6, z = P.pos.z + Math.sin(a) * 6;
+      if (!G.dungeon.walkable(x, z)) continue;
+      const e = new Enemy('demon', x, z, G.depth);
+      e.alerted = true;
+      e.state = 'chase';
+      G.enemies.push(e);
+      G.fx.burst('fire', { x, y: 0.5, z }, 40);
+      G.fx.ring({ x, z }, 3, 0xff3010, 0.6);
+      G.audio.roar();
+      G.ui.log('<b class="c-demon">Noe kommer gjennom sløret.</b> En demon har lagt merke til deg.');
+      return;
+    }
+  }
+
+  buildRatModel() {
+    return buildRat().root;
+  }
+
+  // --- pressa slag --------------------------------------------------------------
+
+  wantsPush(o) {
+    const mode = this.settings.push;
+    if (mode === 'aldri') return false;
+    if (mode === 'alla') return true;
+    return !!o?.important;
+  }
+
+  offerPush(r, cb) {
+    if (this.push || G.state === 'title') { cb(r); return; }
+    const P = G.player;
+    const free = CONDITIONS.filter(c => !P.hasCond(c.id));
+    if (!free.length) { cb(r); return; }
+    const attr = ATTR_NAME[r.skill] ? r.skill : SKILL[r.skill]?.attr;
+    const def = free.find(c => c.id === COND_BY_ATTR[attr]) || free[0];
+    this.push = { r, cb, def: def.id, t: 1.8 };
+    const box = $('#pushbox');
+    box.querySelector('.ps-roll').innerHTML = `<b>${r.o?.label || r.skill}</b> misslyckas: ${r.dice.join('|')} mot ${r.target}`;
+    box.querySelector('.ps-conds').innerHTML = CONDITIONS.map((c, i) => `<button data-c="${c.id}" class="${P.hasCond(c.id) ? 'had' : ''}${c.id === def.id ? ' def' : ''}" ${P.hasCond(c.id) ? 'disabled' : ''}><kbd>${i + 1}</kbd>${c.name}</button>`).join('');
+    box.querySelectorAll('.ps-conds button').forEach(b => (b.onclick = () => this.acceptPush(b.dataset.c)));
+    box.querySelector('.ps-no').onclick = () => this.declinePush();
+    box.hidden = false;
+    box.classList.remove('on');
+    void box.offsetWidth;
+    box.classList.add('on');
+    G.audio.menuTick?.(57);
+  }
+
+  acceptPush(cid) {
+    const p = this.push;
+    if (!p) return;
+    const P = G.player;
+    const id = cid || p.def;
+    if (P.hasCond(id)) return;
+    this.hidePush(true);
+    P.addCond(id, true);
+    const r2 = P.reroll(p.r);
+    G.run.pushes++;
+    P.floorStats.pushes = (P.floorStats.pushes || 0) + 1;
+    G.fx.float('PRESSAT', P.pos, 'cond big', 2.4);
+    G.audio.dice();
+    if (r2.success) G.audio.drake?.();
+    p.cb(r2);
+  }
+
+  declinePush() {
+    const p = this.push;
+    if (!p) return;
+    this.hidePush(true);
+    p.cb(p.r);
+  }
+
+  hidePush(keep) {
+    this.push = null;
+    const box = $('#pushbox');
+    if (box) box.hidden = true;
+    void keep;
+  }
+
+  pushKeys(inp, realDt) {
+    const p = this.push;
+    if (!p) return;
+    p.t -= realDt;
+    $('#pushbox .ps-bar i').style.width = `${Math.max(0, p.t / 1.8) * 100}%`;
+    if (inp.wasPressed('KeyX') || inp.wasPressed('Enter') || inp.wasPressed('TPush')) return this.acceptPush(null);
+    for (let i = 0; i < 6; i++) if (inp.wasPressed('Digit' + (i + 1))) { inp.pressed.delete('Digit' + (i + 1)); return this.acceptPush(CONDITIONS[i].id); }
+    if (inp.wasPressed('Escape') || p.t <= 0) { inp.pressed.delete('Escape'); this.declinePush(); }
+  }
+
+  // --- vila ------------------------------------------------------------------
+
+  // Kort vila: T6 KP, T6 VP og ett tillstånd. Alver mediterer, minnessaken tar ett til.
+  doStretchRest(stairs) {
+    const P = G.player;
+    const out = [];
+    const elf = P.kinAb.includes('inrefrid');
+    let kp = d(6), vp = d(6), conds = 1;
+    if (elf) { kp += d(6); vp += d(6); conds++; out.push('Alven mediterer.'); }
+    const had = CONDITIONS.filter(c => P.hasCond(c.id));
+    if (had.length > conds && P.sheet.memento && !P.floor.memento) { conds++; P.floor.memento = true; out.push(`${P.sheet.memento} gir trøst.`); }
+    const gotKP = P.heal(kp, true);
+    const before = P.vp;
+    P.vp = Math.min(P.maxVP, P.vp + vp);
+    // fjern de tillståndene som skader mest (de som hører til våpenet ditt først)
+    const wAttr = SKILL[P.weapon().skill]?.attr;
+    const order = [...had].sort((a, b) => (b.attr === wAttr) - (a.attr === wAttr));
+    const healed = order.slice(0, conds);
+    for (const c of healed) P.clearCond(c.id);
+    // hunden plastres om (Läkekonst)
+    const C = G.companion;
+    if (C?.alive && C.kp < C.maxKP && P.skills['Läkekonst'] != null) {
+      const r = P.roll('Läkekonst', { noArmed: true });
+      if (r.success) { C.kp = Math.min(C.maxKP, C.kp + d(6)); out.push('Hunden får plaster.'); }
+    }
+    const gains = [gotKP ? `+${gotKP} KP` : '', P.vp > before ? `+${P.vp - before} VP` : ''].filter(Boolean).join(', ');
+    out.unshift(`${gains || 'KP og VP var allerede fulle'}${healed.length ? `${gains ? ',' : '.'} kvitt ${healed.map(c => c.name.toLowerCase()).join(' og ')}` : ''}.`);
+    void stairs;
+    return out.join(' ');
+  }
+
+  stretchRestResult(txt) {
+    G.ui.log(`Kort vila: ${txt}`);
+    G.fx.burst('heal', G.player.pos, 20);
+    G.audio.heal();
+  }
+
+  // --- trappa ned: vila, sesjonsspørsmål, forbedring og gaver ---------------------
+
+  descend() {
+    if (G.state !== 'play') return;
+    G.state = 'transition';
+    G.audio.ui();
+    const P = G.player;
+    if (P.chanRest) P.chanRest = null;
+    P.fx.barsark = 0;
+    P.breakStealth();
+    P.forced = null;
+    P.armed = null;
+    // kort vila i trappa
+    const restTxt = this.doStretchRest(true);
+    const extra = [];
+    // reparasjon med Hantverk eller mesterhender
+    const broken = Object.values(P.equip).filter(it => it?.broken);
+    for (const it of broken) {
+      const wood = it.slot === 'vapen2' || !it.metal;
+      if ((P.has('mastersmed') && it.metal) || (P.has('mastersnickare') && wood)) { it.broken = false; refinalize(it); extra.push(`${it.name} er reparert (mesterhender).`); continue; }
+      const r = P.roll('Hantverk', { noArmed: true });
+      if (r.success) { it.broken = false; refinalize(it); extra.push(`Hantverk ${r.r}/${r.target}: ${it.name} er reparert.`); }
+      else extra.push(`Hantverk ${r.r}/${r.target}: ${it.name} er fortsatt trasig.`);
+    }
+    if (P.has('mastergarvare') && P.floorStats.beasts > 0 && P.equip.rustning && P.equip.rustning.type === 'lader' && !(P.equip.rustning.tanned >= 2)) {
+      const a = P.equip.rustning;
+      a.tanned = (a.tanned || 0) + 1;
+      a.armor++;
+      refinalize(a);
+      extra.push(`Mästergarvare: ${a.name} er forsterket med skinn (+1).`);
+    }
+    // svåra skador gror
+    for (const inj of P.injuries) if (!inj.perm) inj.left--;
+    const healedInj = P.injuries.filter(i => !i.perm && i.left <= 0);
+    if (healedInj.length) { P.injuries = P.injuries.filter(i => i.perm || i.left > 0); extra.push(`Grodd: ${healedInj.map(i => i.name.toLowerCase()).join(', ')}.`); }
+    P.curse.noRegen = false;
+    P.recalc();
+    $('#rest-text').innerHTML = `${P.name} setter seg i trappa for en kort vila. ${restTxt}${extra.length ? '<br>' + extra.join(' ') : ''}`;
+    // sesjonsspørsmål: hvert ja gir ett kryss du velger selv
+    const qs = this.sessionQuestions();
+    this.freeMarks = qs.filter(q => q.yes).length;
+    const sl = $('#session-list');
+    const marked = P.marks;
+    const options = Object.keys(P.skills).sort((a, b) => a.localeCompare(b, 'sv'));
+    const defaultPick = () => {
+      const tr = P.sheet.trained.filter(s => !marked.has(s) && P.skills[s] < 18);
+      return tr.sort((a, b) => P.skills[a] - P.skills[b])[0] || options[0];
+    };
+    sl.innerHTML = qs.map((q, i) => `<div class="sq ${q.yes ? 'yes' : 'no'}"><span class="q">${q.q}</span><span class="a">${q.yes ? 'Ja' : 'Nei'}</span>${q.yes ? `<select data-i="${i}">${options.map(o => `<option${o === (q.pick || (q.pick = defaultPick())) ? ' selected' : ''}>${o}</option>`).join('')}</select>` : '<span></span>'}</div>`).join('');
+    this.sessionQs = qs;
+    sl.querySelectorAll('select').forEach(s => (s.onchange = () => { qs[+s.dataset.i].pick = s.value; }));
+    $('#improve-list').innerHTML = '';
+    this.renderMarked();
+    $('#btn-improve').disabled = false;
+    $('#btn-improve').hidden = false;
+    $('#btn-continue').disabled = true;
+    this.improved = false;
+    this.renderBoons([]);
+    $('#transition-title').textContent = `Trappa ned til nivå ${G.depth + 1}`;
+    $('#transition-next').textContent = FLOORS[G.depth + 1].name;
+    $('#btn-up').disabled = true;
+    G.ui.show('transition');
+  }
+
+  sessionQuestions() {
+    const P = G.player, F = P.floorStats;
+    const w = P.sheet.weakness;
+    const weakTrig = {
+      'Grådig': F.silver >= 25, 'Fråtser': F.bread >= 2, 'Kleptoman': F.chests >= 1, 'Monsterhater': F.monsters >= 1,
+      'Voldelig': F.kills >= 10, 'Feig': F.dodges >= 18, 'Overilt': F.pushes >= 2, 'Hensynsløs': F.pushes >= 2,
+      'Kunnskapstørst': F.runes + F.lore >= 1, 'Lat': !P.floor.stretchRest && !P.floor.roundRest ? false : true,
+      'Skrythals': F.kills >= 6, 'Arrogant': F.kills >= 6, 'Pessimist': P.kp < P.maxKP / 2,
+    };
+    const qs = [
+      { q: 'Utforsket du et nytt sted?', yes: true },
+      { q: 'Beseiret du en farlig fiende?', yes: (F.monsters || 0) > 0 || (F.kills || 0) >= 8 },
+      { q: 'Overvant du et hinder uten å slåss? (lås, gjemmested, runer)', yes: (F.locks || 0) > 0 || (F.runes || 0) > 0 || G.world.caches.some(c => c.found) },
+    ];
+    if (w) qs.push({ q: `Spilte du på svakheten din (${w.toLowerCase()})?`, yes: !!weakTrig[w] });
+    return qs;
+  }
+
+  renderMarked() {
+    const P = G.player;
+    const list = $('#improve-list');
+    const marks = [...P.marks];
+    list.innerHTML = marks.length ? marks.map(sk => `<div class="imp" data-sk="${sk}"><span class="nm">${sk}</span><span class="cur">${P.baseSkills[sk] ?? '?'}</span><span class="die">?</span><span class="res">Markert</span></div>`).join('') : '<div class="imp none">Ingen markerte ferdigheter ennå. Drake og Demon markerer, og hvert ja over gir ett kryss.</div>';
+  }
+
+  rollImprovements() {
+    if (this.improved) return;
+    this.improved = true;
+    $('#btn-improve').disabled = true;
+    const P = G.player;
+    for (const q of this.sessionQs || []) if (q.yes && q.pick) P.marks.add(q.pick);
+    $('#session-list').querySelectorAll('select').forEach(s => (s.disabled = true));
+    this.renderMarked();
+    const list = $('#improve-list');
+    const marks = [...P.marks];
+    P.marks.clear();
+    const reached18 = [];
+    marks.forEach((sk, i) => {
+      const row = list.querySelector(`[data-sk="${CSS.escape(sk)}"]`);
+      const cur = P.baseSkills[sk] ?? 0;
+      setTimeout(() => {
+        const die = row.querySelector('.die');
+        let n = 0;
+        const iv = setInterval(() => {
+          die.textContent = d(20);
+          if (++n > 9) {
+            clearInterval(iv);
+            const r = d(20);
+            die.textContent = r;
+            G.audio.dice();
+            if (r > cur && cur < 18) {
+              P.baseSkills[sk] = cur + 1;
+              row.querySelector('.res').innerHTML = `<b class="up">${cur} til ${cur + 1}</b>`;
+              row.classList.add('win');
+              G.audio.drake();
+              if (cur + 1 === 18) { reached18.push(sk); row.querySelector('.res').innerHTML += ' <b class="up">Ny hjälteförmåga!</b>'; }
+              P.recalc();
+            } else row.querySelector('.res').textContent = 'Ingen framgang';
+          }
+        }, 55);
+      }, 200 + i * 520);
+    });
+    setTimeout(() => this.offerGifts(reached18.length), 400 + marks.length * 520 + 300);
+  }
+
+  offerGifts(n18) {
+    const P = G.player;
+    // hjälteförmågor: når en ferdighet når 18, og etter nivå 2 og 4 (SL belønner storverk)
+    const heroicCards = [];
+    const want = n18 + (G.depth === 2 || G.depth === 4 ? 1 : 0);
+    if (want > 0) {
+      const pool = HEROIC_REWARDS.filter(id => (HEROIC[id].stack || !P.has(id)) && meetsReq(P.skills, id) && !(id === 'tvillingpil' && !P.skills['Pilbåge']));
+      for (const id of pool.sort(() => Math.random() - 0.5).slice(0, Math.min(2, want + 1))) {
+        const h = HEROIC[id];
+        heroicCards.push({ id: 'h_' + id, heroic: id, src: 'Hjältedåd', name: h.name, desc: h.game + (h.vp ? ` (${h.vp} VP)` : '') });
+      }
+    }
+    this.renderBoons(boonChoices(P.boons, heroicCards.slice(0, 2)));
+  }
+
+  renderBoons(choices) {
+    const cards = $('#boon-cards');
+    cards.innerHTML = '';
+    $('#boon-head').hidden = !choices.length;
+    for (const b of choices) {
+      const c = document.createElement('button');
+      c.className = 'boon';
+      c.style.setProperty('--src', SRC_COLOR[b.src]);
+      c.innerHTML = `<div class="src">${b.src}</div><div class="nm">${b.name}</div><div class="ds">${b.desc}</div>`;
+      c.onclick = () => {
+        if (c.classList.contains('picked')) return;
+        cards.querySelectorAll('.boon').forEach(x => x.classList.toggle('picked', x === c));
+        cards.querySelectorAll('.boon').forEach(x => x.classList.toggle('dim', x !== c));
+        this.pendingBoon = b;
+        $('#btn-continue').disabled = false;
+        $('#btn-up').disabled = false;
+        G.audio.ui();
+      };
+      cards.appendChild(c);
+    }
+    this.pendingBoon = null;
+    if (!choices.length && this.improved) { $('#btn-continue').disabled = false; $('#btn-up').disabled = false; }
+  }
+
+  nextFloor() {
+    document.activeElement?.blur?.();
+    this.applyPendingBoon();
+    G.run.nextDepth = G.depth + 1;
+    this.wipe(() => {
+      G.ui.hideScreens();
+      G.state = 'play';
+      this.loadFloor(G.depth + 1);
+      G.ui.buildBar();
+      if (G.audio.music && G.audio.music.name !== 'explore') G.audio.playMusic('explore');
+    });
+  }
+
+  // --- dödsslag ----------------------------------------------------------------
+
+  onPlayerDown() {
+    const P = G.player;
+    if (P.downed || P.dead) return;
+    P.downed = true;
+    P.breakStealth();
+    P.chanRest = null;
+    this.hidePush(false);
+    G.state = 'deathroll';
+    G.post.desat = 0.85;
+    G.audio.music?.setIntensity(0);
+    P.voice('down');
+    const bane = P.hasCond('KRA') ? 1 : 0;
+    this.dr = { s: 0, f: 0, bane, running: false };
+    $('#dr-target').innerHTML = `Slå T20 under eller lik <b>${P.attrs.FYS}</b> (FYS)${bane ? '. Krasslig gir nackdel.' : '.'} Dödsslag kan ikke presses.`;
+    $('#dr-ok').innerHTML = $('#dr-bad').innerHTML = '<i></i><i></i><i></i>';
+    $('#dr-die').textContent = '';
+    $('#dr-die').className = 'bigdie';
+    $('#dr-msg').textContent = `${P.name} ligger i mørket. Tre lyktes før tre feil, så stabiliserer det seg.`;
+    $('#dr-actions').hidden = false;
+    $('#btn-dr-rally').disabled = false;
+    G.ui.update(0);
+    G.ui.show('deathroll');
+  }
+
+  drPips() {
+    $('#dr-ok').querySelectorAll('i').forEach((x, i) => x.classList.toggle('on', i < this.dr.s));
+    $('#dr-bad').querySelectorAll('i').forEach((x, i) => x.classList.toggle('on', i < this.dr.f));
+  }
+
+  // Samla sig själv: PSY med nackdel. Lykkes det, kan du handle med 0 KP, men dödsslagene fortsetter.
+  rallySelf() {
+    const P = G.player;
+    if (this.dr.running) return;
+    $('#btn-dr-rally').disabled = true;
+    const r = skillRoll(P.attrs.PSY, { bane: 1 + (P.hasCond('RAD') ? 1 : 0) });
+    r.skill = 'PSY';
+    G.audio.dice();
+    $('#dr-die').textContent = r.r;
+    $('#dr-die').className = 'bigdie ' + (r.drake ? 'drake' : r.demon ? 'demon' : r.success ? 'ok' : 'fail');
+    if (r.success) {
+      $('#dr-msg').textContent = `${P.name} biter tennene sammen og reiser seg. Dödsslagene fortsetter: drikk en legedrikk, eller hold ut.`;
+      setTimeout(() => {
+        P.downed = false;
+        P.dying = { s: this.dr.s, f: this.dr.f, t: 0 };
+        P.kp = 0;
+        P.invuln = 1.2;
+        G.post.desat = 0.4;
+        G.ui.hideScreens();
+        G.state = 'play';
+        this.updateDyingHud();
+        G.ui.log(`${P.name} samler seg med 0 KP. Hver skade er et misslyckat dödsslag.`);
+      }, 900);
+    } else {
+      $('#dr-msg').textContent = 'Kroppen vil ikke. Dödsslagene må slås.';
+      setTimeout(() => this.deathRollSequence(), 900);
+    }
+  }
+
+  deathRollSequence() {
+    if (this.dr.running) return;
+    this.dr.running = true;
+    $('#dr-actions').hidden = true;
+    const P = G.player;
+    const step = () => {
+      const r = skillRoll(P.attrs.FYS, { bane: this.dr.bane });
+      let die = 0;
+      const anim = setInterval(() => {
+        $('#dr-die').textContent = d(20);
+        if (++die > 8) {
+          clearInterval(anim);
+          $('#dr-die').textContent = r.r;
+          $('#dr-die').className = 'bigdie ' + (r.drake ? 'drake' : r.demon ? 'demon' : r.success ? 'ok' : 'fail');
+          G.audio.dice();
+          if (r.drake) { this.dr.s += 2; $('#dr-msg').textContent = 'Drake! To lyktes på en gang.'; G.audio.drake(); }
+          else if (r.demon) { this.dr.f += 2; $('#dr-msg').textContent = 'Demon! To feil på en gang.'; G.audio.demon(); }
+          else if (r.success) { this.dr.s++; $('#dr-msg').textContent = 'Klamrer seg fast.'; }
+          else { this.dr.f++; $('#dr-msg').textContent = 'Det blir mørkere.'; }
+          this.drPips();
+          if (this.dr.s >= 3) setTimeout(() => this.survive(), 900);
+          else if (this.dr.f >= 3) setTimeout(() => this.onDeath(), 1100);
+          else setTimeout(step, 520);
+        }
+      }, 50);
+    };
+    setTimeout(step, 300);
+  }
+
+  survive() {
+    const P = G.player;
+    P.downed = false;
+    P.downs++;
+    const n = d(6);
+    P.kp = n;
+    P.invuln = 2.2;
+    for (const e of G.enemies) {
+      if (e.dead) continue;
+      tmp.set(e.pos.x - P.pos.x, 0, e.pos.z - P.pos.z);
+      const dd = tmp.length();
+      if (dd < 6) { e.vel.addScaledVector(tmp.normalize(), 14); e.setState('stagger'); e.stunDur = 1; }
+    }
+    G.fx.ring(P.pos, 6, 0xfff0c0, 0.5);
+    if (P.isDuck) G.fx.burst('feather', P.pos, 16);
+    G.post.desat = 0;
+    G.post.flash(0xfff0c0, 0.3);
+    P.voice('up');
+    G.ui.hideScreens();
+    G.ui.log(`${P.name} er stabil igjen (+${n} KP).`);
+    G.state = 'play';
+    this.severeInjuryCheck();
+  }
+
+  // Valgfri regel: svåra skador når du har vært nede på 0 KP
+  severeInjuryCheck() {
+    if (!this.settings.injuries) return;
+    const P = G.player;
+    const r = P.roll('FYS', { noArmed: true });
+    if (r.success) { G.ui.logRoll(r, 'Ingen varige skader denne gangen.'); return; }
+    const n = d(20);
+    const inj = { ...fromRange(INJURIES, n) };
+    inj.left = inj.heal || 0;
+    if (inj.newWeakness) P.sheet = { ...P.sheet, weakness: WEAKNESS[d(20) - 1] };
+    if (inj.amnesia) G.dungeon.explored.fill(0);
+    P.injuries.push(inj);
+    P.recalc();
+    G.ui.logRoll(r, `<b class="c-demon">Svår skada (${n}):</b> ${inj.name}.${inj.perm ? ' Den blir aldri helt bra.' : ` Gror etter ${inj.left} vila i trappa.`}`);
+    G.fx.float(inj.name, P.pos, 'demon', 2.4);
+  }
+
+  updateDyingHud() {
+    const P = G.player;
+    const box = $('#dying');
+    if (!P.dying) { box.hidden = true; return; }
+    box.hidden = false;
+    box.querySelector('.ok').innerHTML = [0, 1, 2].map(i => `<i class="${i < P.dying.s ? 'on' : ''}"></i>`).join('');
+    box.querySelector('.bad').innerHTML = [0, 1, 2].map(i => `<i class="${i < P.dying.f ? 'on' : ''}"></i>`).join('');
+  }
+  hideDying() {
+    $('#dying').hidden = true;
+    if (G.post) G.post.desat = 0;
+  }
+
+  feathersFor(victory) {
+    const r = G.run;
+    return r.depthReached * 5 + Math.floor(r.kills / 3) + (victory ? 30 : 0);
+  }
+
+  onDeath(instant = false) {
+    const P = G.player;
+    if (P.dead) return;
+    P.dead = true;
+    P.dying = null;
+    this.hideDying();
+    this.hidePush(false);
+    G.state = 'dead';
+    G.audio.playMusic('death', { fast: true });
+    G.post.desat = 0;
+    const f = this.feathersFor(false);
+    G.meta.feathers += f;
+    G.meta.best = Math.max(G.meta.best, G.run.depthReached);
+    saveMeta(G.meta);
+    this.showEnd(false, f, instant);
+  }
+
+  onVictory() {
+    if (G.state === 'dead' || G.state === 'victory' || G.state === 'title') return;
+    if (G.state !== 'play') { setTimeout(() => this.onVictory(), 500); return; }
+    G.state = 'victory';
+    G.audio.playMusic('victory', { fast: true });
+    const f = this.feathersFor(true);
+    G.meta.feathers += f;
+    G.meta.wins++;
+    G.meta.best = 5;
+    saveMeta(G.meta);
+    this.showEnd(true, f);
+  }
+
+  showEnd(win, feathers, instant) {
+    const r = G.run;
+    const P = G.player;
+    const mins = Math.max(1, Math.round((performance.now() - r.t0) / 60000));
+    $('#end-title').textContent = win ? 'Safranen er funnet' : `${P.name} er død`;
+    $('#end-text').textContent = win
+      ? (P.isNebb
+        ? 'Rødpels er beseiret. Safranen ligger i en kiste bak tronen hans, og noe av den er ikke engang spist. Far får beholde jobben. Sjefen sier ikke takk.'
+        : `Rødpels er beseiret. ${P.name} bærer safransekkene opp til herr Nansen, som får beholde jobben. Betalingen er ti silver og et brød fra i forrigårs.`)
+      : (P.isNebb
+        ? `Svart Nebb ble liggende i mørket under Fristaden${instant ? ' etter ett eneste, altfor hardt slag' : ''}. Mester Flansen kommer til å si at han visste det. Han kommer til å si det med munnen full av brød.`
+        : `${P.name} ble liggende i mørket under Fristaden${instant ? ' etter ett eneste, altfor hardt slag' : ''}. Herr Nansen leier en ny neste uke.`);
+    $('#end-stats').innerHTML = [
+      ['Nivå nådd', `${r.depthReached} av 5`],
+      ['Fiender felt', r.kills],
+      ['Drake', r.drakes],
+      ['Demon', r.demons],
+      ['Pressade slag', r.pushes],
+      ['Parerat / undvikt', `${r.parries} / ${r.dodges}`],
+      ['Skade gjort', r.damageDealt],
+      ['Skade tatt', r.damageTaken],
+      ['Silver plukket', r.silver],
+      ['Tid', `${mins} min`],
+    ].map(([k, v]) => `<div><span>${k}</span><b>${v}</b></div>`).join('');
+    $('#end-feathers').textContent = `+${feathers} fjær til Mester Flansens dojo`;
+    $('#touch').hidden = true;
+    this.endRunCleanup();
+    G.ui.show('end');
+  }
+
+  // --- butikken ------------------------------------------------------------------
+
+  openShop() {
+    G.state = 'dialog';
+    const D = G.dungeon;
+    const P = G.player;
+    const lines = P.isNebb ? DAD : NANSEN;
+    const inTown = !!D.isTown;
+    const idep = inTown ? Math.max(1, G.run.nextDepth || 1) : G.depth + 1;
+    if (!D.shopStock) {
+      D.shopStock = [
+        { id: 'bread', name: 'Brød', desc: 'Helbreder 3 KP. Ferskt i forrigårs.', price: 4 },
+        { id: 'potion', name: 'Legedrikk', desc: 'Helbreder 2T6 KP.', price: 14 },
+        { id: 'stone', name: 'Bryne', desc: '+1 skade resten av løpet.', price: 28, once: true },
+        { id: 'picks', name: 'Enkla dyrkar', desc: 'Ingen nackdel på Fingerfärdighet når du dyrker opp låser.', price: 8, once: true },
+        { id: 'repair', name: 'Reparasjon', desc: 'Far fikser alt som er trasig. Han har en tang.', price: 6 },
+        { id: 'rest', name: 'Lång vila bak disken', desc: 'Sov et skift i trygghet: alle KP, VP og tillstånd. Gratis.', price: 0, once: true },
+        { id: 'item', item: makeItem(idep, G.world.lootOpts({ rarity: 'magisk' })) },
+        { id: 'item', item: makeItem(idep, G.world.lootOpts({ luck: 0.4 })) },
+      ];
+      if (inTown) D.shopStock = D.shopStock.filter(s => s.id !== 'rest');
+      for (const s of D.shopStock) if (s.item) { s.name = s.item.name; s.price = s.item.value + 10 * Math.max(0, G.depth); }
+      D.dadGreet = inTown ? lines.town[Math.floor(Math.random() * lines.town.length)] : lines.greet[(G.depth - 1) % lines.greet.length];
+      D.barter = null;
+      D.advance = false;
+    }
+    if (!P.isNebb) for (const s of D.shopStock) if (s.id === 'repair') s.desc = 'Herr Nansen fikser alt som er trasig. Han har en tang.';
+    this.dadSay(D.dadGreet);
+    this.renderShop(false);
+    $('#dlg-who').innerHTML = P.isNebb ? 'Far <span>butikkbetjent, ikke kjøpmann</span>' : 'Herr Nansen <span>butikkbetjent, ikke kjøpmann</span>';
+    G.ui.show('dialog');
+    G.audio.quack(0.9, 0.6);
+  }
+
+  dadSay(text) {
+    $('#dlg-text').textContent = text;
+  }
+
+  priceOf(s) {
+    const P = G.player;
+    const D = G.dungeon;
+    let m = 1;
+    if (P.flags.has('discount')) m *= 0.6;
+    if (D.isTown && G.run.guild) m *= 0.9;
+    if (D.isTown && (G.run.rykte || 0) <= -2) m *= 1.25;
+    if (D.barter === 'good') m *= 0.8;
+    else if (D.barter === 'great') m *= 0.6;
+    else if (D.barter === 'bad') m *= 1.25;
+    return s.price === 0 ? 0 : Math.max(1, Math.round(s.price * m));
+  }
+
+  renderShop(showWares) {
+    const P = G.player;
+    const D = G.dungeon;
+    const lines = P.isNebb ? DAD : NANSEN;
+    const kw = $('#dlg-kw');
+    kw.innerHTML = '';
+    const words = ['NAVN', 'JOBB', 'HANDEL', 'SAFRAN', 'FLANSEN', 'KARAD'];
+    if (G.depth >= 2 || G.run.depthReached >= 2) words.push('REVEN');
+    if (!D.advance) words.push('FORSKUDD');
+    words.push('FARVEL');
+    for (const w of words) {
+      const b = document.createElement('button');
+      b.className = 'kw';
+      b.textContent = w;
+      b.onclick = () => {
+        G.audio.ui();
+        if (w === 'HANDEL') { this.startBarter(); return; }
+        if (w === 'FORSKUDD') { this.askAdvance(); return; }
+        if (w === 'FARVEL') { this.dadSay(lines.FARVEL); setTimeout(() => this.closeShop(), 700); return; }
+        this.dadSay(lines[w]);
+      };
+      kw.appendChild(b);
+    }
+    const wares = $('#dlg-wares');
+    wares.hidden = !showWares;
+    if (!showWares) return;
+    const mods = [];
+    if (P.flags.has('discount')) mods.push('ansatterabatt');
+    if (D.barter === 'good') mods.push('Köpslå: 20% avslag');
+    if (D.barter === 'great') mods.push('Köpslå: 40% avslag');
+    if (D.barter === 'bad') mods.push('Köpslå: 25% dyrere');
+    wares.innerHTML = `<div class="purse">Du har <b>${P.silver}</b> silver${mods.length ? ` <span>(${mods.join(', ')})</span>` : ''}</div>`;
+    for (const s of D.shopStock) {
+      if (s.sold) continue;
+      if (s.id === 'repair' && !Object.values(P.equip).some(it => it?.broken)) continue;
+      if (s.id === 'picks' && P.kit.has('dyrkar')) continue;
+      const price = this.priceOf(s);
+      const row = document.createElement('div');
+      row.className = 'ware';
+      const nameCol = s.item ? RARITY[s.item.rarity].color : 'var(--parch)';
+      const desc = s.item ? s.item.lines.join(', ') : s.desc;
+      row.innerHTML = `<div class="txt"><div class="nm" style="color:${nameCol}">${s.name}</div><div class="ds">${desc}</div></div><button class="btn small" ${P.silver < price ? 'disabled' : ''}>${price ? price + ' silver' : 'Gratis'}</button>`;
+      row.querySelector('button').onclick = () => this.buy(s, price);
+      wares.appendChild(row);
+    }
+  }
+
+  // Köpslå: ett slag per besøk
+  startBarter() {
+    const P = G.player;
+    const D = G.dungeon;
+    if (D.barter) { this.dadSay('Se deg om. Ikke ta på noe du ikke skal kjøpe.'); this.renderShop(true); return; }
+    P.rollPush('Köpslå', { important: true, label: 'Köpslå', noArmed: false }, r => {
+      if (r.demon) { D.barter = 'bad'; this.dadSay('Prute? Med meg? Nå ble alt litt dyrere.'); }
+      else if (r.drake) { D.barter = 'great'; this.dadSay('Du er verre enn sjefen. Greit, greit. Halv pris nesten.'); }
+      else if (r.success) { D.barter = 'good'; this.dadSay('Hmf. Du får en rabatt. Ikke si det til noen.'); }
+      else { D.barter = 'none'; this.dadSay('Prisene står på lappene. De står der av en grunn.'); }
+      G.ui.logRoll(r, 'Köpslå hos butikkbetjenten.');
+      this.renderShop(true);
+    });
+  }
+
+  askAdvance() {
+    const P = G.player;
+    const D = G.dungeon;
+    D.advance = true;
+    if (P.curse.frog) { this.dadSay('Du åpner munnen, og en frosk hopper ut. Han ser lenge på den. Svaret er nei.'); this.renderShop(false); return; }
+    P.rollPush('Övertala', { important: true, label: 'Övertala' }, r => {
+      if (r.success) {
+        const n = rollDice('D6') * (r.drake ? 4 : 2);
+        P.silver += n;
+        this.dadSay(P.isNebb ? `Her. ${n} silver. Det er av lønna mi, så ikke bruk alt på brød.` : `Et forskudd. ${n} silver. Det trekkes fra betalingen. Hvis det blir noen betaling.`);
+        G.audio.coin();
+      } else this.dadSay(P.isNebb ? 'Forskudd? Jeg har ikke fått lønn siden vårsolverv.' : 'Forskudd? Du har ikke funnet noe ennå.');
+      G.ui.logRoll(r, 'Övertala butikkbetjenten.');
+      this.renderShop(false);
+    });
+  }
+
+  buy(s, price) {
+    const P = G.player;
+    if (P.silver < price) return;
+    if (s.id === 'potion' && P.potions >= 4) { this.dadSay('Du har ikke plass til flere. Drikk opp de du har først.'); return; }
+    P.silver -= price;
+    if (price) G.audio.coin();
+    if (s.id === 'bread') { const got = P.heal(3); this.dadSay(got ? 'Tygg ordentlig.' : 'Du er jo mett. Men takk for pengene.'); }
+    else if (s.id === 'potion') { P.potions++; this.dadSay('Ikke drikk den på tom mage.'); }
+    else if (s.id === 'stone') { P.metaMods.dmg = (P.metaMods.dmg || 0) + 1; P.recalc(); s.sold = true; this.dadSay('Brynet var bestefars. Ikke si det til sjefen.'); }
+    else if (s.id === 'picks') { P.kit.add('dyrkar'); s.sold = true; this.dadSay('Til hva? Nei. Ikke svar.'); }
+    else if (s.id === 'repair') {
+      for (const it of Object.values(P.equip)) if (it?.broken) { it.broken = false; refinalize(it); }
+      P.recalc();
+      this.dadSay('Sånn. Som nytt. Nesten.');
+    } else if (s.id === 'rest') {
+      // lång vila: et skift i trygghet
+      P.kp = P.maxKP;
+      P.vp = P.maxVP;
+      P.clearConds();
+      P.floor.roundRest = false;
+      P.floor.stretchRest = false;
+      P.floor.memento = false;
+      s.sold = true;
+      G.fx.burst('heal', P.pos, 30);
+      G.audio.heal();
+      this.dadSay('Sov du. Jeg passer butikken. Det er jo det jeg gjør.');
+      G.ui.log('Lång vila: alle KP, VP og tillstånd er tilbake.');
+    } else if (s.item) {
+      G.world.equipItem(s.item);
+      s.sold = true;
+      this.dadSay('Den der passer deg. Nesten.');
+    }
+    this.renderShop(true);
+  }
+
+  closeShop() {
+    if (G.state !== 'dialog') return;
+    if (G.talk?.npc) { G.talk.close(); return; }
+    const tl = G.dungeon?.life;
+    if (tl?.talkingNansen) { tl.talkingNansen.talking = false; tl.talkingNansen = null; }
+    G.ui.hideScreens();
+    G.state = 'play';
+    G.ui.buildBar();
+  }
+
+  // --- pause og rollformulär ---------------------------------------------
+
+  pause() {
+    if (G.state !== 'play') return;
+    G.state = 'pause';
+    const P = G.player;
+    $('#btn-rest-round').disabled = !!P.floor?.roundRest;
+    $('#btn-rest-stretch').disabled = !!P.floor?.stretchRest;
+    const qs = Object.entries(G.run.quests || {}).filter(([, q]) => q.state === 'active' || q.state === 'done');
+    $('#pause-quests').innerHTML = qs.length ? '<h3>Oppdrag</h3>' + qs.map(([id, q]) => `<div class="qrow ${q.state}">${q.state === 'done' ? 'Fullført: ' : ''}${QUEST_TITLES[id] || id}</div>`).join('') : '';
+    G.ui.show('pause');
+  }
+  openSheet() {
+    if (G.state !== 'play' && G.state !== 'pause') return;
+    G.state = 'sheet';
+    G.ui.renderSheet();
+    G.ui.show('sheet');
+  }
+  resume() {
+    document.activeElement?.blur?.();
+    if (G.state === 'pause' || G.state === 'sheet' || G.state === 'dialog') {
+      G.ui.hideScreens();
+      G.state = 'play';
+    }
+  }
+
+  // --- løkke ---------------------------------------------------------------
+
+  updateAim() {
+    const inp = G.input;
+    const ndc = tmp.set((inp.mouse.x / innerWidth) * 2 - 1, -(inp.mouse.y / innerHeight) * 2 + 1, 0);
+    this.raycaster.setFromCamera(ndc, G.camera);
+    const hit = this.raycaster.ray.intersectPlane(this.ground, tmp2);
+    if (hit) G.aim.copy(hit);
+  }
+
+  loop(now) {
+    requestAnimationFrame(t => this.loop(t));
+    let dt = Math.max(0, Math.min(0.05, (now - this.last) / 1000));
+    this.last = now;
+    const inp = G.input;
+    const P = G.player;
+    const inTitle = G.state === 'title' || G.state === 'splash';
+    inp.allowNav = inTitle || G.state === 'dialog';
+    // pressa slag: egne taster, og tiden går sakte
+    if (this.push) this.pushKeys(inp, dt);
+    const typing = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName);
+    if (G.state === 'title') this.titleKeys(inp);
+    else if (inp.wasPressed('Escape')) {
+      if (G.state === 'play') this.pause();
+      else if (G.state === 'dialog') this.closeShop();
+      else this.resume();
+    }
+    if (inp.wasPressed('KeyM') && !inTitle && !typing) G.audio.setMuted(!G.audio.muted);
+    if (G.state === 'play') {
+      if (inp.wasPressed('KeyC')) this.openSheet();
+      if (inp.wasPressed('Tab')) G.ui.toggleBigMap();
+    } else if (G.state === 'sheet' && inp.wasPressed('KeyC')) this.resume();
+
+    if (inTitle) {
+      G.time += dt;
+      if (this.title.leaving) this.title.leave = Math.min(1, this.title.leave + dt / 0.75);
+      this.title.update(dt, G.camera);
+      this.renderPass.scene = this.title.scene;
+      G.post.tick(dt, G.time);
+      G.audio.update(dt);
+      G.composer.render();
+      inp.endFrame();
+      return;
+    }
+    this.renderPass.scene = G.scene;
+
+    if (G.state === 'play') {
+      let gdt = dt;
+      if (this.push) gdt *= 0.12;
+      if (G.hitStop > 0) { G.hitStop -= dt; gdt = dt * 0.06; }
+      if (G.slowmo > 0) { G.slowmo -= dt; gdt *= 0.3; }
+      G.time += gdt;
+      G.run.clock += gdt / 120;
+      this.updateAim();
+      if (inp.wasPressed('KeyE')) G.world.interact();
+      this.flowTimer -= gdt;
+      if (this.flowTimer <= 0) { this.flowTimer = 0.25; G.dungeon.computeFlow(P.pos.x, P.pos.z); }
+      if (!this.push) P.update(gdt, inp);
+      else P.animate(gdt, 0);
+      for (let i = G.enemies.length - 1; i >= 0; i--) {
+        if (!G.enemies[i].update(gdt)) { G.enemies[i].dispose(); G.enemies.splice(i, 1); }
+      }
+      G.companion?.update(gdt);
+      if (G.dungeon.isTown) G.dungeon.update(gdt, P, this.townLights(gdt));
+      G.world.update(gdt, G.camera);
+      G.fx.update(gdt, G.camera);
+      G.ui.update(dt);
+      this.musicTimer = (this.musicTimer || 0) - dt;
+      if (this.musicTimer <= 0) {
+        this.musicTimer = 0.3;
+        let n = 0;
+        for (const e of G.enemies) if (!e.dead && e.alerted && !e.def.boss && Math.abs(e.pos.x - P.pos.x) + Math.abs(e.pos.z - P.pos.z) < 22) n++;
+        G.audio.music?.setIntensity(Math.min(1, n * 0.34));
+      }
+    } else {
+      G.time += dt;
+      if (G.state === 'deathroll') {
+        P.animate(dt, 0);
+        for (const e of G.enemies) e.animate(dt * 0.3);
+      }
+      if (G.dungeon?.isTown && (G.state === 'dialog' || G.state === 'transition')) G.dungeon.update(dt, P, this.townLights(dt));
+      G.world.update(0, G.camera);
+      G.fx.update(G.state === 'deathroll' ? dt * 0.2 : dt, G.camera);
+    }
+    G.ambient.update(dt, P.pos, G.time);
+    G.post.tick(dt, G.time);
+    G.audio.update(dt);
+    this.updateCamera(dt);
+    this.updateLights(dt);
+    if (G.dungeon?.waterMat) {
+      G.dungeon.waterMat.uniforms.uTime.value = G.time;
+      G.dungeon.waterMat.uniforms.uPlayer.value.copy(P.pos);
+    }
+    G.composer.render();
+    inp.endFrame();
+  }
+
+  titleKeys(inp) {
+    if (this.wiping || performance.now() < (this.titleReadyAt || 0)) return;
+    const typing = ['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement?.tagName);
+    if (this.view === 'tv-menu') {
+      if (inp.wasPressed('ArrowDown') || inp.wasPressed('KeyS')) this.selectMenu((this.menuSel ?? 0) + 1);
+      if (inp.wasPressed('ArrowUp') || inp.wasPressed('KeyW')) this.selectMenu((this.menuSel ?? 0) - 1);
+      const items = this.menuItems();
+      if ((inp.wasPressed('Enter') || inp.wasPressed('Space')) && !items.includes(document.activeElement)) {
+        this.menuAction(items[this.menuSel ?? 0].dataset.act);
+      }
+    } else if (inp.wasPressed('Escape') || (inp.wasPressed('Backspace') && !typing)) {
+      if (this.view === 'tv-create') { this.refreshPick(); this.showView('tv-pick'); G.audio.menuTick?.(57); }
+      else this.backToMenu();
+    }
+  }
+
+  updateCamera(dt) {
+    const cam = G.camera;
+    const P = G.player;
+    const lead = tmp2.set(0, 0, 0);
+    if (G.state === 'play' && !G.input.usingTouch) {
+      lead.set(G.aim.x - P.pos.x, 0, G.aim.z - P.pos.z);
+      const l = lead.length();
+      if (l > 6) lead.multiplyScalar(6 / l);
+      lead.multiplyScalar(0.18);
+    }
+    this.camTarget.lerp(tmp.set(P.pos.x + lead.x, 0.6, P.pos.z + lead.z), 1 - Math.exp(-7 * dt));
+    const sh = G.fx.shake * G.fx.shake * (G.shakeMul ?? 1);
+    const off = CAM_OFF;
+    cam.position.set(this.camTarget.x + off.x, this.camTarget.y + off.y, this.camTarget.z + off.z);
+    if (sh > 0.001) {
+      const t = G.time * 60;
+      cam.position.x += (Math.sin(t * 1.3) + Math.sin(t * 2.7)) * sh * 0.35;
+      cam.position.y += Math.sin(t * 1.9) * sh * 0.3;
+      cam.position.z += (Math.cos(t * 1.7) + Math.sin(t * 3.1)) * sh * 0.35;
+    }
+    cam.lookAt(this.camTarget);
+  }
+
+  updateLights(dt = 0.016) {
+    const P = G.player;
+    if (this.inTown) {
+      const cam = G.camera;
+      cam.updateMatrixWorld();
+      tmp.set(P.pos.x, 1.0, P.pos.z).project(cam);
+      const pr = G.renderer.getPixelRatio();
+      cutawayUniforms.uCutPos.value.set((tmp.x * 0.5 + 0.5) * innerWidth * pr, (tmp.y * 0.5 + 0.5) * innerHeight * pr);
+      tmp.set(P.pos.x, 1.0, P.pos.z).applyMatrix4(cam.matrixWorldInverse);
+      cutawayUniforms.uCutDepth.value = -tmp.z;
+      cutawayUniforms.uCutR.value = innerHeight * pr * 0.17;
+      return;
+    }
+    const want = P.fx?.barsark > 0 || P.armed === 'vresig' ? 1 : 0;
+    this.rageMix = (this.rageMix || 0) + (want - (this.rageMix || 0)) * Math.min(1, dt * 4);
+    const light = P.fx?.light ? 1.6 : 1;
+    this.lantern.color.setRGB(1, 0.69 - 0.4 * this.rageMix, 0.44 - 0.34 * this.rageMix);
+    this.lantern.intensity = (9 + this.rageMix * 10) * light;
+    this.lantern.distance = 8 * (P.fx?.light ? 1.5 : 1);
+    this.key.position.set(P.pos.x + 1.5, 11, P.pos.z + 1.5);
+    this.key.target.position.set(P.pos.x, 0, P.pos.z);
+    this.key.target.updateMatrixWorld();
+    this.lantern.position.set(P.pos.x + 1.2, 2.3, P.pos.z + 1.2);
+    this.fill.position.set(P.pos.x + 10, 14, P.pos.z + 10);
+    this.fill.target.position.copy(P.pos);
+    this.fill.target.updateMatrixWorld();
+    const cam = G.camera;
+    cam.updateMatrixWorld();
+    tmp.set(P.pos.x, 1.0, P.pos.z).project(cam);
+    const pr = G.renderer.getPixelRatio();
+    cutawayUniforms.uCutPos.value.set((tmp.x * 0.5 + 0.5) * innerWidth * pr, (tmp.y * 0.5 + 0.5) * innerHeight * pr);
+    tmp.set(P.pos.x, 1.0, P.pos.z).applyMatrix4(cam.matrixWorldInverse);
+    cutawayUniforms.uCutDepth.value = -tmp.z;
+    cutawayUniforms.uCutR.value = innerHeight * pr * 0.16;
+  }
+}
+
+void SKILLS; void COND_BY_ID; void rollDice;
+
+new Game().init();
