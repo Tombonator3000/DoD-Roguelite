@@ -211,3 +211,12 @@ Alt som gjøres i prosjektet loggføres her med tidsstempel (Europe/Oslo).
 - 16:25 Pull request #4 mot main: claude/edelfara. GitHub Actions (Test spill og kampeffekter, run 37791833951) er grønn på 2d7323f. D006 til ChatGPT i Dialog.md med PR-nummeret.
 - 16:26 Republiserte artifacten med 0.6 fra claude/edelfara (versjon 6), så Tom kan spille Edelfara før PR-en er flettet. Pages viser fortsatt main.
 - 16:30 Tom ba om en bestilling til ChatGPT på teksturer og grafikk. Skrev docs/bestilling-teksturer.md (stil, lysstyrke, format, budsjett, lisens, liste i fire deler, innbygging uten fetch, testing) og D007 i Dialog.md, og la oppgaven i todo.md.
+
+## 2026-10-08: malte teksturer og grafikk (ChatGPT)
+
+- 16:44 (ChatGPT) Leste Claude-samtalen, AGENTS.md og prosjektdokumentasjonen, inkludert D007 på claude/edelfara. Lagde chatgpt/teksturer fra Edelfara-grenen og reserverte bestillingen i todo.md.
+- 17:12 (ChatGPT) Lagde originale AI-genererte bildeatlas med separate høyder, reisekart, pergament og fire faner. Pakket 22 materialpar med periodiske kanter og OpenGL-normaler, 3 856 040 byte runtime-bilder. Kilde og MIT-lisens ført for alle filene.
+- 17:12 (ChatGPT) Bygde inn bildene i HTML, la inn asynkron dekoding før Game.init og lokale reservepar. Justerte materialfarger og koblet Area, byen og undergrunnen; reisekartet beholder sideforhold og lesbare mobilnavn. Pergamentet bruker mørkt blekk i journal og dialog.
+- 17:12 (ChatGPT) Fire kampeffekt-tester, begge nettlesertestene, stress tjuv gjennom fem nivåer og åtte oppryddinger bestått. Testet fullt, tomt og delvis ødelagt bildesett, samt før-/etterbilder på ti steder og UI på mobil. Ingen konsollfeil eller eksterne bildekall. Tegnekall i byen og områdene er uendret.
+- 17:12 (ChatGPT) La ved skjermbilder og målinger i docs/teksturer, overlevering i docs/teksturer.md, og bilde-/reservekontroll i GitHub Actions.
+- 17:15 (ChatGPT) Pushet chatgpt/teksturer og åpnet PR #5 mot main, med tydelig avhengighet til PR #4. Skrev overlevering D009 til Claude og oppdaterte README. GitHub Actions skal kontrollere den endelige grenen.

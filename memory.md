@@ -172,3 +172,14 @@ Detaljene står i docs/regler/IMPLEMENTERING.md. Det viktigste:
 ## Dialog mellom agentene
 
 - `Dialog.md` i repoets rot brukes til beskjeder, spørsmål og overleveringer mellom Claude, ChatGPT/Codex og andre agenter, etter Toms bestilling 2026-10-08. Les nye innlegg ved øktstart, også på relevante arbeidsgrener/PR-er. Innlegg har meldings-ID, norsk tidspunkt, avsender/mottaker, emne, status og gren/PR; svar legges nederst med henvisning til ID-en. Beslutninger, arbeidsfordeling og utført arbeid føres også i memory.md, todo.md og log.md.
+
+## Malte teksturer og grafikk (ChatGPT, D007)
+
+- `src/textures.js` dekoder `window.TEX` før Game.init. `paintedTexture(navn)` returnerer `{ map, normalMap }` bare når hele paret finnes; ellers bruker fabrikkene gammel reserve. Delte teksturer caches, materialer RepeatWrapping/anisotropy 4, fargekart sRGB og normalkart lineære. Fanene bruker clamp.
+- `build.mjs` bygger bare JPG/PNG direkte under `assets/tex/` inn som data-URI-er. Ingen bilde-fetch. Budsjett 4 000 000 byte, artifact 16 MiB. `raw/` er arbeidsdata og bygges ikke inn. Settet tar 3 856 040 byte; HTML omtrent 6,81 MB.
+- 22 par, 512 x 512: gress, skogbunn, jord, brostein, heller, planker, klippe, teltduk, bindingsverk, steinvegg, bymur, takstein, spon, halm, skifer, kobber, kloakk_gulv/vegg, dverg_gulv/vegg og rev_gulv/vegg. Egne høyder i raw/*_h.png, OpenGL-normaler fra periodiske sentraldifferanser. Normal-PNG er paletter med 24 retninger, uten dithering; ikke sRGB.
+- `tools/prepare_textures.py` krever Pillow og numpy bare ved bildeendring. Farge-JPEG kvalitet 76, kart 80; kantkorreksjon og snittlysstyrke etter D007. Bindingsverket settes sammen med presise UV-felt fra timber(), med smale skjøter ved sokkel/overbånd. KILDER.md dokumenterer egen AI-generert kunst og MIT-lisens.
+- Nye materialfelt i townTextures: forest, rock, canvas. Nøytral materialfarge for malte kart utenfor byen og i Area; reservekart får gamle farger. CanvasTexture brukes til å skille reserve fra malte bilder.
+- edelfara_kart_c er 1600 x 1152, bare canvas. NODES/EDGES og skjulte steder står for alle navn og ruter. Tegningen røper ikke den skjulte leiren. Reisekartets CSS-bredde begrenser høyden, draw() beholder forholdet 0,72. Ingen nye reiser eller regelendringer.
+- pergament_c brukes via --pergament og body.malt-pergament for journal og dialog; mørkt blekk, også på tjenesteknapper. Faner fane_edelfara/eke/ridderskors/lekh er 256 x 512 PNG med alfa.
+- `tools/test/texture-browser.mjs` tar bilder og måler én composer-render ved likt kamera. `texture-fallback.mjs` tester komplett/manglende/ødelagt sett og dekoding, fargerom og wrapping. CI kjører begge, Pages kjører fallback. Alle lokale spilltester, fem nivåer og åtte oppryddinger bestått uten feil. Visuell gjennomgang og målinger i docs/teksturer.md. Ingen nye tegnekall i byen eller områdene. Fysisk mobil og uvær er fortsatt åpne spilltester.

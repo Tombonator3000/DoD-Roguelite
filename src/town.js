@@ -133,7 +133,7 @@ function materials() {
   MAT.glassIn = new THREE.MeshStandardMaterial({ color: 0x2a3444, roughness: 0.3, metalness: 0.2, emissive: 0x3a5070, emissiveIntensity: 0.4 });
   MAT.lampGlass = new THREE.MeshStandardMaterial({ color: 0x302010, emissive: 0xffb860, emissiveIntensity: 0.2 });
   MAT.coal = new THREE.MeshStandardMaterial({ color: 0x1a0a04, emissive: 0xff5a10, emissiveIntensity: 1.6, roughness: 0.9 });
-  MAT.outside = new THREE.MeshStandardMaterial({ map: TX.grass.map, roughness: 1, color: 0x9aa884 });
+  MAT.outside = new THREE.MeshStandardMaterial({ map: TX.grass.map, normalMap: TX.grass.normalMap, roughness: 1, color: TX.grass.map.isCanvasTexture ? 0x9aa884 : 0xf2f2e8 });
   MAT.field = new THREE.MeshStandardMaterial({ map: TX.dirt.map, roughness: 1, color: 0xa08a6a });
   MAT.leaf = stdMat({ roughness: 0.85, flatShading: true });
   MAT.bark = stdMat({ color: 0x4a3424, roughness: 0.95 });

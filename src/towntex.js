@@ -2,6 +2,7 @@
 // kobber, brostein, jord, gress og plankegulv. Lages én gang og gjenbrukes.
 import * as THREE from 'three';
 import { stoneTextures, hash2, fbm, smooth } from './assets.js';
+import { paintedTexture } from './textures.js';
 
 const cache = {};
 
@@ -326,16 +327,25 @@ export function signTexture(text, sub) {
 
 export function townTextures() {
   if (cache.ready) return cache;
-  cache.timber = timber();
-  cache.stone = stoneWall();
-  cache.city = cityWall();
-  cache.roof = { tile: roofTile(), shingle: roofShingle(), thatch: roofThatch(), slate: roofSlate(), copper: roofCopper() };
+  cache.timber = paintedTexture('bindingsverk') || timber();
+  cache.stone = paintedTexture('steinvegg') || stoneWall();
+  cache.city = paintedTexture('bymur') || cityWall();
+  cache.roof = {
+    tile: paintedTexture('takstein') || roofTile(),
+    shingle: paintedTexture('spon') || roofShingle(),
+    thatch: paintedTexture('halm') || roofThatch(),
+    slate: paintedTexture('skifer') || roofSlate(),
+    copper: paintedTexture('kobber') || roofCopper(),
+  };
   cache.roof.cone = cache.roof.slate;
-  cache.cobble = cobble();
-  cache.flag = flag();
-  cache.dirt = dirt();
-  cache.grass = grass();
-  cache.planks = planks();
+  cache.cobble = paintedTexture('brostein') || cobble();
+  cache.flag = paintedTexture('heller') || flag();
+  cache.dirt = paintedTexture('jord') || dirt();
+  cache.grass = paintedTexture('gress') || grass();
+  cache.planks = paintedTexture('planker') || planks();
+  cache.forest = paintedTexture('skogbunn') || cache.grass;
+  cache.rock = paintedTexture('klippe') || cache.stone;
+  cache.canvas = paintedTexture('teltduk');
   cache.tuft = tuft();
   cache.bannerTorn = banner('torn');
   cache.bannerSol = banner('sol');

@@ -32,6 +32,8 @@ jobs:
         run: node --test tools/test/combatfx.test.mjs
       - name: Test det ferdige spillet fra Pages-undermappa
         run: node tools/test/combatfx-browser.mjs dist/pages-test
+      - name: Test bildeinnlasting og prosedyriske reserver
+        run: node tools/test/texture-fallback.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -9,6 +9,7 @@ import { WALL, FLOOR, WATER, HOUSE, FENCE, GR, TW, TH } from './townmap.js';
 import { hash2, buildChest, buildBarrel, buildCrate } from './assets.js';
 import { townTextures, signTexture } from './towntex.js';
 import { addWetness, addSway } from './wet.js';
+import { imageTexture } from './textures.js';
 import { AreaLife } from './arealife.js';
 import { buildAreaGrid, K_FOREST, K_DEEP, K_HILL, K_WALL } from './areagrid.js';
 
@@ -33,6 +34,8 @@ function canvasTex(key, w, h, draw) {
 // Fanene er spillets egne: boka sier ikke hva husene fører i skjoldet.
 // Natthök (greven): en svart nattfalk på sølv. Eke: en grønn eik på gull. Ridderskors: et rødt kors på hvitt.
 export function heraldry(kind) {
+  const painted = imageTexture('fane_' + kind, false);
+  if (painted) return painted;
   return canvasTex('her_' + kind, 128, 256, (g, W, Hh) => {
     const bg = { edelfara: '#d8dce4', eke: '#d8b048', ridderskors: '#ece6d8', lekh: '#141014' }[kind] || '#888';
     g.fillStyle = bg;
@@ -150,12 +153,11 @@ export class Area extends Town {
     this.M = M;
     if (!M.forestFloor) {
       const TX = townTextures();
-      // Gressteksturen er mørk i seg selv (bakken i byen får lys fra vertex-fargene),
-      // så fargen her må ligge nær hvit, ellers blir kullen nesten svart.
-      M.forestFloor = new THREE.MeshStandardMaterial({ map: TX.grass.map, roughness: 1, color: 0x9aa682 });
-      M.hill = new THREE.MeshStandardMaterial({ map: TX.grass.map, normalMap: TX.grass.normalMap, roughness: 1, color: 0xdce4c8 });
-      M.rock = new THREE.MeshStandardMaterial({ map: TX.stone.map, normalMap: TX.stone.normalMap, roughness: 0.95, color: 0x8a867c, flatShading: true });
-      M.tent = new THREE.MeshStandardMaterial({ roughness: 0.95, vertexColors: true, side: THREE.DoubleSide });
+      // De malte fargekartene trenger en nøytral materialfarge.
+      M.forestFloor = new THREE.MeshStandardMaterial({ map: TX.forest.map, normalMap: TX.forest.normalMap, roughness: 1, color: TX.forest.map.isCanvasTexture ? 0x9aa682 : 0xf2f0e8 });
+      M.hill = new THREE.MeshStandardMaterial({ map: TX.grass.map, normalMap: TX.grass.normalMap, roughness: 1, color: TX.grass.map.isCanvasTexture ? 0xdce4c8 : 0xf2f2e8 });
+      M.rock = new THREE.MeshStandardMaterial({ map: TX.rock.map, normalMap: TX.rock.normalMap, roughness: 0.95, color: TX.rock.map.isCanvasTexture ? 0x8a867c : 0xeae6dd, flatShading: true });
+      M.tent = new THREE.MeshStandardMaterial({ ...TX.canvas, roughness: 0.95, vertexColors: true, side: THREE.DoubleSide });
       M.spruce = new THREE.MeshStandardMaterial({ roughness: 0.9, flatShading: true });
       addWetness(M.forestFloor, { puddles: false, k: 0.45 });
       addWetness(M.hill, { puddles: false, k: 0.45 });

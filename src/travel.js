@@ -1,8 +1,9 @@
 // Reisekartet over Edelfara. Åpnes fra Nordporten i Fristaden og fra veiene ut av hvert område.
-// Kartet er tegnet etter oversiktskartet i «Triangeldrama i Edelfara» (s. 15), forenklet.
+// Steder og reisetider følger «Triangeldrama i Edelfara». Bakgrunnsbildet er laget for spillet.
 import { G } from './state.js';
 import { NODES, EDGES } from './edelmap.js';
 import { fl, started } from './ivan.js';
+import { textureImage } from './textures.js';
 
 const $ = s => document.querySelector(s);
 const EDGE_NAME = { skog: 'gjennom Torilskogen', vei: 'langs landeveien', sti: 'på en sti gjennom skogen' };
@@ -166,10 +167,13 @@ export class Travel {
   draw() {
     const cv = this.cv;
     const box = cv.parentElement.getBoundingClientRect();
-    const W = Math.max(320, Math.floor(box.width)), Hh = Math.max(240, Math.floor(Math.min(box.width * 0.72, innerHeight * 0.62)));
+    const W = Math.max(1, Math.floor(box.width)), Hh = Math.max(1, Math.floor(W * 0.72));
     if (cv.width !== W || cv.height !== Hh) { cv.width = W; cv.height = Hh; }
     const g = this.ctx;
-    // pergament
+    const painted = textureImage('edelfara_kart_c');
+    if (painted) g.drawImage(painted, 0, 0, W, Hh);
+    else {
+    // Prosedyrisk reserve når det malte kartet mangler.
     const bg = g.createLinearGradient(0, 0, W, Hh);
     bg.addColorStop(0, '#e6d6b0'); bg.addColorStop(1, '#cdb88a');
     g.fillStyle = bg;
@@ -200,6 +204,7 @@ export class Travel {
     g.stroke();
     g.fillStyle = 'rgba(60,110,150,0.55)';
     g.beginPath(); g.ellipse(0.71 * W, 0.47 * Hh, 0.03 * W, 0.02 * Hh, -0.4, 0, Math.PI * 2); g.fill();
+    }
     // veier
     for (const [a, b, h, kind] of this.edges()) {
       const [ax, ay] = this.pos(a), [bx, by] = this.pos(b);
@@ -209,8 +214,10 @@ export class Travel {
       g.beginPath(); g.moveTo(ax, ay); g.lineTo(bx, by); g.stroke();
       g.setLineDash([]);
       g.fillStyle = 'rgba(60,40,20,0.85)';
-      g.font = `italic ${Math.round(W / 72)}px Georgia, serif`;
+      g.font = `italic ${Math.max(9, Math.round(W / 72))}px Georgia, serif`;
       g.textAlign = 'center';
+      g.lineWidth = 2; g.strokeStyle = '#efe2c2';
+      g.strokeText(h < 1 ? `${Math.round(h * 60)} min` : `${h} t`, (ax + bx) / 2 + 8, (ay + by) / 2 - 6);
       g.fillText(h < 1 ? `${Math.round(h * 60)} min` : `${h} t`, (ax + bx) / 2 + 8, (ay + by) / 2 - 6);
     }
     // valgt rute
@@ -233,13 +240,17 @@ export class Travel {
       g.beginPath(); g.arc(x, y, here || sel ? 9 : 7, 0, Math.PI * 2); g.fill();
       g.strokeStyle = '#e6d6b0'; g.lineWidth = 2; g.stroke();
       g.fillStyle = '#2a1a10';
-      g.font = `bold ${Math.round(W / 50)}px Georgia, serif`;
+      g.font = `bold ${Math.max(11, Math.round(W / 50))}px Georgia, serif`;
       g.textAlign = x > W * 0.8 ? 'right' : 'left';
       const ox = x > W * 0.8 ? -14 : 14;
+      // Lys blekk-kant gjør navnene lesbare over skogen.
+      g.lineJoin = 'round'; g.lineWidth = 3; g.strokeStyle = '#efe2c2';
+      g.strokeText(n.name, x + ox, y + 4);
       g.fillText(n.name, x + ox, y + 4);
-      g.font = `italic ${Math.round(W / 70)}px Georgia, serif`;
+      g.font = `italic ${Math.max(9, Math.round(W / 70))}px Georgia, serif`;
       g.fillStyle = 'rgba(42,26,16,0.75)';
-      g.fillText(here ? 'du er her' : n.sub, x + ox, y + 4 + Math.round(W / 52));
+      g.strokeText(here ? 'du er her' : n.sub, x + ox, y + 4 + Math.max(12, Math.round(W / 52)));
+      g.fillText(here ? 'du er her' : n.sub, x + ox, y + 4 + Math.max(12, Math.round(W / 52)));
     }
     // markøren under reisen
     if (this.anim) {
@@ -255,9 +266,12 @@ export class Travel {
     // tittel og rose
     g.fillStyle = 'rgba(42,26,16,0.85)';
     g.textAlign = 'left';
-    g.font = `bold ${Math.round(W / 34)}px Georgia, serif`;
+    g.font = `bold ${Math.max(16, Math.round(W / 34))}px Georgia, serif`;
+    g.lineWidth = 2; g.strokeStyle = '#efe2c2';
+    g.strokeText('Grevskapet Edelfara', 18, Hh - 22);
     g.fillText('Grevskapet Edelfara', 18, Hh - 22);
-    g.font = `italic ${Math.round(W / 64)}px Georgia, serif`;
+    g.font = `italic ${Math.max(10, Math.round(W / 64))}px Georgia, serif`;
+    g.strokeText('hertigdömet Pharynx, Zorakin', 20, Hh - 6);
     g.fillText('hertigdömet Pharynx, Zorakin', 20, Hh - 6);
   }
 }
