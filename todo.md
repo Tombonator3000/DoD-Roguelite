@@ -8,6 +8,8 @@ Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når p
 
 - Claude (`main`, versjon 0.5): inventar med sekk og bärförmåga, 3D-ikoner, lagre/laste-meny med lagringsplasser, shadere (ild, vann, vind, våte flater), vær og flere partikler, tilt-shift og fargegradering. Rører mest inventory.js, itemmodels.js, icons.js, save.js, world.js, player.js, main.js, ui.js, page.html, fx.js, post.js, town.js.
 
+- ChatGPT (`chatgpt/kampeffekter`): eget kampeffektlag i combatfx.js og combatfx-pool.js, tester og overlevering. main.js får bare ny FX-import. Claude beholder fx.js, post.js og grafikkarbeidet for vær, vann og ild.
+
 ## Nå
 
 - [ ] Sjekke de uverifiserte verdiene (`uv: true` i src/dod.js) mot grunnboka: WP-kostnader og krav for hjälteförmågor, svenske navn, tabellen for svåra skador, noen våpen. Lista står i memory.md.
