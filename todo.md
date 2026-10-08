@@ -20,6 +20,7 @@ Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når p
 - [ ] Rida: hester i Sortmund og Akershus som korter ned reisetida på kartet, med et Rida-slag.
 - [ ] Pharynx som eget område med hertigens vaktkaptein, i stedet for bare en rapport.
 - [ ] Resten av Ivanhoe-boksen (Medeltidsregler og Aidne) er ikke brukt. Se om noe passer, for eksempel turnering i Sortmund.
+- [ ] Håndlagde teksturer og grafikk (bakken, husene, kloakken, reisekartet, pergament, våpenskjold): bestilt hos ChatGPT i D007, se docs/bestilling-teksturer.md.
 - [ ] Spilltest grafikken på ekte maskin og mobil: er regnet for tett, tilt-shift for sterk, natta for mørk i uvær?
 - [ ] Mer grafikk: tåke som ligger lavt over elva om morgenen, snø om vinteren, lysstråler gjennom vinduene i flere hus, varmeflimmer over smia, skyggen av fuglene på bakken.
 
