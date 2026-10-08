@@ -6,7 +6,7 @@ Sortert etter hva som gir mest spill for minst jobb.
 
 Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når pull requesten er inne. Se AGENTS.md.
 
-- Claude (`claude/verdenskart`, PR #7): verdenskart over Aidne med reise, tåke, møter og proviant. Nye filer worldmap.js, world.js, worldview.js, areatemplates.js. Endrer main.js, travel.js, edelmap.js, arealife.js, inventory.js, townfolk.js, page.html, player.js.
+- Claude (`claude/verdenskart`, PR #7): verdenskart over Aidne og grafikkfiksene etter Weatherglass. Klar til gjennomgang. Nye filer worldmap.js, worldtravel.js, worldview.js, areatemplates.js, envlight.js, treegeo.js. Endrer main.js, travel.js, edelmap.js, arealife.js, inventory.js, invui.js, townfolk.js, townpeople.js, save.js, ui.js, area.js, town.js, page.html, player.js.
 
 ## Nå
 
@@ -15,6 +15,11 @@ Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når p
 - [x] DoD91-regler (4.0) med Expert og Gigant: sju grundegenskaper, FV per ferdighet, träffområden med egne KP og rustning, parering per SR, magi med PSY, yrker og raser fra Bok I, Skräcktabellen, stridsmoral, fummeltabeller, EP og hjältepoäng (0.5). Lagrede spill fra 2023-reglene kan ikke lastes.
 - [x] Ild i ett tegnekall, vann med refleksjoner og ringer, regn og lyn, våte flater og pytter, vind i gress og trær, løv, fugler, flaggermus, sporer, glør, damp, røkelse, tilt-shift og fargestemning (0.5)
 - [x] Edelfara utenfor Nordporten: reisekart med tid, sju områder (Ekeskogen, Sortmund, Ridderskors borg, Akershus, Akershus borg, Glimming, Lekhs leir) og hele eventyret Triangeldrama i Edelfara med tre mistenkte, ledetråder, villspor, frist på sju dager, allierte, Lekh på ulven og fire slutter i Pharynx (0.6)
+- [x] Verdenskart over Aidne og Drakdjupet i Fallout-stil (0.7): tåke, steder du kjenner eller finner, reise rute for rute, møter med Upptäcka fara og Smyga, Orientering, landsbyer, fire skjulte steder, proviant og sult, lagring på kartet. Se docs/verdenskart.md.
+- [ ] Spilltest verdenskartet: er møtene for mange eller for få? Er 23 timer fra Fristaden til Edelfara for langt? Blir sulten et mas eller en fin grunn til å handle?
+- [ ] Verdenskartet: flere landsbyer med egne folk og oppdrag (nå er alle landsbyer fra samme mal), Pendon og Ekeborg som egne byer, skip fra Fristaden og Ardesch.
+- [ ] Verdenskartet: Rida og hester som halverer tida, og at været på kartet gjør reisen tregere (Bok II s. 5: dårlig vær -25 %, elendig -50 %).
+- [ ] Packningen fra verdenskartet: å slippe en ting der legger den i området bak kartet, så den blir borte. Sperr slipp når kartet er oppe.
 - [ ] Spilltest Edelfara: holder sju dager, eller er det for romslig? Er leiren for hard alene og for lett med grevens soldater? Finner folk fram til Ulfmar og bevisene uten journalen?
 - [ ] Rida: hester i Sortmund og Akershus som korter ned reisetida på kartet, med et Rida-slag.
 - [ ] Pharynx som eget område med hertigens vaktkaptein, i stedet for bare en rapport.

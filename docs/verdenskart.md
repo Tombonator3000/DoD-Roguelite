@@ -1,4 +1,4 @@
-# Verdenskart i Fallout-stil for Ereb Altor (plan)
+# Verdenskart i Fallout-stil for Ereb Altor
 
 Claude, 2026-10-08. Tom spurte om et verdenskart som i Fallout 1 og 2: du klikker på kartet og reiser, det kan dukke opp tilfeldige møter, du kan finne steder selv, og noen byer er markert fra starten. På sikt skal Ereb Altor-verdenen og kartet bli større. Dette er en plan, ingen kode ennå.
 
@@ -232,11 +232,83 @@ Den lagres med resten av løpet.
 3. **Hest, karavaner og skip.** Hester i Fristaden og Sortmund (Rida), karavaner mot betaling og skipsreiser fra Fristaden.
 4. **Kopparhavet.** Et sjøkart med farvann og flere landkart.
 
-## Spørsmål til Tom
+## Spørsmål til Tom (besvart 8. oktober 21:21)
 
-1. Ærlig målestokk (Edelfara er en lang reise, men hest og skip hjelper) eller sammenpresset (alt innen noen dagers reise, som nå)?
-2. Hvor skal Ereno ligge: nord eller nordøst for Fristaden (de gamle bøkene) eller sør (2024-kartet)?
-3. Skal mat og proviant være med fra start, eller vente?
+1. Målestokk: **sammenpresset.** Én rute er omtrent én time på vei.
+2. Ereno: **2024-kartet**, sør for Fristaden.
+3. Mat og proviant: **fra start.**
+
+## Slik ble det (0.7)
+
+Koden ligger i src/worldmap.js (data), src/worldtravel.js (regler), src/worldview.js (skjermen) og src/areatemplates.js (møter, landsbyer og steder). main.js kobler det sammen.
+
+### Kartet
+
+- Kartet er 50 x 30 ruter, tegnet etter 2024-kartet over Aidne og Drakdjupet.
+- Terreng:
+
+  | Tegn | Terreng | Timer per rute | Møter |
+  | --- | --- | --- | --- |
+  | `.` | slette | 1,5 | uvanlig |
+  | `F` | skog | 2,5 | vanlig |
+  | `^` | fjell | 3,5 | vanlig |
+  | `~` | hav | stengt | |
+  | `o` | innsjø | stengt | |
+
+  En rute på vei eller sti tar 1 time. Diagonale steg tar 1,41 ganger så lang tid. Tallene er uv.
+- Veier: Kongeveien fra Fristaden via Ardesch, Tyndal, Galastan og Edelfara til Pendon, med sideveier og stier.
+- Regioner med fare 1 til 3: Zorakin, Torilskogen, Vorgabergen, Nidabergen, Yverne og Tolan, Goiana, Kardunien og Aidnebergen. Faren styrer hvor sterke fiendene er i møtene.
+- Tåke: land du ikke har sett, er blankt pergament. Du ser én rute rundt deg, og to fra fjellet. Landet rett rundt Fristaden er kjent fra start.
+- Steder:
+  - Kjent fra start: Fristaden, Karad Batur, Ereno og Edelfara. Pharynx blir kjent når oppdraget har begynt.
+  - Byer og landsbyer blir kjent når du ser dem, når du står i ruta, eller når noen forteller om dem (RYKTER, KONGEVEIEN hos Folkard).
+  - De skjulte stedene (gravhaugen, orchleiren, Svarta Tornet og vraket) finner du først når du står i ruta eller får høre om dem.
+
+### Reisen
+
+- Klikk på kartet eller på et sted i lista, så viser panelet tid og når du er fremme. Ruta finnes med A* i åtte retninger, og veien er litt billigere.
+- Du går én rute av gangen. Hver rute:
+  1. Klokka går.
+  2. Du ser deg om.
+  3. Sulten sjekkes.
+  4. Det kan komme et møte.
+- Orientering: når du går fra vei inn i skog eller fjell. Halv CL når himmelen ikke er klar. Mislykket koster 1 time, fummel 3.
+- Møter:
+  - Sjansen per rute følger Fallout-stigen, men lavere: ingen 0, sjelden 0,025, uvanlig 0,05, vanlig 0,085 og hyppig 0,14 (uv).
+  - Sjansen går ett trinn ned på vei og ett opp utenfor vei der faren er 2 eller mer. Den går også ett opp om natta, og er høyst sjelden ved byene.
+  - Fiender: Upptäcka fara (−3 om natta). Klarer du slaget, velger du mellom Gå nærmere, Smyg forbi (Smyga, +2 i skog, −3 på slette) og Gå rundt (1 time). Bommer du, er det bakhold.
+  - Folk og spesielle møter kan du gå bort til eller la være.
+- Slå leir: sov til klokka sju. Du får all PSY, og 1T3 KP hvis du har spist. Det kan komme et møte i løpet av natta.
+- Let etter mat: Överlevnad tar 1 time. Modifikasjon 0 i skog, −2 på slette, −4 på fjellet. Klarer du det, gir det én dagsranson, perfekt gir to.
+
+### Sult
+
+- Ett måltid per døgn. Spiser du ikke, spises proviant og deretter brød fra sekken av seg selv.
+- Mat teller som et måltid: et måltid på vertshuset, en pilegrim som deler, eller noe fra sekken (proviant, brød, mat som leger).
+- Sulten etter 24 timer: søvn gir ingen KP, og PSY kommer ikke tilbake av seg selv.
+- Utsultet etter 48 timer: 1 KP hvert 12. time, aldri under 1.
+- Du starter med 2 brød og 2 proviant. Proviant koster 15 sm på vertshusene, og jegere og bønder selger også.
+
+### Områdene
+
+- Møter, landsbyer og steder er områder fra mal på 46 x 46 fliser. Fra hvilken som helst kant går du ut på kartet igjen, men ikke mens noen jager deg.
+- Landsbyene har vertshus (rom, mat, proviant, rykter), handelsbod og en bonde eller vakt.
+- Stedene gir en gjenstand, silver og 1 hjältepoäng når de er ryddet.
+- `G.run.areaSpec` husker hvilket område det er, så et lagret spill kan bygge det på nytt. Lagrer du på kartet, åpnes kartet igjen når du laster (`onWorld` i lagringen).
+
+### Knytningen til resten av spillet
+
+- Nordporten går rett ut på kartet. Om natta er porten stengt også når du kommer utenfra, så da må du slå leir.
+- Edelfara-ruta åpner reisekartet over Edelfara. Den gamle Fristaden-noden heter nå Landeveien og tar 1 time. Bli her går tilbake til kartet.
+- Pharynx-ruta gir rapporten, og så rir du tilbake til Glimming.
+- Fra kartet kan du åpne pausen (Esc), rollformuläret (C) og packningen (I).
+
+### Til testing
+
+- `G.debugNoEnc = true` slår av møtene.
+- `G.worldview.select(x, y)` og `go()` reiser.
+- `G.worldview.encounter(def, x, y, time)` gir et møte med en gang.
+- `G.game.layoutFor(spec)` bygger et område fra mal uten å laste det.
 
 ## Kilder
 
