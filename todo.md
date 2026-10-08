@@ -62,8 +62,10 @@ Ingen arbeider på noe nå. PR #4, #5 og #6 er flettet inn i main 2026-10-08.
 
 ## Senere
 
+- [ ] Verdenskart i Fallout-stil over Aidne (rutenett med tåke, reise i dager, tilfeldige møter, steder du finner eller får vite om), og senere hele Kopparhavet. Plan i docs/verdenskart.md, venter på Toms svar om målestokk, Ereno og proviant.
+
 - [ ] Flere regioner fra "Hjältar från Kopparhavet" (Arkipelagen, Mindre Akrogal, Tolan og Jorien, Norra Samkarna, Norra Soluna) i bakgrunnssteget.
-- [ ] Oververden i Ultima-stil: kart over Zorakin med Fristaden, Karad Batur og Ereno.
+- [ ] Oververden i Ultima-stil: kart over Zorakin med Fristaden, Karad Batur og Ereno. Se verdenskartet over.
 - [x] Samtaler med nøkkelord som i Ultima IV og V (0.4). Neste: ord som låses opp av ting du har sett i kloakken.
 - [ ] Samarbeidsspill for to (Rune som spilleder?).
 

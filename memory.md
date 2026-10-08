@@ -137,6 +137,12 @@ Detaljene står i docs/regler/IMPLEMENTERING.md. Det viktigste:
 - Journalen (ivan.js) viser fargen for fakta, svart og villspor først når `reported` er satt.
 - Testriggen med ekte skrifter: Google Fonts nås ikke fra sandkassen, så skjermbilder viser reserveskriftene. `npm install @fontsource/grenze-gotisch @fontsource/alegreya @fontsource/alegreya-sans-sc` i en egen mappe og svar på forespørslene til fonts.googleapis.com og fonts.gstatic.com med CSS og woff2 derfra (page.route i Playwright), så ser bildene ut som i en vanlig nettleser.
 
+## Ereb Altor: geografi til verdenskartet
+
+- Fristaden ligger innerst i Dakkilobukten (Drakdjupet i 2024-kartet) nordøst på Aidne-halvøya, ved foten av fjellet, med Karad Batur like ved. Pharynx er et hertugdømme midt i Zorakin ved Caddobukten, omtrent 1 100 km fra Fristaden. Edelfara er sørvest i Pharynx ved Torilskogen på Grindanu. Spillet har i dag bare 9 timers reise mellom dem.
+- To lag med kanon: 1985 til 1991 (Ivanhoe, Spelledarboken og Kampanjboken 1989, Svartfolk) har Pharynx, Torilskogen og Kardien. 2024 til 2025 (Helmgast) har Karad Batur og Kardunien, men ikke Pharynx. Ereno ligger nord eller nordøst for Fristaden i de gamle bøkene og sør i 2024-kartet.
+- Avstander og sjøreiser, farer per område og kildene står i docs/verdenskart.md. Reiseregler i Bok II s. 5: gang 20 km, marsj 30 km, ritt 25 km, hard ritt 40 km per 12 timer, dårlig vær -25 %, elendig -50 %. Hemvistkoder for monstre i Bok II s. 24.
+
 ## Testing
 
 - Testriggen ligger i tools/test. shot.mjs åpner siden i headless Chromium med SwiftShader og ruter three.js til lokal node_modules (stien THREE_DIR må peke riktig). NOANIM=1 slår av CSS-animasjoner (de står på 0 fordi hvert bilde tar over et sekund), LOWQ=1 setter lav grafikk og stille lyd, INIT="$(cat sim.js)" legger inn hjelpere, VW/VH/TOUCH for mobil.
