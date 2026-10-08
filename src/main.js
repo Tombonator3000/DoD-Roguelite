@@ -32,6 +32,11 @@ import { saveGame, readSave, latestSave, deleteSave, describe as describeSave } 
 import { SaveUI } from './saveui.js';
 import { WaterFX } from './water.js';
 import { Weather } from './weather.js';
+import { Area } from './area.js';
+import { AREAS, NODES } from './edelmap.js';
+import { ARRIVE } from './arealife.js';
+import { Travel } from './travel.js';
+import { Q, fl, journalHTML, hoursLeft } from './ivan.js';
 
 const $ = s => document.querySelector(s);
 const CAM_OFF = new THREE.Vector3(10.4, 15.6, 10.4);
@@ -49,6 +54,17 @@ const UPGRADES = [
   { id: 'niste', name: 'Fars niste', desc: 'Start med en ekstra legedrikk.', cost: 15, max: 2 },
   { id: 'slip', name: 'Slipestein', desc: '+1 skade på alle treff.', cost: 30, max: 2 },
 ];
+
+// første gang du kommer til et sted i Edelfara
+const AREA_INTRO = {
+  ekeskogen: 'Torilskogen. Vårsola titter fram mellom bladene høyt over stien, og fuglene synger. Sortmund og Galande Tuppen ligger en drøy dagsmarsj østover. Du er nesten skuffet over at du ikke har sett noe svartfolk.',
+  sortmund: 'Sortmund. Allerede på avstand ser du at noe er galt. Alle dører og vinduer er lukket, og gata er tom. Ikke engang hundene er ute, selv om været er fint.',
+  ridderskors: 'Markisens borg på borgkullen. Sjøen Kärkel ligger blank og kald nedenfor.',
+  akershus: 'Akershus. Baron Ekes borg ligger majestetisk på toppen av kullen, i kanten av en stor glenne i Torilskogen. Nedenfor står fem runde telt med grevens faner, og lyset fra leirbålene glimter i blankt metall.',
+  akershus_borg: 'Akershus borg. En hovedbygning og et høyt tårn, bundet sammen av en mur. Fem soldater, en baron og to gutter mot en hel hær.',
+  glimming: 'Glimming. Grevens prektige borg ligger ved veiskillet, og värdshuset Kräklan & Svärdet ved veien sørover.',
+  lagret: 'En glenne hogd ut i skogen. Telt av hud, røyk fra leirbål, og et sted bak trærne uler en ulv.',
+};
 
 const FLOOR_INTRO = {
   0: 'Fristaden. Bymuren holder orchene ute, og kloakken holder det verste nede. Det meste av tiden.',
@@ -235,6 +251,7 @@ class Game {
     G.icons = new Icons();
     G.inv = new InvUI();
     G.saveui = new SaveUI();
+    G.travel = new Travel();
     G.audio = new Sound();
     G.input = new Input(renderer.domElement);
     G.world = new World();
@@ -663,6 +680,106 @@ class Game {
     });
   }
 
+  // --- Edelfara: reisekartet og områdene utenfor byen ---------------------------------------
+
+  openTravel(from) {
+    if (G.state !== 'play' || this.wiping) return;
+    G.travel.open(from);
+  }
+
+  // Reis langs veiene til et sted. Første gang stopper du i Ekeskogen, der kureren ligger (s. 2).
+  travelTo(to, from) {
+    if (this.wiping || G.travel.anim) return;
+    const r = G.travel.route(from, to);
+    if (!r) return;
+    let path = r.path;
+    if (Q().stage < 1 && path.includes('ekeskogen') && to !== 'ekeskogen' && from !== 'ekeskogen') path = path.slice(0, path.indexOf('ekeskogen') + 1);
+    const dest = path[path.length - 1];
+    const prev = path[path.length - 2];
+    const hours = G.travel.hoursOf(path);
+    G.state = 'transition';
+    document.activeElement?.blur?.();
+    G.travel.animate(path, () => {
+      this.wipe(() => {
+        G.ui.hideScreens();
+        G.state = 'play';
+        G.run.clock += hours;
+        if (dest !== to) G.ui.log('Halvveis gjennom Torilskogen ser du noe under en busk ved veiskillet. Du stopper.');
+        if (dest === 'fristaden') {
+          this.loadFloor(0, null, false, 'gate');
+          G.ui.buildBar();
+          G.audio.playMusic('town');
+          G.ui.log(`Du kommer inn gjennom Nordporten etter ${hours} timer på veien. Folkard nikker til deg.`);
+          return;
+        }
+        if (dest === 'pharynx') {
+          // Pharynx har ikke noe eget område: du rapporterer, og rir tilbake til Glimming
+          G.run.clock += hours;
+          this.loadArea('glimming', 'east');
+          G.dungeon.life?.reportPharynx?.();
+          return;
+        }
+        this.loadArea(dest, ARRIVE[dest]?.[prev]);
+      });
+    });
+  }
+
+  // Inn eller ut av en borg i samme område (borgveien i Sortmund, kullen i Akershus)
+  goArea(id, arrival) {
+    if (this.wiping) return;
+    G.state = 'transition';
+    this.wipe(() => {
+      G.ui.hideScreens();
+      G.state = 'play';
+      G.run.clock += 0.25;
+      this.loadArea(id, arrival);
+    });
+  }
+
+  loadArea(id, arrival, opts = {}) {
+    const L0 = AREAS[id];
+    if (!L0) return;
+    if (G.dungeon) G.dungeon.dispose();
+    G.fx.clearLevel();
+    G.ui.hideBoss();
+    G.depth = 0;
+    G.run.area = id;
+    const L = { ...L0, state: { trail: !!fl('trail') } };
+    G.dungeon = new Area(L, arrival);
+    G.dungeon.build(G.assets);
+    this.setTownLighting(true);
+    G.world.buildLevel(G.dungeon);
+    const info = G.dungeon.info;
+    G.scene.fog.color.setHex(info.fog);
+    G.scene.background.setHex(0x040304);
+    this.hemi.color.setHex(info.ambient);
+    const P = G.player;
+    P.pos.set(G.dungeon.start.x, 0, G.dungeon.start.z);
+    P.vel.set(0, 0, 0);
+    P.yaw = G.dungeon.startYaw;
+    P.onFloor();
+    G.dungeon.computeFlow(P.pos.x, P.pos.z);
+    this.camTarget.copy(P.pos);
+    G.camera.position.copy(P.pos).add(CAM_OFF);
+    G.audio.setBiome('stad');
+    const look = BIOME_LOOK.stad;
+    G.ambient.setLook(look.mist, look.motes, look.density);
+    this.townNight = null;
+    G.weather.snap();
+    G.water.clear();
+    G.post.mood('stad');
+    G.ui.setDepth(0, L.name, { region: 'Edelfara, Pharynx', town: !!L.peaceful });
+    G.ui.buildBar();
+    G.audio.playMusic(L.music === 'town' ? 'town' : 'explore');
+    const seen = G.run.seenAreas || (G.run.seenAreas = []);
+    if (!seen.includes(id)) { seen.push(id); if (L.intro) G.ui.log(L.intro); else G.ui.log(AREA_INTRO[id] || L.name + '.'); }
+    if (!this.loadingSave && !opts.noSave) setTimeout(() => { if (G.state === 'play' && !G.player.dead) saveGame('auto', true); }, 400);
+  }
+
+  onEnemyDied(e) {
+    G.dungeon?.life?.onEnemyDied?.(e);
+  }
+
   // fra trappa og opp til byen
   goUpToTown() {
     document.activeElement?.blur?.();
@@ -681,6 +798,7 @@ class Game {
 
   loadFloor(depth, seed, title = false, arrival = 'start') {
     if (G.dungeon) G.dungeon.dispose();
+    if (G.run) G.run.area = null;
     G.fx.clearLevel();
     G.ui.hideBoss();
     G.depth = depth;
@@ -769,7 +887,8 @@ class Game {
       this.applyViewOffset();
       this.title.leaving = false;
       $('#title').hidden = true;
-      this.loadFloor(d.depth, d.seed, false, 'start');
+      if (d.area && AREAS[d.area]) this.loadArea(d.area, null);
+      else this.loadFloor(d.depth, d.seed, false, 'start');
       // onFloor() nullstilte disse, så de settes tilbake etter at nivået er bygd
       P.floor = JSON.parse(JSON.stringify(d.player.floor || P.floor));
       P.floorStats = JSON.parse(JSON.stringify(d.player.floorStats || P.floorStats));
@@ -784,8 +903,8 @@ class Game {
       G.camera.position.copy(P.pos).add(CAM_OFF);
       this.loadingSave = false;
       G.ui.buildBar();
-      G.audio.playMusic(G.dungeon.isTown ? 'town' : 'explore');
-      G.ui.log(`Fortsetter: ${describeSave(d).title}${G.dungeon.isTown ? ', Fristaden' : ''}.`);
+      G.audio.playMusic(G.dungeon.isArea ? (G.dungeon.L.music === 'town' ? 'town' : 'explore') : G.dungeon.isTown ? 'town' : 'explore');
+      G.ui.log(`Fortsetter: ${describeSave(d).title}${G.dungeon.isArea ? ', ' + G.dungeon.L.name : G.dungeon.isTown ? ', Fristaden' : ''}.`);
     }, fromTitle ? 0.7 : 0.55);
   }
 
@@ -1477,7 +1596,7 @@ class Game {
     G.state = 'pause';
     const P = G.player;
     const qs = Object.entries(G.run.quests || {}).filter(([, q]) => q.state === 'active' || q.state === 'done');
-    $('#pause-quests').innerHTML = qs.length ? '<h3>Oppdrag</h3>' + qs.map(([id, q]) => `<div class="qrow ${q.state}">${q.state === 'done' ? 'Fullført: ' : ''}${QUEST_TITLES[id] || id}</div>`).join('') : '';
+    $('#pause-quests').innerHTML = (qs.length ? '<h3>Oppdrag</h3>' + qs.map(([id, q]) => `<div class="qrow ${q.state}">${q.state === 'done' ? 'Fullført: ' : ''}${QUEST_TITLES[id] || id}</div>`).join('') : '') + journalHTML();
     G.ui.show('pause');
   }
   openSheet() {
@@ -1516,6 +1635,7 @@ class Game {
     if (G.state === 'title') this.titleKeys(inp);
     else if (inp.wasPressed('Escape')) {
       if (G.state === 'inventory') G.inv.close();
+      else if (G.state === 'travel') G.travel.close();
       else if (!$('#saves').hidden) this.closeSaves();
       else if (G.state === 'play') this.pause();
       else if (G.state === 'dialog') this.closeShop();

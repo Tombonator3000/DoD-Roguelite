@@ -118,6 +118,8 @@ export function refinalize(item) { return finalize(item); }
 
 // Belønninger fra oppdrag i Fristaden
 export function questAmulet(kind) {
+  // hertigens signetring for den som løste Triangeldrama i Edelfara (spillets egen belønning, uv)
+  if (kind === 'hertig') return finalize({ slot: 'amulett', base: 'Ring', name: 'Hertigens signetring', rarity: 'unik', kg: 0.05, price: 800, mods: { 'skill:Övertala': 3, 'skill:Upptäcka fara': 2, luck: 1 }, flavor: 'Pharynx\' segl i gull. Folk under hertigs rang pleier å høre etter når de ser den.' });
   if (kind === 'martyr') return finalize({ slot: 'amulett', base: 'Minnemynt', name: 'Martyrens minnemynt', rarity: 'unik', kg: 0.05, price: 200, mods: { psy: 2, 'skill:Upptäcka fara': 2, fearless: 1 }, flavor: 'Et mynt med navnet til en falt tornväktare. Syster Jehanne sier at han våker over deg.' });
   return finalize({ slot: 'amulett', base: 'Stein', name: 'Pimpas lykkestein', rarity: 'magisk', kg: 0.1, price: 5, mods: { luck: 1 }, flavor: 'Den er helt vanlig. Pimpa sier den er magisk.' });
 }

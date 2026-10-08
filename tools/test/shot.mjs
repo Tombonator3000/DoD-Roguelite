@@ -40,8 +40,8 @@ for (const a of actions) {
   else if (a.t === 'mup') await page.mouse.up();
   else if (a.t === 'wait') await page.waitForTimeout(a.ms);
   else if (a.t === 'eval') logs.push('[eval] ' + JSON.stringify(await page.evaluate(a.js)));
-  else if (a.t === 'shot') await page.screenshot({ path: out.replace('.png', `_${shotIdx++}.png`) });
+  else if (a.t === 'shot') await page.screenshot({ path: out.replace('.png', `_${shotIdx++}.png`), timeout: parseInt(process.env.SHOT_TIMEOUT || '30000') });
 }
 console.log(logs.slice(0, 80).join('\n'));
-try { await page.screenshot({ path: out, timeout: 20000 }); } catch (e) { console.log('[shot] ' + e.message.split('\n')[0]); }
+try { await page.screenshot({ path: out, timeout: parseInt(process.env.SHOT_TIMEOUT || '20000') }); } catch (e) { console.log('[shot] ' + e.message.split('\n')[0]); }
 await browser.close();

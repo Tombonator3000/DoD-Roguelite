@@ -9,6 +9,7 @@ import { WEAPONS, ARMORS, SR, LOC_SHORT, hitLocation, skadebonus, FUMMEL_NARSTRI
 import { makeBody, hurt, lostKP, usable, kneeling } from './body.js';
 import { buildRat, buildSkeleton, buildGoblin, buildOrc, buildFox } from './assets.js';
 import { buildDemon } from './kinmodels.js';
+import { buildOrcEd, buildSvartalf, buildWolf } from './edelmodels.js';
 
 const A = (STY, STO, FYS, SMI, INT, PSY) => ({ STY, STO, FYS, SMI, INT, PSY });
 
@@ -60,6 +61,86 @@ export const DEFS = {
     interrupt: false, bounty: 10, ferocity: 2, ko: 'kill',
     lore: 'En demon fra den andre siden. Hud som rustning (6), og blodet fræser. Hold avstand når du hugger.',
   },
+
+  // --- Svartfolket i Torilskogen (Triangeldrama i Edelfara, s. 7-11) ---------------------------
+  // Lekhs orcher: FV 6 på alle våpen, elitorchene har 2 poeng bedre grundegenskaper og FV 8 (s. 10-11).
+  // Grundegenskapene til en vanlig orch er tatt fra Bok II som orch over. Felles: group 'svartfolk'.
+  orc_band: {
+    // de fem på veien mellom Sortmund og Akershus: «slåss till sista blodsdroppen och ger ingen pardon» (s. 7)
+    name: 'Orch', attrs: A(14, 12, 11, 11, 8, 11), kp: 12, nat: 0, detailed: true, humanoid: true, weapon: 'kroksabel', fv: 6,
+    armor: ['laderharnesk', 'laderarmskydd'], shield: 'vanligskold', noMoral: true, upptacka: 6, group: 'svartfolk', grunt: 0.85, heavy: true,
+    speed: 3.0, radius: 0.66, aggro: 12, range: 2.2, windup: 0.8, recover: 0.95, shape: 'cone', sr: 2.9, arc: 1.9, charge: true, silver: [10, 40],
+    build: () => buildOrcEd({ kind: 'band' }), interrupt: false, bounty: 4, ko: 'kill', bodyY: 1.12, h: 1.2, dieLine: 'Orchen dundrer i bakken.',
+    lore: 'Orcher fra Torilskogen. Lærharnesk og skjold. Disse gir seg ikke, og de tar ingen fanger.',
+  },
+  orc_lead: {
+    name: 'Ledarorch', attrs: A(15, 13, 12, 11, 8, 11), kp: 13, nat: 0, detailed: true, humanoid: true, weapon: 'kroksabel', fv: 7, uv: true,
+    armor: ['laderharnesk', 'laderarmskydd', 'nitladerhuva'], shield: 'vanligskold', noMoral: true, upptacka: 7, group: 'svartfolk', grunt: 0.75, heavy: true,
+    speed: 3.0, radius: 0.68, aggro: 12, range: 2.2, windup: 0.78, recover: 0.9, shape: 'cone', sr: 3.0, arc: 1.9, charge: true, silver: [5, 15],
+    build: () => buildOrcEd({ kind: 'lead' }), interrupt: false, bounty: 5, ko: 'kill', bodyY: 1.12, h: 1.2, dieLine: 'Ledarorchen faller. Papirbitene blafrer av gårde.',
+    lore: 'Han som tygger papir. Lederen for de fem.',
+  },
+  orc_camp: {
+    // de fleste i leiren er udisiplinerte og flykter ved motgang (s. 9-10)
+    name: 'Orch', attrs: A(14, 12, 11, 11, 8, 11), kp: 12, nat: 0, detailed: true, humanoid: true, weapon: 'kortspjut', fv: 6,
+    armor: ['laderarmskydd', 'laderbenskydd'], shield: 'vanligskold', moral: 8, upptacka: 6, group: 'svartfolk', grunt: 0.9, heavy: true,
+    speed: 3.0, radius: 0.66, aggro: 12, range: 2.6, windup: 0.8, recover: 0.95, shape: 'cone', sr: 3.2, arc: 1.2, silver: [10, 40],
+    build: () => buildOrcEd({ kind: 'spjut' }), interrupt: false, bounty: 3, ko: 'kill', bodyY: 1.12, h: 1.2, dieLine: 'Orchen dundrer i bakken.',
+    lore: 'Orcher fra Lekhs leir. De fleste er udisiplinerte og løper når det går dårlig.',
+  },
+  orc_elite: {
+    // de ti vältränade: +2 på grundegenskapene, FV 8, slåss til siste blodsdråpe (s. 10-11)
+    name: 'Elitorch', attrs: A(16, 14, 13, 13, 10, 13), kp: 14, nat: 0, detailed: true, humanoid: true, weapon: 'kroksabel', fv: 8,
+    armor: ['nitladerharnesk', 'laderarmskydd', 'laderbenskydd', 'nitladerhuva'], shield: 'vanligskold', noMoral: true, upptacka: 8, group: 'svartfolk', grunt: 0.7, heavy: true,
+    speed: 3.2, radius: 0.72, aggro: 13, range: 2.3, windup: 0.72, recover: 0.85, shape: 'cone', sr: 3.0, arc: 2.0, charge: true, silver: [20, 60],
+    build: () => buildOrcEd({ kind: 'elite' }), interrupt: false, bounty: 6, ko: 'kill', bodyY: 1.25, h: 1.3, lootBonus: 0.1, dieLine: 'Elitorchen faller uten en lyd.',
+    lore: 'En av Lekhs vältränade orcher. Bedre rustet, bedre trent, og den flykter aldri.',
+  },
+  orc_xbow: {
+    // et dusin bærer lett armborst. Pilene er hullingförsedda og gjør 1 poeng ekstra i skada (s. 10-11)
+    name: 'Orch med armborst', attrs: A(14, 12, 11, 11, 8, 11), kp: 12, nat: 0, detailed: true, humanoid: true, weapon: 'lattarmborst', melee: 'kroksabel', fv: 6, meleeFv: 6,
+    armor: ['laderharnesk'], moral: 8, upptacka: 7, ranged: true, pref: 9, dmgPlus: 1, group: 'svartfolk', grunt: 0.95, heavy: true,
+    speed: 3.0, radius: 0.64, aggro: 15, windup: 1.0, recover: 1.1, silver: [10, 40],
+    build: () => buildOrcEd({ kind: 'xbow' }), interrupt: true, bounty: 4, ko: 'kill', bodyY: 1.12, h: 1.2, dieLine: 'Armborsten skramler mot bakken.',
+    lore: 'Lett armborst med hullingpiler. Hold deg i bevegelse, og kom tett på.',
+  },
+  svartalf: {
+    // Lekhs ti svartalfer: grundegenskaper 3 over typvärdet, omkring FV 10 på sköld og handvapen,
+    // en tapperhet som er sjelden hos svartfolk (s. 11). Typvärdena er ikke sjekket mot Bok II (uv).
+    name: 'Svartalf', attrs: A(12, 10, 14, 17, 14, 14), kp: 12, nat: 0, detailed: true, humanoid: true, weapon: 'kortsvard', fv: 10, uv: true,
+    armor: ['nitladerharnesk', 'laderbenskydd'], shield: 'vanligskold', moral: 14, upptacka: 12, group: 'svartfolk', grunt: 1.35,
+    speed: 3.7, radius: 0.48, aggro: 14, range: 1.9, windup: 0.6, recover: 0.75, shape: 'cone', sr: 2.4, arc: 1.7, silver: [20, 70],
+    build: () => buildSvartalf(), interrupt: true, bounty: 5, ko: 'kill', h: 1.0, lootBonus: 0.08, dieLine: 'Svartalfen faller med et hvesende pust.',
+    lore: 'Svartalfer fra Lekhs stamme. Raske, godt trent, og de verner Lekh med livet.',
+  },
+  ulv: {
+    // ulv etter typvärdena i Monsterboken (s. 15). Ikke sjekket mot DoD91 Bok II (uv).
+    name: 'Ulv', attrs: A(9, 8, 13, 15, 4, 9), kp: 10, nat: 1, detailed: false, beast: true, uv: true,
+    attacks: [{ name: 'bett', dmg: 'D8', fv: 10, type: 'p', natural: true }], noSB: true,
+    moral: 9, upptacka: 13, speed: 5.4, radius: 0.55, aggro: 14, range: 1.8, windup: 0.42, recover: 0.6, shape: 'cone', sr: 2.0, arc: 1.4,
+    silver: [0, 0], build: () => buildWolf(), interrupt: true, bounty: 2, ko: 'bite', quad: true, bodyY: 0.62, gait: 13, h: 0.8, noLoot: true,
+    group: 'svartfolk', dieLine: 'Ulven uler en siste gang.',
+    lore: 'Dresserte ulver fra Lekhs hage. Bittet er farlig, og de er raskere enn deg.',
+  },
+  lekh: {
+    // Lekh, svartalfenes leder (s. 10). Verdiene er lest fra en uklar skanning, så de er merket uv.
+    name: 'Lekh', barName: 'Lekh, svartalfenes høvding', attrs: A(14, 12, 15, 17, 13, 9), kp: 16, nat: 0, detailed: true, humanoid: true, uv: true,
+    weapon: 'arbalest', melee: 'langspjut', fv: 13, meleeFv: 15, ranged: true, pref: 10,
+    armor: ['metallharnesk', 'nitladerarmskydd', 'nitladerbenskydd', 'oppenhjalm'], noMoral: true, fearImmune: true, upptacka: 16, group: 'svartfolk', grunt: 1.2,
+    speed: 3.6, radius: 0.5, aggro: 18, range: 2.8, windup: 1.1, recover: 0.9, shape: 'cone', sr: 3.2, arc: 1.0, silver: [150, 300],
+    build: () => buildSvartalf({ lekh: true }), interrupt: false, bounty: 15, ko: 'kill', h: 1.0, leader: true, lootBonus: 0.5,
+    dieLine: 'Lekh faller. De store føttene hans rykker en gang, så er det over.',
+    lore: 'Lekh er en uvanlig svartalf med et skarpt hode. Han skyter med arbalest på avstand og bruker langspydet når du kommer nær.',
+  },
+  lekh_ulv: {
+    // Lekh på ulveryggen når han flykter (s. 9)
+    name: 'Lekh på ulven', barName: 'Lekh, svartalfenes høvding', attrs: A(14, 12, 15, 17, 13, 9), kp: 16, nat: 1, detailed: false, beast: true, uv: true,
+    attacks: [{ name: 'ulvebett', dmg: 'D8', fv: 10, type: 'p', natural: true }], noSB: true, noMoral: true, fearImmune: true,
+    upptacka: 16, speed: 5.6, radius: 0.7, aggro: 30, range: 1.9, windup: 0.5, recover: 0.6, shape: 'cone', sr: 2.2, arc: 1.4, silver: [150, 300],
+    build: () => buildWolf({ rider: true }), interrupt: false, bounty: 15, ko: 'kill', quad: true, bodyY: 0.78, gait: 12, h: 1.4, leader: true, group: 'svartfolk',
+    dieLine: 'Ulven stuper, og Lekh blir liggende under den.',
+    lore: 'Lekh flykter på en dressert ulv. Ulven er rask. Lekh er raskere i hodet.',
+  },
 };
 
 // Rødpels' angrepstabell (T6). Samme angrep to ganger på rad gir det neste i tabellen.
@@ -97,7 +178,7 @@ export class Enemy {
     this.root.position.set(x, 0, z);
     G.scene.add(this.root);
     if (G.gfx) {
-      this.blob = G.gfx.blobFor(this.def.radius * (this.type === 'rat' ? 1.1 : 0.9), 0.5);
+      this.blob = G.gfx.blobFor(this.def.radius * (this.type === 'rat' || this.def.quad ? 1.1 : 0.9), 0.5);
       this.root.add(this.blob);
     }
     this.pos = this.root.position;
@@ -115,7 +196,7 @@ export class Enemy {
     this.weapon = D.weapon ? WEAPONS[D.weapon] : null;
     this.weaponDur = this.weapon?.dur || 0;
     this.meleeW = D.melee ? WEAPONS[D.melee] : null;
-    this.shieldItem = D.shieldDeep && depth >= (type === 'orc' ? 4 : 3) ? WEAPONS[D.shieldDeep] : null;
+    this.shieldItem = D.shield ? WEAPONS[D.shield] : D.shieldDeep && depth >= (type === 'orc' ? 4 : 3) ? WEAPONS[D.shieldDeep] : null;
     this.shieldDur = this.shieldItem?.dur || 0;
     this.armor = [...(D.armor || []), ...(depth >= 3 ? D.armorDeep || [] : [])].map(id => ARMORS[id]).filter(Boolean);
     this.metalArmor = this.armor.some(a => a.metal);
@@ -172,6 +253,7 @@ export class Enemy {
     else if (this.type === 'orc') G.audio.grunt(0.8);
     else if (this.type === 'skeleton') G.audio.bones();
     else if (this.type === 'goblin') G.audio.grunt(1.6);
+    else if (this.def.grunt) G.audio.grunt(this.def.grunt);
     const flock = [this];
     for (const e of G.enemies) {
       if (e !== this && !e.dead && !e.alerted && e.pos.distanceTo(this.pos) < 7) {
@@ -197,7 +279,7 @@ export class Enemy {
     if (this.dead) {
       this.deadT += dt;
       const p = Math.min(1, this.deadT / 0.35);
-      this.root.rotation.z = (1 - Math.pow(1 - p, 3)) * (this.type === 'rat' ? 2.6 : 1.45) * this.deadSide;
+      this.root.rotation.z = (1 - Math.pow(1 - p, 3)) * (this.type === 'rat' ? 2.6 : this.def.quad ? 1.6 : 1.45) * this.deadSide;
       this.root.position.y += (0 - this.root.position.y) * Math.min(1, dt * 8);
       const len = this.def.boss ? 2.2 : 0.9;
       const dp = Math.max(0, (this.deadT - 0.3) / len);
@@ -209,7 +291,7 @@ export class Enemy {
       }
       if (this.blob && dp > 0.4) this.blob.visible = false;
       if (dp > 0 && dp < 1) {
-        const hh = { rat: 0.4, skeleton: 1.0, goblin: 0.8, orc: 1.3, boss: 1.8, demon: 1.8 }[this.type] || 1;
+        const hh = this.def.h || { rat: 0.4, skeleton: 1.0, goblin: 0.8, orc: 1.3, boss: 1.8, demon: 1.8 }[this.type] || 1;
         const n = Math.random() < dt * (this.def.boss ? 120 : 45) ? (this.def.boss ? 3 : 1) : 0;
         if (n) G.fx.burst('dissolve', { x: this.pos.x, y: 0.15, z: this.pos.z, w: this.radius * 2.6, h: hh, col: ghost ? 'ghost' : '' }, n);
       }
@@ -360,6 +442,10 @@ export class Enemy {
         break;
       }
       case 'chase': {
+        // står i nærkamp med en alliert (grevens soldater i Edelfara): blir stående og slåss med ham
+        const eb = this.engagedBy;
+        if (eb && !eb.dead && Math.hypot(eb.pos.x - this.pos.x, eb.pos.z - this.pos.z) < 2.6 && dist > 3) { faceTarget = eb.pos; desired.set(0, 0, 0); break; }
+        if (eb && (eb.dead || Math.hypot(eb.pos.x - this.pos.x, eb.pos.z - this.pos.z) > 4)) this.engagedBy = null;
         if (playerOut) { desired.set(0, 0, 0); break; }
         if (!canSee && P.stealth && dist > 3.5 && !this.def.boss) { this.setState('search'); break; }
         faceTarget = P.pos;
@@ -915,7 +1001,7 @@ export class Enemy {
     G.run.damageDealt = (G.run.damageDealt || 0) + real;
     G.fx.float(String(real), this.pos, o.crit ? 'crit big' : 'dmg', this.def.boss ? 3.2 : this.type === 'rat' ? 1.0 : 1.9);
     G.fx.burst(this.def.bones ? 'bone' : 'blood', { x: this.pos.x, y: this.type === 'rat' ? 0.4 : 1.1, z: this.pos.z }, o.crit ? 16 : 8, dir);
-    const kres = this.def.boss ? 0.12 : this.type === 'orc' || this.type === 'demon' ? 0.45 : 1;
+    const kres = this.def.boss ? 0.12 : this.type === 'orc' || this.type === 'demon' || this.def.heavy ? 0.45 : 1;
     if (this.rooted <= 0) this.vel.addScaledVector(dir, knock * kres);
     // frätande blod: den som hugger demonen i närstrid må klare et SMI-slag (Bok II s. 29)
     if (this.def.acidBlood && o.src === 'player' && !o.ranged && !o.total && d(20) > P.attrs.SMI) {
@@ -955,7 +1041,8 @@ export class Enemy {
   }
 
   flock(r = 12) {
-    return G.enemies.filter(e => !e.dead && e.type === this.type && e.pos.distanceTo(this.pos) < r);
+    const grp = this.def.group || this.type;
+    return G.enemies.filter(e => !e.dead && (e.def.group || e.type) === grp && e.pos.distanceTo(this.pos) < r);
   }
 
   // Moralslag: 1T20 lik eller under moral står kvar (Expert s. 61-62)
@@ -993,6 +1080,7 @@ export class Enemy {
   die(how) {
     if (this.dead) return;
     this.dead = true;
+    this.deathHow = how;
     this.deadSide = Math.random() < 0.5 ? 1 : -1;
     this.lifted = 0;
     G.fx.endTelegraph(this.tg);
@@ -1003,7 +1091,7 @@ export class Enemy {
     if (P.floorStats) {
       P.floorStats.kills = (P.floorStats.kills || 0) + 1;
       if (this.def.beast) P.floorStats.beasts = (P.floorStats.beasts || 0) + 1;
-      if (this.def.monster || this.type === 'orc') P.floorStats.monsters = (P.floorStats.monsters || 0) + 1;
+      if (this.def.monster || this.type === 'orc' || this.def.group === 'svartfolk') P.floorStats.monsters = (P.floorStats.monsters || 0) + 1;
     }
     const p = this.pos;
     if (this.def.bones) {
@@ -1046,8 +1134,10 @@ export class Enemy {
         orc: 'Orchen dundrer i bakken.',
         demon: 'Demonen sprekker i glør og svovel. Det lukter brent hår lenge etterpå.',
       };
-      if (how === 'fall' || how === 'ko') { /* allerede logget */ } else if (Math.random() < 0.35 || this.type === 'demon') G.ui.log(lines[this.type]);
+      const line = this.def.dieLine || lines[this.type];
+      if (how === 'fall' || how === 'ko' || !line) { /* allerede logget */ } else if (Math.random() < 0.35 || this.type === 'demon' || this.def.leader) G.ui.log(line);
     }
+    G.game.onEnemyDied?.(this);
   }
 
   dispose() {
@@ -1060,12 +1150,12 @@ export class Enemy {
   animate(dt) {
     const P = this.parts;
     const sp = Math.min(1, Math.hypot(this.vel.x, this.vel.z) / Math.max(1, this.def.speed));
-    const t = this.animT * (this.type === 'rat' ? 16 : 8);
+    const t = this.animT * (this.type === 'rat' ? 16 : this.def.gait || 8);
     const sw = Math.sin(t) * sp;
     const st = this.state;
     const wp = st === 'windup' || st === 'aim' || st === 'chargeWindup' || st === 'howl' ? Math.min(1, this.t / (this.windupDur || 1)) : 0;
-    if (this.type === 'rat') {
-      P.body.position.y = 0.3 + Math.abs(sw) * 0.05;
+    if (this.type === 'rat' || this.def.quad) {
+      P.body.position.y = (this.def.bodyY || 0.3) + Math.abs(sw) * 0.05;
       P.tail.rotation.y = Math.sin(this.animT * 6) * 0.5;
       P.legs.forEach((l, i) => (l.rotation.x = Math.sin(t + i * Math.PI * 0.5) * 0.8 * sp));
       P.head.rotation.x = st === 'windup' ? -0.3 * wp : 0;
@@ -1078,7 +1168,7 @@ export class Enemy {
     const bodyNode = P.torso || P.body;
     const kneel = kneeling(this.body) ? 0.3 : 0;
     if (P.hips) P.hips.position.y = 0.95 + Math.abs(sw) * 0.05 - kneel;
-    else if (P.body) P.body.position.y = (this.type === 'goblin' ? 0.62 : this.type === 'orc' ? 1.25 : this.type === 'demon' ? 1.3 : 1.55) + Math.abs(sw) * 0.05 - kneel;
+    else if (P.body) P.body.position.y = (this.def.bodyY || (this.type === 'goblin' ? 0.62 : this.type === 'orc' ? 1.25 : this.type === 'demon' ? 1.3 : 1.55)) + Math.abs(sw) * 0.05 - kneel;
     let armR = -sw * 0.5, armL = sw * 0.5;
     if (st === 'windup') armR = -2.2 * wp;
     else if (st === 'recover' && this.t < 0.2) armR = -2.2 + (this.t / 0.2) * 2.6;

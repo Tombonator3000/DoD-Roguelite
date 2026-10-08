@@ -23,14 +23,19 @@ export const KIND_NAME = { klart: 'klart', skyet: 'skyet', regn: 'regn', storm: 
 const hash = n => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
 
 // Tak over byen: høyden under taket per flis, så regn og løv ikke faller inn i husene.
-function coverTexture() {
-  const data = new Uint8Array(TW * TH);
-  for (const b of BUILDINGS) {
+// Hvert område (Fristaden og stedene i Edelfara) fyller den på nytt med sine bygninger og telt.
+function fillCover(tex, buildings, extra = []) {
+  const data = tex.image.data;
+  data.fill(0);
+  for (const b of [...buildings, ...extra]) {
     const h = Math.min(12.5, (b.wallH || 3.5) + 1.6);
-    for (let y = b.y0; y <= b.y1; y++) for (let x = b.x0; x <= b.x1; x++) data[y * TW + x] = Math.round(h * 20);
+    for (let y = b.y0; y <= b.y1; y++) for (let x = b.x0; x <= b.x1; x++) if (x >= 0 && y >= 0 && x < TW && y < TH) data[y * TW + x] = Math.round(h * 20);
   }
-  const t = new THREE.DataTexture(data, TW, TH, THREE.RedFormat, THREE.UnsignedByteType);
-  t.needsUpdate = true;
+  tex.needsUpdate = true;
+}
+function coverTexture() {
+  const t = new THREE.DataTexture(new Uint8Array(TW * TH), TW, TH, THREE.RedFormat, THREE.UnsignedByteType);
+  fillCover(t, BUILDINGS);
   return t;
 }
 
@@ -401,6 +406,7 @@ export class Weather {
 
   levelStart() {
     const D = G.dungeon;
+    if (D?.isTown) fillCover(this.cover, D.buildings || BUILDINGS, D.covers || []);
     const biome = D?.biome || D?.info?.biome;
     this.spores.visible = biome === 'kloakk';
     this.embers.visible = biome === 'dverg' || biome === 'rev';

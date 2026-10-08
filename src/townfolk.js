@@ -26,6 +26,7 @@ export const QUEST_TITLES = {
   rotter: 'Rotteplagen: drep ti rotter i kloakken og gå til Edegar.',
   dode: 'De dødes fred: gi seks skjeletter fred og gå til Syster Jehanne.',
   runer: 'Runesteinen: les runesteinen i dvergehallene og gå til Bataar.',
+  ivan: 'Triangeldrama i Edelfara: finn ut hvem som drepte Riddar Kettil, og rapporter til Pharynx.',
 };
 
 export function hourOf(clock) { return ((clock % 24) + 24) % 24; }
@@ -37,7 +38,7 @@ function openAt(hours, h) {
 }
 
 // --- en person ---------------------------------------------------------------------------
-class NPC {
+export class NPC {
   constructor(def, life) {
     this.def = def;
     this.id = def.id;
@@ -135,10 +136,10 @@ class NPC {
 
   spotPos(name) {
     if (name === 'patrol') {
-      const p = SPOTS[this.def.patrol[this.patrolI % this.def.patrol.length]];
+      const p = this.life.spots[this.def.patrol[this.patrolI % this.def.patrol.length]];
       return { x: U(p.x), z: U(p.y), yaw: 0, spot: p };
     }
-    const p = SPOTS[name];
+    const p = this.life.spots[name];
     return { x: U(p.x), z: U(p.y), yaw: p.yaw || 0, spot: p };
   }
 
@@ -210,7 +211,7 @@ class NPC {
       }
     } else if (this.arrived && this.mode !== 'sleep' && this.mode !== 'gone' && this.mode !== 'sit') {
       // rusle rundt ved stedet sitt
-      const spot = this.spotName === 'patrol' ? null : SPOTS[this.spotName];
+      const spot = this.spotName === 'patrol' ? null : this.life.spots[this.spotName];
       if (spot?.wander || this.def.wanderer) {
         this.wanderT -= dt;
         if (this.wanderT <= 0) {
@@ -272,7 +273,7 @@ class NPC {
     const t = this.animT;
     const mode = sp > 0 ? 'walk' : this.mode;
     if (sp > 0) this.walkPhase += dt * sp * 3.4;
-    const spot = SPOTS[this.spotName];
+    const spot = this.life.spots[this.spotName];
     // posisjon og leie
     let y = 0, rx = 0, rz = 0;
     if (mode === 'sleep') {
@@ -342,16 +343,18 @@ class NPC {
 
 // --- byen lever ---------------------------------------------------------------------------
 export class TownLife {
-  constructor(town, W) {
+  // people: folk i andre områder (arealife.js). Standard er folket i Fristaden.
+  constructor(town, W, people = PEOPLE) {
     this.town = town;
     this.W = W;
+    this.spots = town.spots || SPOTS;
     const run = G.run;
     run.quests = run.quests || {};
     run.rykte = run.rykte || 0;
     this.visit = { barter: {}, stolen: new Set(), once: new Set(), fished: 0, rumor: Math.floor(Math.random() * RUMORS.length) };
     this.talk = new Talk(this);
     G.talk = this.talk;
-    this.npcs = PEOPLE.map(def => new NPC(def, this));
+    this.npcs = people.map(def => new NPC(def, this));
     const h = hourOf(run.clock);
     for (const n of this.npcs) n.snap(h);
     for (const n of this.npcs) {
@@ -378,6 +381,12 @@ export class TownLife {
   addFixtures() {
     const T0 = this.town;
     this.grateIt = this.add(T0.grate.x, T0.grate.z, 0.85, 'Klatre ned i kloakken', () => G.game.enterSewers());
+    // Nordporten: ut til Edelfara (reisekartet). Stengt om natta.
+    this.gateIt = this.add(U(18.5), U(4.6), 1.2, 'Gå ut gjennom Nordporten', () => {
+      const hh = this.hour;
+      if (hh >= 22 || hh < 5) { G.ui.log('Nordporten er stengt om natta. Folkard åpner når det lysner, rundt klokka fem.'); G.fx.float('Stengt', G.player.pos, 'miss'); return; }
+      G.game.openTravel('fristaden');
+    });
     this.add(T0.board.x, T0.board.z, 0.6, 'Les oppslagstavla', () => this.talk.open(BOARD));
     this.add(T0.memorial.x, T0.memorial.z, 0.5, 'Les minnesteinen', () => this.readMemorial());
     this.add(T0.sundial.x, T0.sundial.z, 0.75, 'Se på soluret', () => this.readSundial());
@@ -430,7 +439,8 @@ export class TownLife {
       if (it.stage) it.label = h >= 17 || h < 2 ? `Opptre på scenen (${this.performSkill()})` : null;
     }
     const n = G.run.nextDepth || 1;
-    this.grateIt.label = n > 1 ? `Klatre ned i kloakken (tilbake til nivå ${n})` : 'Klatre ned i kloakken';
+    if (this.grateIt) this.grateIt.label = n > 1 ? `Klatre ned i kloakken (tilbake til nivå ${n})` : 'Klatre ned i kloakken';
+    if (this.gateIt) this.gateIt.label = h >= 22 || h < 5 ? 'Nordporten (stengt om natta)' : 'Gå ut gjennom Nordporten';
     if (this.garin) {
       const g = this.garin;
       tmp.set(0, 0, 0);
