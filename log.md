@@ -232,3 +232,4 @@ Alt som gjøres i prosjektet loggføres her med tidsstempel (Europe/Oslo).
 - 19:19 Samtaler: tallene 1 til 9 velger et ord når skrivefeltet er tomt. Journalen viser ikke hvilke ledetråder som er villspor før saken er rapportert.
 - 19:19 Test: skjermbilder av alle skjermene på PC og mobil etter endringene, Escape fra innstillingene tilbake til pausen og videre til spillet, tallvalg i samtalen, to trykk for Til tittelskjermen, og innstillingene lagres. Fire kampeffekt-tester, combatfx-browser mot combatfx-test og pages-test, texture-fallback og texture-browser grønne, uten feil i konsollen. Bilder og oversikt i docs/menyer.md.
 - 19:20 Pull request #6 mot main fra claude/menyer. Avhenger av PR #4 og PR #5, som må flettes først. PR-nummeret ført inn i D010.
+- 19:28 GitHub Actions er grønn på b541e16. Republiserte artifacten (versjon 7) fra claude/menyer, med Edelfara, ChatGPTs teksturer og de nye menyene, så Tom kan prøve alt før PR #4, #5 og #6 er flettet.
