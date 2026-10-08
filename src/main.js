@@ -1022,7 +1022,7 @@ class Game {
     if (!title) {
       if (!town) G.run.depthReached = Math.max(G.run.depthReached, depth);
       G.ui.setDepth(depth, info.name);
-      G.ui.log(FLOOR_INTRO[depth]);
+      if (!this.quietLoad) G.ui.log(FLOOR_INTRO[depth]);
       if (!this.loadingSave) setTimeout(() => { if (G.state === 'play' && !G.player.dead) saveGame('auto', true); }, 400);
     }
   }
@@ -1057,6 +1057,8 @@ class Game {
       this.endRunCleanup();
       this.pauseFromWorld = false;
       this.loadingSave = true;
+      // lagret på verdenskartet: området bak kartet bygges stille
+      this.quietLoad = !!d.onWorld;
       G.run = { ...this.freshRun(), ...d.run, known: new Set(d.run.known || []), t0: performance.now() };
       const P = G.player;
       if (d.player.sheet?.id) { try { this.selectedId = d.player.sheet.id; localStorage.setItem('svartnebb.lastchar', d.player.sheet.id); } catch (e) { /* valgfritt */ } }
@@ -1089,6 +1091,7 @@ class Game {
       this.camTarget.copy(P.pos);
       G.camera.position.copy(P.pos).add(CAM_OFF);
       this.loadingSave = false;
+      this.quietLoad = false;
       G.ui.buildBar();
       G.audio.playMusic(G.dungeon.isArea ? (G.dungeon.L.music === 'town' ? 'town' : 'explore') : G.dungeon.isTown ? 'town' : 'explore');
       G.ui.log(`Fortsetter: ${describeSave(d).title}${d.onWorld ? ', på verdenskartet' : G.dungeon.isArea ? ', ' + G.dungeon.L.name : G.dungeon.isTown ? ', Fristaden' : ''}.`);

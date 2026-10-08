@@ -295,7 +295,7 @@ export class WorldView {
 
   // --- reisen ---------------------------------------------------------------------------------
   go() {
-    if (this.moving || !this.sel) return;
+    if (this.moving || !this.sel || G.state !== 'world') return;
     const w = W();
     const path = findPath(w.x, w.y, this.sel[0], this.sel[1]);
     if (!path || path.length < 2) return;
@@ -396,7 +396,7 @@ export class WorldView {
   }
 
   enter() {
-    if (this.moving) return;
+    if (this.moving || G.state !== 'world') return;
     const w = W();
     const pid = placeAt(w.x, w.y);
     G.game.enterSquare(pid && known(pid) ? pid : null);
@@ -404,7 +404,7 @@ export class WorldView {
 
   // En natt ute: til klokka sju. Søvn gir 1T3 KP og all PSY hvis du har spist. En sjekk for møter i natt.
   camp() {
-    if (this.moving) return;
+    if (this.moving || G.state !== 'world') return;
     const w = W(), P = G.player;
     const hrs = campHours();
     const night = 22;
@@ -422,13 +422,13 @@ export class WorldView {
     const hungry = hungerLevel() > 0;
     const got = hungry ? 0 : P.heal(Math.ceil(Math.random() * 3), true);
     P.gainPSY(P.maxPSY);
-    G.ui.log(`Du sover under åpen himmel. ${got ? `+${got} KP og ` : ''}all PSY.${hungry ? ' Du er for sulten til at sårene gror.' : ''} Klokka er sju.`);
+    G.ui.log(`Du sover under åpen himmel${got ? ` og får tilbake ${got} KP og all PSY` : ' og får tilbake all PSY'}.${hungry ? ' Du er for sulten til at sårene gror.' : ''} Klokka er sju.`);
     G.audio.heal?.();
     this.refresh();
   }
 
   forageHere() {
-    if (this.moving) return;
+    if (this.moving || G.state !== 'world') return;
     const w = W();
     const { r, n } = forage(w.x, w.y);
     G.ui.logRoll(r, n ? `Du finner mat for ${n} døgn: bær, sopp og en hare som var for treg.` : 'En time med leting, og ingenting å spise.');

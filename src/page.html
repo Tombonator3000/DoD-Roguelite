@@ -849,12 +849,35 @@ body:not(.touch) #dlg-kw .kw:nth-child(-n+9)::before { content: counter(kw); mar
 .malt-pergament #world .w-side .btn.primary { color: #f8ead0; background: linear-gradient(#7a1a14, #3e0b08); }
 .malt-pergament #world .w-stats div { background: rgba(255,249,226,.4); }
 .malt-pergament #world .w-mapwrap { border-color: #947348; }
+/* Sentrert når det er plass, men toppen klippes ikke bort når panelet er høyere enn skjermen */
+#world { place-items: start center; }
+#world .panel.worldp { margin-block: auto; }
 @media (max-width: 900px) {
   #world { padding: 8px; }
   #world .panel.worldp { padding: 12px 12px 14px; max-height: none; }
   .w-body { grid-template-columns: minmax(0, 1fr); }
   .w-mapwrap { max-width: none; }
-  .w-stats div { min-width: 0; flex: 1 1 22%; padding: 4px 7px 5px; }
+  .w-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); width: 100%; }
+  .w-stats div { min-width: 0; padding: 4px 7px 5px; }
+  .w-stats b { font-size: 13px; overflow: hidden; text-overflow: ellipsis; }
+  .w-log { max-height: 4.3em; overflow: hidden; justify-content: flex-end; }
+  .w-places { max-height: none; }
+}
+/* Mobil på tvers: kartet til venstre så høyt som skjermen tillater, panelet til høyre */
+@media (max-height: 560px) and (orientation: landscape) {
+  #world { padding: 4px; }
+  #world .panel.worldp { padding: 8px 10px; max-height: calc(100vh - 8px); }
+  #world .w-head { margin-bottom: 6px; }
+  #world .w-head h2 { font-size: 20px; }
+  .w-stats { display: flex; width: auto; }
+  .w-stats div { min-width: 0; flex: none; padding: 3px 7px 4px; }
+  .w-stats b { font-size: 13px; }
+  .w-body { grid-template-columns: auto minmax(0, 1fr); gap: 10px; }
+  .w-mapwrap { width: calc((100vh - 84px) * 1.6667); max-width: 62vw; }
+  .w-log { min-height: 0; max-height: 2.9em; overflow: hidden; font-size: 12px; }
+  .w-side { gap: 6px; }
+  .w-btns .btn { padding: 8px 6px; font-size: 12px; }
+  .w-info { min-height: 0; }
   .w-places { max-height: none; }
 }
 </style>
