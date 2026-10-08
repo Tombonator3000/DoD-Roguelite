@@ -1,5 +1,5 @@
 // node tools/test/combatfx-browser.mjs [utmappe]
-// TEST_SOURCE=1 kj�rer ES-modulene direkte, ellers testes det ferdige bygget.
+// TEST_SOURCE=1 kjører ES-modulene direkte, ellers testes det ferdige bygget.
 import fs from 'node:fs';
 import path from 'node:path';
 import http from 'node:http';
@@ -21,11 +21,18 @@ if (process.env.TEST_SOURCE) {
       .replace('/*__DUCK_DATA__*/', () => `window.DUCK_B64="${duck}";window.DUCK_TEX="data:image/jpeg;base64,${tex}";`)
       .replace('/*__GAME_JS__*/', () => "import '/src/main.js';") + '</body></html>';
 } else html = fs.readFileSync(path.join(root, 'dist/index.html'), 'utf8');
+if (!process.env.TEST_SOURCE) assert.ok(!html.includes('/*__GAME_JS__*/') && !html.includes('/*__DUCK_DATA__*/'), 'bygget har uerstattede plassholdere');
+const gamePath = '/DoD-Roguelite/';
 html = html.replaceAll('https://cdn.jsdelivr.net/npm/three@0.170.0/', '/node_modules/three/');
 
 const server = http.createServer((req, res) => {
   const name = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
-  if (name === '/') { res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' }); res.end(html); return; }
+  if (name === '/favicon.ico') { res.writeHead(204); res.end(); return; }
+  if (name === gamePath) { res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' }); res.end(html); return; }
+  // Pages inneholder bare HTML-fila. Lokale moduler brukes kun av testriggen.
+  if (!name.startsWith('/node_modules/three/') && !(process.env.TEST_SOURCE && name.startsWith('/src/'))) {
+    res.writeHead(404); res.end(); return;
+  }
   const file = path.resolve(root, '.' + name), rel = path.relative(root, file);
   if (rel.startsWith('..') || path.isAbsolute(rel) || !fs.existsSync(file) || !fs.statSync(file).isFile()) {
     res.writeHead(404); res.end(); return;
@@ -42,6 +49,8 @@ try {
     args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--autoplay-policy=no-user-gesture-required'],
   });
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
+  page.setDefaultTimeout(90000);
+  page.on('requestfailed', r => errors.push(`${r.failure()?.errorText} ${r.url()}`));
   page.on('pageerror', e => errors.push(e.stack || e.message));
   page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
   page.on('response', r => { if (r.status() >= 400) errors.push(`${r.status()} ${r.url()}`); });
@@ -52,13 +61,46 @@ try {
   for (const f of ['sim.js', 'town.js', 'townstress.js', 'stress.js']) {
     await page.addInitScript(fs.readFileSync(path.join(root, 'tools/test', f), 'utf8'));
   }
-  await page.goto(`http://127.0.0.1:${server.address().port}/`, { timeout: 90000 });
+  await page.goto(`http://127.0.0.1:${server.address().port}${gamePath}`, { timeout: 90000 });
   await page.addStyleTag({ content: '*,*::before,*::after{animation-duration:0s!important;transition:none!important}' });
   await page.waitForFunction(() => window.G?.game && window.G?.player && window.G?.fx?.combat, null, { timeout: 90000 });
+  // Bruk samme startknapp og tastatur som en spiller, fra Pages-undermappa.
+  await page.keyboard.press('Enter');
+  await page.waitForFunction(() => window.G.state === 'title' && document.querySelector('#splash').hidden);
+  await page.screenshot({ path: path.join(out, 'tittel.png') });
+  await page.locator('#mi-quick').click();
+  await page.waitForFunction(() => window.G.state === 'play' && window.G.depth === 0 && !window.G.game.wiping);
+  result.start = await page.evaluate(() => ({
+    path: location.pathname, state: G.state, depth: G.depth, town: !!G.dungeon.isTown,
+    duckVertices: G.assets.duckGeo?.getAttribute('position').count || 0,
+    textureLoaded: !!G.assets.duckTex?.image?.complete,
+    hudVisible: !G.ui.hud.hidden, titleHidden: document.querySelector('#title').hidden,
+  }));
+  assert.equal(result.start.path, gamePath);
+  assert.equal(result.start.state, 'play');
+  assert.ok(result.start.town && result.start.hudVisible && result.start.titleHidden);
+  assert.ok(result.start.duckVertices > 1000 && result.start.textureLoaded, 'andemodellen mangler');
+  await page.screenshot({ path: path.join(out, 'start-i-fristaden.png') });
+  const before = await page.evaluate(() => ({ x: G.player.pos.x, z: G.player.pos.z }));
+  await page.keyboard.down('w');
+  try {
+    result.movement = await page.evaluate(() => ({
+      keyReceived: G.input.down('KeyW'), error: sim(0.75),
+      x: G.player.pos.x, z: G.player.pos.z,
+    }));
+  } finally { await page.keyboard.up('w'); }
+  assert.ok(result.movement.keyReceived, 'W når ikke spilleren');
+  assert.equal(result.movement.error, null);
+  assert.ok(Math.hypot(result.movement.x - before.x, result.movement.z - before.z) > 0.05, 'spilleren beveger seg ikke');
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(() => window.G.state === 'pause' && !document.querySelector('#pause').hidden);
+  await page.locator('#btn-resume').click();
+  await page.waitForFunction(() => window.G.state === 'play' && document.querySelector('#pause').hidden);
+  result.pauseAndResume = true;
   result.stress = await page.evaluate(() => stress('tjuv', 20));
   assert.deepEqual(result.stress.errors, [], 'stresstesten feilet');
   assert.equal(result.stress.floors.length, 5);
-  // Treff- og magishadere m� ogs� kompileres med ekte WebGL.
+  // Treff- og magishadere må også kompileres med ekte WebGL.
   await page.evaluate(() => {
     const G = window.G;
     G.player.setSheet(G.game.selectedSheet());

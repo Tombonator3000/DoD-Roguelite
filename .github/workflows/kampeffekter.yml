@@ -1,4 +1,4 @@
-name: Test kampeffekter
+name: Test spill og kampeffekter
 
 on:
   pull_request:
@@ -9,6 +9,7 @@ on:
       - 'package.json'
       - 'tools/test/**'
       - '.github/workflows/kampeffekter.yml'
+      - '.github/workflows/pages.yml'
   workflow_dispatch:
 
 permissions:

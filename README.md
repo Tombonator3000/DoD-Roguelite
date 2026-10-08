@@ -42,6 +42,8 @@ Laget med three.js r170. Alt annet er skrevet for hånd: teksturer, musikk, lyd,
 
 ## Kjøre spillet
 
+[Spill i nettleseren](https://tombonator3000.github.io/DoD-Roguelite/). Trykk en tast på åpningsbildet, og velg «Ned i mørket» for å starte med Svart Nebb i Fristaden.
+
 Åpne `dist/index.html` i en moderne nettleser (Chrome, Edge, Firefox). Det trengs nett for å hente three.js fra jsdelivr og skriftene fra Google Fonts. Ingen server trengs.
 
 ## Bygge
@@ -53,6 +55,8 @@ npm run build:dev    # uten minifisering
 ```
 
 `build.mjs` bundler `src/*.js` med esbuild (three holdes ekstern og lastes via importmap), og bygger inn `assets/duck.bin` og `assets/duck_tex.jpg` som base64.
+
+GitHub Pages publiseres fra `main` etter at bygg, regresjonstester og nettlesertest har bestått. Nettlesertesten klikker startknappen, sjekker anda, tastatur og pause, og kjører fem nivåer fra samme undermappe som Pages. Den bruker lokale Three.js-filer; tilgjengeligheten til jsdelivr og Google Fonts testes ikke. Skjermbilder og `resultat.json` ligger i Actions-artefakten `pages-spilltest`.
 
 ## Kontroller
 

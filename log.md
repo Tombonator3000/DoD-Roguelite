@@ -135,3 +135,5 @@ Alt som gjøres i prosjektet loggføres her med tidsstempel (Europe/Oslo).
 ## 2026-10-08: spillbarhet på GitHub Pages (ChatGPT)
 
 - 09:02 (ChatGPT) PR #1 er flettet inn. Pages-publiseringen av 5232b06 er grønn og peker til https://tombonator3000.github.io/DoD-Roguelite/. Reserverte spilltest før publisering på egen gren. Direkte nettlesertilgang til den offentlige adressen er avvist i denne økta; testene kjøres mot en lokal kopi.
+- 09:05 (ChatGPT) La inn startknapp, modell og tekstur, W-bevegelse og pause/Fortsett i den eksisterende nettlesertesten. Spillet serveres fra /DoD-Roguelite/ som på Pages. Pages-jobben må bestå disse kontrollene, fem nivåer og kampeffektopprydding før HTML-fila lastes opp; testbilder og resultat lagres også ved feil. README har direkte spilladresse.
+- 09:08 (ChatGPT) Fire kampeffekt-tester bestått lokalt. Nettlesertesten besto start fra /DoD-Roguelite/, original and med 19 594 verts og tekstur, W-bevegelse, pause/Fortsett, fem nivåer og åtte oppryddinger uten konsoll- eller spillfeil. GitHub skal også teste det minifiserte bygget i PR #2.

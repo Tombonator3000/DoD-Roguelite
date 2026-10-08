@@ -59,6 +59,8 @@ Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når p
 
 ## Teknisk
 
+- [ ] Spilltest før Pages-publisering: startknapp, andemodell, tastatur og pause fra prosjektets undermappe, fem nivåer og kampeffekter. ChatGPT i PR #2.
+
 - [x] Instansierte kampeffekter og opprydding ved nivåbytte, ChatGPT i PR #1. Tester og overlevering følger med.
 
 - [ ] Instansiere fiendedeler for færre draw calls hvis det blir mange fiender.
