@@ -6,17 +6,17 @@ Sortert etter hva som gir mest spill for minst jobb.
 
 Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når pull requesten er inne. Se AGENTS.md.
 
-- Claude (`main`): bytter reglene fra DoD 2023 til DoD91 (4.0) med Expert og Gigant der det trengs, med fulle träffområden. Rører nesten alt i regelkoden: dod.js, rules.js, player.js, enemies.js, creation.js, ui.js, loot.js, townfolk.js. Vent med endringer i disse til det er pushet.
-- Claude (`main`, etterpå): shadere (ild, vann, vind, våte flater), vær og flere partikler, tilt-shift og fargegradering. fx.js, post.js, town.js, world.js.
+- Claude (`main`): shadere (ild, vann, vind, våte flater), vær og flere partikler, tilt-shift og fargegradering. fx.js, post.js, town.js, world.js, dungeon.js.
 
 ## Nå
 
 - [x] Inventar med sekk, belte, 3D-ikoner og dra og slipp (0.5)
 - [x] Lagre og laste med autolagring og tre plasser (0.5)
-- [ ] DoD91-regler (4.0) med Expert og Gigant: egenskaper, färdigheter i T20, träffområden med egne KP, skadebonus, magi med PSY/KP-kostnad, yrken og raser fra Bok I. Lagrede spill fra 2023-reglene kan ikke lastes etterpå.
+- [x] DoD91-regler (4.0) med Expert og Gigant: sju grundegenskaper, FV per ferdighet, träffområden med egne KP og rustning, parering per SR, magi med PSY, yrker og raser fra Bok I, Skräcktabellen, stridsmoral, fummeltabeller, EP og hjältepoäng (0.5). Lagrede spill fra 2023-reglene kan ikke lastes.
+- [ ] Shadere, vær og partikler, postprosessering (Claude, pågår).
 
-- [ ] Sjekke de uverifiserte verdiene (`uv: true` i src/dod.js) mot grunnboka: WP-kostnader og krav for hjälteförmågor, svenske navn, tabellen for svåra skador, noen våpen. Lista står i memory.md.
-- [ ] Spilltest balansen på ekte maskin med flere rollpersoner. Spesielt: svake rollpersoner (FYS 6-8) på nivå 1, ridder i plåt mot Rødpels, magiker uten våpen, hvor ofte pressa-boksen dukker opp.
+- [ ] Sjekke det som er merket `uv` mot bøkene: rottene (finnes ikke i Bok II), Rødpels og demonen, prisene i byen, sanntidsoversettelsene i docs/regler/IMPLEMENTERING.md.
+- [ ] Spilltest balansen på ekte maskin med flere rollpersoner. Spesielt: svake rollpersoner (FYS 6-8) på nivå 1, halvlängdsman med STY 4, ridder i plåt mot Rødpels, magiker med stav (FV 5 er lite), hvor ofte du blir medvetslös.
 - [ ] Rigge anda (Tripo har auto-rigging, ellers Mixamo) og bytte vagge-animasjonen med ekte gange, angrep, dukk og fall.
 - [ ] Bedre modeller for de andre släktene (samme pipeline som anda), eller i det minste kontur og hender.
 - [x] Musikk, fancy startmeny, bedre grafikk og effekter (0.2)
@@ -29,12 +29,12 @@ Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når p
 
 ## DoD-regler som mangler
 
-- [ ] Flere hjälteförmågor: Stridsrop, Kattfot, Förklädnad, Örnöga, Gott läkekött, Järngrepp, Blixtsnabb, Magisk talang, Massivt slag, Mästerkock, Mästerbesvärjare, Monsterjägare, Stigfinnare, Kvartermästare, Ynkrygg, Parera pilar.
-- [ ] Allmän magi (Skingra, Beskyddare, Magisk sköld), besvärjelser på rang 2 og 3, lære nye fra grimoire eller lærer, grensen for preparerte besvärjelser.
-- [ ] Bruk for ferdigheter som ikke gjør noe ennå: Hoppa & klättra (hull og avsatser), Bluffa (vakter), Vildmarksvana (mat), Simma (dypt vann), Rida, Sjökunnighet, Observation, Taktik. (Jakt & fiske, Uppträda, Fingerfärdighet og Köpslå brukes i byen fra 0.4.)
-- [ ] Belastning (STY/2 gjenstander), mat og sult, fakler som brenner ut, gull og kopper i tillegg til silver.
-- [ ] Sykdom og gift med virulens og styrke som motstridige slag.
-- [ ] Flere monstre fra boka med egne angrepstabeller (troll som regenererer, kjempeedderkopp med nett, gast med skräck).
+- [ ] Hjälteförmågor som ikke er i koden ennå: Tålig, Stålblick, Fint, Hjältesprång, Giftskydd, Sköldkrossare. De står i HJALTEFORMAGOR, men Jehanne selger dem ikke.
+- [ ] Flere besvärjelser fra Bok III og Expert Magi, og lære fra formelsamlinger i kloakken.
+- [ ] Bruk for ferdigheter som ikke gjør noe ennå: Rida, Sjökunnighet, Spåra, Geologi og flere kunskapsferdigheter.
+- [ ] Mat og sult, fakler som brenner ut, guld- og kopparmynt i tillegg til silver.
+- [ ] Gift og sykdom med styrke mot FYS på Motståndstabellen.
+- [ ] Flere monstre fra Bok II og Monsterboken med egne anfall (troll som gror, jättespindel med nett, gast med skräck).
 
 ## Snart
 

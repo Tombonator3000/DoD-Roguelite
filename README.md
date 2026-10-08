@@ -1,8 +1,20 @@
 # Svart Nebb under Fristaden
 
-En spillbar prototype av et roguelite i stil med Diablo og Hades, med litt Ultima i dialogen. Du spiller Svart Nebb (egentlig Nansen), anka fra Fristaden i Zorakin, eller lager din egen rollperson. Reglene under panseret er hentet fra Drakar och Demoner (2023) og tilpasset sanntid: T20 under ferdigheten, Drake og Demon, parera og undvika, pressa slag, tillstånd, hjälteförmågor, magi med effektgrad, vila og dödsslag.
+En spillbar prototype av et roguelite i stil med Diablo og Hades, med litt Ultima i dialogen. Du spiller Svart Nebb (egentlig Nansen), anka fra Fristaden i Zorakin, eller lager din egen rollperson. Reglene under panseret er Drakar och Demoner 4.0 fra 1991, med Expert og Gigant der det trengs, tilpasset sanntid: 1T20 mot CL, perfekt og fummel, träffområden med egne KP og rustning, parering per stridsrunde, Skräcktabellen, stridsmoral, magi med PSY, erfarenhet og hjältepoäng.
 
 Laget med three.js r170. Alt annet er skrevet for hånd: teksturer, musikk, lyd, fiendemodeller og effekter genereres i nettleseren. Den eneste eksterne ressursen er 3D-modellen av anda, som er pakket inn i HTML-fila.
+
+## Nytt i 0.5: DoD91, inventar og lagring
+
+- Reglene er byttet fra DoD 2023 til DoD 4.0 (1991) med Expert og Gigant. Sju grundegenskaper med STO, FV per ferdighet, yrkene og rasene fra Bok I, stridskonster fra Gigant (Quack-fu for anka).
+- Fulle träffområden: hvert treff går mot en kroppsdel med egne KP og egen rustning. En arm på 0 slipper våpenet, et bein på 0 setter deg på kne, hodet på 0 slår deg ut. Kroppsdelene vises som en liten figur ved KP-kula.
+- Parering er ett slag per våpen eller skjold per stridsrunde, med tabellen fra Bok II: skade over BV koster våpenet 1 BV. Fiendene parerer også, og de har egne våpen og rustning.
+- Magi koster PSY. Effektgraden senker CL. Fummel gir Snedtändning. Ingen metall mot kroppen.
+- Medvetslös i stedet for dödsslag: vätter og orcher raner deg, rotter biter, skjeletter og demoner slår videre. Du våkner etterpå, eller reiser deg med en hjältepoäng.
+- Erfarenhet per ferdighet. Den setter seg når du hviler en uke på Den feite gåsen. Hjältepoäng fra store dåder gjør neste slag bedre (V), eller blir til grundegenskaper og hjälteförmågor hos Syster Jehanne.
+- Ny rollpersonsskaping i ti steg etter Bok I, med tre sett terninger, flytting 2:1, alder, socialt stånd, yrkesval, EP-fordeling, besvärjelser, utrustning og navn.
+- Inventar med 3D-ikoner: sekk etter bärförmåga (STY kg), belte med legedrikker, sju plasser på kroppen (også armar og ben), dra og slipp, sammenligning med det du har på.
+- Lagre og laste: autolagring og tre plasser med bilde, både i byen og nede i kloakken.
 
 ## Nytt i 0.4: Fristaden over bakken
 
@@ -17,7 +29,7 @@ Laget med three.js r170. Alt annet er skrevet for hånd: teksturer, musikk, lyd,
 - Fra trappa mellom nivåene kan du klatre opp til byen, og kloakkluken tar deg tilbake dit du snudde.
 - Ny musikk: «Fristadens torg» i D-dur, stille om natta og en dans på vertshuset.
 
-## Nytt i 0.3
+## Nytt i 0.3 (med DoD 2023-reglene, byttet ut i 0.5)
 
 - Rollpersonsskaping etter kapittel 2 i DoD: släkte (T12), yrke (T10), ålder (T6), grundegenskaper (4T6, stryk laveste, ett bytte), färdigheter (6 fra yrket og 2, 4 eller 6 frie), hjälteförmåga eller tre besvärjelser og tre trolleritrick, utrustningspakke (T6), navn, svaghet, utseende og minnessak (T20). Valgfri bakgrunn fra Aidne (Ereb Altor) med socialt stånd og en ekstra tränad ferdighet.
 - Rollpersonene lagres i nettleseren og kan endres eller slettes. Svart Nebb er bygget på nytt som en ferdig DoD-rollperson.
@@ -64,21 +76,21 @@ GitHub Pages publiseres fra `main` etter at bygg, regresjonstester og nettlesert
 |---|---|
 | WASD | Gå. Musa sikter. |
 | Venstre klikk | Anfall (hold for kombo). Med avstandsvåpen skyter du. |
-| Høyre klikk | Parera (hold inne) |
-| Mellomrom | Undvika (dukk unna) |
+| Høyre klikk | Parera (hold inne). Ett våpen eller skjold parerer én gang per stridsrunde. |
+| Mellomrom | Dukk unna (SMI-slag hvis et anfall treffer mens du dukker) |
 | Q / Z | Kast et kastvåpen / bytt våpen (også musehjulet) |
-| R / G / T | Hjälteförmågor, eller besvärjelser (hold for effektgrad 2 og 3) |
-| F | Släktesförmåga |
-| Shift | Smyga. Neste angrep blir et smyganfall |
-| X, 1 til 6 | Pressa slaget når boksen dukker opp |
-| V / H | Snabb vila / kort vila |
-| 1 | Legedrikk (2T6 KP) |
-| E | Ta opp, åpne, les, snakk, gå ned trappa eller kloakkluken |
+| R / G / T | Besvärjelser (hold for høyere effektgrad), eller Bärsärkagång og Avväpna |
+| F | Yrkesförmåga: Handpåläggning, Meditation, Riddarslag, Tjuvens tur, Bardens sång |
+| H | Första hjälpen (stopper blødning) |
+| V | Gjør klar en hjältepoäng: neste slag blir ett trinn bedre |
+| Shift | Smyga. Bakfra mot en som ikke har sett deg: +7, og ingen parering |
+| 1 | Legedrikk |
+| E / X | Ta opp, åpne, snakk, gå ned trappa / ta på med en gang |
 | Skriv + Enter | Spør om et ord i samtaler |
-| C | Rollformulär |
+| I / C | Packning / rollformulär |
 | Tab | Stort kart |
 | M | Lyd av/på |
-| Esc | Pause |
+| Esc | Pause, lagre og laste |
 
 På mobil vises en virtuell stikke og knapper. Angrep sikter automatisk på nærmeste fiende.
 
@@ -86,25 +98,32 @@ På mobil vises en virtuell stikke og knapper. Angrep sikter automatisk på nær
 
 ```
 src/
-  main.js       spill-løkke, kamera, lys, meny, rollpersoner, etasjer, vila, dödsslag, pressa slag, butikk, byen inn og ut
+  main.js       spill-løkke, kamera, lys, meny, rollpersoner, etasjer, søvn i trappa, medvetslös, butikk, byen inn og ut
   townmap.js    kartet over Fristaden (ren data)
   town.js       byen: hus, tak, vegger, elv, mur, inventar, kollisjon, sol og måne
   towntex.js    teksturer for byen
   townpeople.js folk i byen, samtaletekst, rykter, oppslagstavla
   townfolk.js   døgnrytme, tjenester, tyveri, oppdrag
   talk.js       samtaler med nøkkelord
-  dod.js        regeldata fra Drakar och Demoner: ferdigheter, släkten, yrken, våpen, evner, magi, tabeller
+  dod.js        regeldata fra DoD 4.0, Expert og Gigant: raser, yrker, färdigheter, våpen, rustning, besvärjelser, tabeller
+  body.js       kroppsdelene: KP per träffområde, blødning, lammelser
   rules.js      terninger, slag, rollformulär (buildSheet), Svart Nebb, tilfeldig rollperson
-  creation.js   rollpersonsskaping i åtte steg
+  creation.js   rollpersonsskaping i ti steg
   player.js     rollpersonen: bevegelse, våpen, forsvar, evner, magi, vila, animasjon
   kinmodels.js  modeller for släktene, våpen, hund og demon
-  companion.js  jegerens hund
   enemies.js    fiendetyper og AI, monsterangrep, sjefen Rødpels
   dungeon.js    generator, kollisjon, sikt, flytfelt, stier, geometri
   world.js      prosjektiler, loot, kister, gjemmesteder, runer, trapp, butikk, lys-pool
   title.js      3D-scenen bak tittelskjermen og rollpersonen på plattformen
   ui.js         HUD, evnelinje, logg, kart, tooltip, rollformulär
   loot.js       gjenstander, unike, gaver
+  inventory.js  sekk, belte, vekt, salg
+  invui.js      inventarskjermen
+  icons.js      3D-ikoner for gjenstander
+  itemmodels.js modeller av gjenstander
+  save.js       lagring av løp
+  saveui.js     lagre/laste-menyen
+  combatfx.js   instansierte kampeffekter (ChatGPT)
   music.js      musikkmotor og sanger
   audio.js      prosedyrisk lyd
   post.js       fargegradering, korn, vignett, blink
@@ -126,6 +145,6 @@ dist/
 
 ## Om reglene
 
-Reglene følger Drakar och Demoner (Fria Ligan, 2023) så langt det går i sanntid. Initiativkort og runder er byttet ut med telegraferte angrep og nedkjøling, og noen evner er tilpasset (de står forklart både som i boka og som i spillet). Verdier som ikke er sjekket mot grunnboka er merket `uv` i `src/dod.js`. Bakgrunnen fra Aidne er fra «Ereb Altor: Hjältar från Kopparhavet».
+Reglene følger Drakar och Demoner 4.0 (1991) med Expert og Gigant så langt det går i sanntid. En stridsrunde (SR) er 1,5 sekunder, initiativ er byttet ut med telegraferte angrep, og noen förmågor er tilpasset. Bøkene er oppsummert med sidetall i `docs/regler/`, og `docs/regler/IMPLEMENTERING.md` forklarer hvordan hver regel er oversatt. Det som ikke står i boka, er merket `uv`. Bakgrunnen fra Aidne er fra «Ereb Altor: Hjältar från Kopparhavet».
 
 Se `memory.md` for tekniske beslutninger og hvordan reglene er tolket, `todo.md` for neste steg og `IDEER.md` for idébanken.

@@ -5,7 +5,7 @@ Ting som er lurt å huske neste gang noen (menneske eller AI) jobber med prosjek
 ## Hva det er
 
 - Roguelite dungeon crawler, Diablo/Hades-kamera og -kamp, Ultima-aktig dialog med nøkkelord.
-- Regler fra Drakar och Demoner (Fria Ligan, 2023, også kjent som Dragonbane), tilpasset sanntid.
+- Regler fra Drakar och Demoner 4.0 (1991, "DoD91") med Expert og Gigant der DoD91 ikke dekker noe, tilpasset sanntid. Fram til 0.5 var det DoD 2023 (Dragonbane); de reglene er fjernet helt.
 - Hovedperson: Svart Nebb, egentlig Nansen. Anka, tjuv og lönnmördare fra Fristaden i Zorakin (Ereb Altor). Kampstil: Kvakk-Fu (Slagsmål), lært av Mester Flansen. Skal føles brutal, ikke elegant.
 - Fra 0.3 kan du også lage egen rollperson etter reglene. Svart Nebb er den ferdige rollpersonen.
 - Far (herr Nansen) er butikkbetjent, ikke kjøpmann. Gjennomgangsvits. Spiller du en annen rollperson, er han den som har leid deg, og han har egne replikker (NANSEN i main.js).
@@ -14,11 +14,11 @@ Ting som er lurt å huske neste gang noen (menneske eller AI) jobber med prosjek
 
 ## Kilder for reglene
 
-- Google Drive har "ereb_altor_hjaltar_fran_kopparhavet.pdf" (id 1QKI2XwSbfsRLdwJL8mb4C5qZWWOO2e_F), men ikke grunnboka for DoD 2023. Teksten ligger uttrukket i /home/claude/rules/hjaltar.txt (forsvinner med sandkassen).
-- Resten kommer fra nettet (oktober 2026): Free Leagues offisielle Foundry-modul via den italienske oversettelsen (github.com/LuckyFrico/dragonbane-translation-ita), Foundry-systemet pafvel/dragonbane, Roll20-arket (svenske navn), offisielle pregens, forumet til Fria Ligan. Ingen piratkopier.
-- Verdier som ikke er sjekket mot boka er merket `uv: true` i src/dod.js. Har Tom boka, bør disse sjekkes: WP-kostnad og krav for de fleste hjälteförmågor, svenske navn på Anpasslig, Hal som en ål, Inre frid, Livvakt (Guardian), Sjöben, Skattjägare, intervallene i tabellen for svåra skador, STY-krav for tvåhandssvärd, skaden til stridsklubba og treudd, besvärjelsenes svenske navn (Eldklot, Vindstöt, Blixtsken, Långsteg, Lyfta, Snärjande rötter).
-- Tom har pekt på https://kingafw.no/Drakar/index.html (oktober 2026): bibliotek med eldre utgaver (DoD 1.0 til 5.0, Expert, Chronopia), svensk tekst. Bra for lore og monstre (Ereb Altor, Monsterboken, Svartfolk, Tjuvar och lönnmördare, Kopparhavets Kapare), men ikke for tallene i 2023-reglene.
-- Funn: Ill-Tempered heter Vresig på svensk (ikke Lättretad), Webbed Feet heter Simfötter.
+- DoD 4.0 Bok I (Grundregler), Bok II (Strid), Bok III (Magi), Expert Regler og Magi, Gigant Regelbok. Teksten er hentet fra https://kingafw.no/Drakar/index.html (Toms lenke, oktober 2026) og oppsummert med sidetall i docs/regler/ (bok1.md, bok2.md, magi.md, expert_gigant.md).
+- docs/regler/IMPLEMENTERING.md er kontrakten: hvordan hver regel er oversatt til sanntid, og Player-API-et som byen og skapingen bruker. Les den før du rører regelkoden.
+- Verdier som ikke står i boka (fiender som ikke finnes der, priser i byen, sanntidsoversettelser) er merket `uv` i koden eller i IMPLEMENTERING.md.
+- Lore: Ereb Altor, Monsterboken 1 og 2, Svartfolk, Tjuvar och lönnmördare, Kopparhavets Kapare fra samme bibliotek. "Ereb Altor: Hjältar från Kopparhavet" (Google Drive, id 1QKI2XwSbfsRLdwJL8mb4C5qZWWOO2e_F) for Aidne-bakgrunnen.
+- Funn fra 2023-tida som fortsatt gjelder for navn: Simfötter (Webbed Feet).
 
 ## Tekniske beslutninger
 
@@ -33,7 +33,7 @@ Ting som er lurt å huske neste gang noen (menneske eller AI) jobber med prosjek
 - Lys: én spotlight over spilleren med skygge, svakt halvkulelys, og en pool på 7 punktlys som flyttes til nærmeste fakler hver frame.
 - Bloom via UnrealBloomPass, tonemapping ACES via OutputPass, GradePass til slutt.
 - Delt tilstand i `G` (state.js). `window.G` og `G.dev` (randomChoices, buildSheet) er satt for feilsøking.
-- Lagring i localStorage med try/catch: meta (svartnebb.meta.v1), innstillinger (svartnebb.settings.v1), rollpersoner (svartnebb.chars.v1, maks 8), valgt rollperson (svartnebb.lastchar).
+- Lagring i localStorage med try/catch: meta (svartnebb.meta.v1), innstillinger (svartnebb.settings.v1), rollpersoner (svartnebb.chars.v1, maks 8), valgt rollperson (svartnebb.lastchar), lagrede spill (svartnebb.saves.v1, fra 0.5).
 
 ## Versjon 0.2: lyd, meny og grafikk
 
@@ -45,32 +45,36 @@ Ting som er lurt å huske neste gang noen (menneske eller AI) jobber med prosjek
 
 ## Versjon 0.3: egen rollperson og DoD-regler
 
-- Moduler: dod.js (all regeldata), rules.js (terninger, buildSheet, svartNebb, randomChoices), creation.js (skapingen), kinmodels.js (modeller), companion.js (hunden).
+- Moduler: dod.js (all regeldata), rules.js (terninger, buildSheet, svartNebb, randomChoices), creation.js (skapingen), kinmodels.js (modeller). companion.js (hunden) ligger der fortsatt, men brukes ikke fra 0.5.
 - Regeltermer står på svensk som i boka (färdigheter, tillstånd, förmågor). Resten av teksten er norsk.
-- Rollformulär (sheet) er et rent JSON-objekt: kin, profession, age, school, rawAttrs, attrs (etter alder), trained, skills, kinAbilities, heroic, spells, tricks, gear { w, a, h, g }, silver, food, weakness, appearance, memento, aidne, choices (for å kunne endre senere).
+- Rollformulär (sheet) er et rent JSON-objekt. Fra 0.5 er formatet DoD91 (`v: 2, rules: 'dod91'`): kin, profession, age, sex, rolled, attrs (sju: STY STO FYS SMI INT PSY KAR), special, hand, stand, yrke (valgte yrkesfärdigheter), skills { navn: FV }, spells { id: S }, school, konst, ability, gear { w, a, g }, silver, ep-felter, choices. Gamle formulærer (2023) filtreres bort i main.js.
 - Hvert løp starter fra formulæret. Forbedringer i løpet forsvinner når løpet er over (roguelite). Bare dojo-oppgraderinger er permanente.
-- Utstyr: vapen (hovedhånd), vapen2 (reserve eller skjold), rustning, hjalm, amulett. Ubevæpnet = Slagsmål T6.
-- Tastene: LMB anfall, RMB parera (hold), Mellomrom undvika, Q kast, Z/hjul bytt våpen, R/G/T evner eller besvärjelser (hold for effektgrad 2 og 3), F släktesförmåga, Shift smyga, X pressa, V snabb vila, H kort vila, 1 legedrikk, E bruk.
+- Utstyr fra 0.5: sju plasser, vapen (hovedhånd), vapen2 (andre hånd eller skjold), rustning (kropp), armar, ben, hjalm, amulett. Ubevæpnet = Slagsmål.
+- Tastene fra 0.5: LMB anfall, RMB parera (hold), Mellomrom dukk, Q kast, Z/hjul bytt våpen, R/G/T besvärjelser eller Bärsärkagång/Avväpna (hold for høyere E), F yrkesförmåga, H första hjälpen, V gjør klar en hjältepoäng, Shift smyga, 1 legedrikk, E bruk, X ta på, I packning, C rollformulär.
 
-## Regler slik de er implementert
+## Versjon 0.5: inventar og lagring
 
-- Slag: T20 lik eller under. 1 Drake, 20 Demon. Fördel/nackdel: to terninger, beste eller verste, nuller hverandre.
-- Grundchans etter egenskap (1-5: 3, 6-8: 4, 9-12: 5, 13-15: 6, 16-18: 7). Tränad = dobbel. Sekundære (magi) finnes bare hvis tränad.
-- Skadebonus fra STY eller SMI etter våpenets ferdighet (13-16 T4, 17+ T6). Armbrøst har ingen.
-- Tillstånd: nackdel på egenskapen og ferdighetene som hører til. Varer til vila. Får du et du har, velges et annet. Alle seks: T6 VP, så T6 KP.
-- Pressa slag: viktige slag (forsvar, smyga, magi, lås, gjemmesteder, runer, skräck, butikk) gir en boks med sakte film (tid x0.12) i 1,8 sekunder. Standardvalget er tillståndet som hører til slaget. Innstilling: Viktige, Alle, Aldri. Demon kan ikke presses.
-- Forsvar: angrep som lander mens du dukker (0,3 s vindu) gir Undvika-slag. Holder du parera og angrepet kommer forfra, slår du våpenets ferdighet (skjold: beste STY-närstrid). Mot en fiendes Drake hjelper bare en Drake. Parera-Drake gir motanfall. Skade over brytvärdet gjør våpenet trasig (nackdel), unntatt stikkskade. Piler kan bare pareres med skjold. Monsterangrep kan bare pareres der det står (eller med Sköldblockad).
-- Anfall treffer ett mål (Dubbelhugg: to). Tredje slag i komboen er tungt (fellende våpen slår overende), med kniv eller knyttneve er det et spark (Slagsmål).
-- Smyganfall (fra Smyga, overraskede fiender eller Tjuvhugg): fördel, kan ikke forsvares, smidige våpen får en terning til, Lönnmördare +T8.
-- Drake på anfall velges automatisk: ignorer rustning (stikk mot rustning 3+), ekstra anfall (hvis målet uansett dør og det står en til ved siden), ellers dobbel skadeterning.
-- Demon på anfall: T6 på missödestabellen for närstrid eller avstånd.
-- Fiender (NPC) parerer eller undviker av og til, og det koster dem tid. Monstre forsvarer seg mot 15 med "handlingskraft"-poeng.
-- Vann: halv fart, nackdel på närstrid, ingen avstandsanfall. Simfötter og Sjöben fjerner det.
-- Vila: snabb vila (V, T6 VP, én per nivå), kort vila (H eller i trappa, T6 KP, T6 VP, ett tillstånd, alv mediterer, minnessaken tar ett til én gang per nivå), lång vila hos butikkbetjenten (alt). VP kommer også sakte tilbake utenfor kamp (1 per 5 s), det er spillets eget.
-- Dödsslag: FYS, Krasslig gir nackdel, kan ikke presses, Drake og Demon teller dobbelt. Tre lyktes gir T6 KP. Samla sig (PSY med nackdel) lar deg handle med 0 KP med dödsslag hvert 5. sekund. Skade på 0 KP er et misslyckat dödsslag. Omedelbar död hvis skade minus KP er minst maks KP. Svåra skador (valgfritt): FYS-slag etter fallet, ellers T20.
-- Forbedring: Drake og Demon markerer. Sesjonsspørsmål i trappa (nytt sted, farlig fiende, hinder uten vold, svakhet) gir kryss du velger selv. T20 over verdien gir +1. Ferdighet som når 18 gir en hjälteförmåga. Etter nivå 2 og 4 kan du også få en.
-- Skräck: Rødpels' vrål gir PSY-slag og T8 på skräcktabellen. Orädd står imot for 2 VP.
-- Magi: effektgrad 1-3 koster 2/4/6 VP (Blixtsken dobbelt innendørs). Feil slag bruker VP likevel. Drake: dobbel effekt eller gratis. Demon: T20 magiskt missöde (dyreskikkelse er en rotte, 20 kaller på en demon). Metallrustning eller metallhjelm stopper magi. Kraft ur kroppen ved 0-1 VP.
+- Moduler: inventory.js (sekk, belte, vekt, giveItem, salg), invui.js (inventarskjermen med dra og slipp), icons.js (egen WebGL-renderer for 3D-ikoner), itemmodels.js (modeller av alle gjenstander), save.js og saveui.js (lagring), body.js (kroppsdelene).
+- Lagring: autolagring og tre plasser med bilde av skjermen. Nivået bygges på nytt fra frøet, og bare endringene lagres (levende fiender, åpne kister, knuste tønner, gjemmesteder, ting på bakken, sett kart, butikk). Ikke midt i en kamp. Autolagring slettes når løpet er over. SAVE_VERSION 2 og rules 'dod91': eldre lagringer kan ikke lastes.
+- Gjenstander som går til spilleren, skal gjennom giveItem (inventory.js). Skjold går til vapen2.
+
+## Regler slik de er implementert (DoD91, fra 0.5)
+
+Detaljene står i docs/regler/IMPLEMENTERING.md. Det viktigste:
+
+- Slag: 1T20 lik eller under CL. Slår du 1, slår du om: under FV er perfekt. Slår du 20, slår du om: over FV er fummel (`clRoll(cl, fv)`). Motståndstabellen: 10 + aktiv - passiv (`resist`).
+- Kroppen (src/body.js): totala KP = ceil((FYS+STO)/2), og sju kroppsdeler med egne KP fra `locKP` (huvud, brost, mage, harm, varm, hben, vben). Rustning per kroppsdel, beste stykke teller, pluss SKYDD og naturlig rustning. LOC_NAME er svensk (rollformulär), LOC_SHORT er norsk prosa (hodet, brystet, høyre arm).
+- En kroppsdel på 0 blør 1 KP per 6 SR. Arm 0 slipper våpenet, bein 0 setter deg på kne, bryst eller mage 0 betyr kryping, hodet 0 slår deg ut. Kritisk (KP på minus maks): hodet er døden, bryst og mage gir medvetslös og et svårt FYS-slag, armer og bein slår på CRIT_LIMB. -2 CL per tapt KP i kroppsdelene ferdigheten trenger. Totala KP 2 halverer CL, 1 stopper ferdigheter, 0 er medvetslös, minus FYS er døden.
+- Parering: én per våpen eller skjold per SR (`parryT`, må være { vapen: 0, vapen2: 0 }). Resultattabellen i Bok II: lyckat tar slaget, skade over BV koster 1 BV og resten går igjennom. Ingen parering mot piler (bare skjold), kastvåpen bare med skjold, naturlige anfall kan ikke pareres. Projektilparering (hjälteförmåga) gir parering mot piler og kast med sverd eller stav.
+- Dukking er et vanlig SMI-slag (+3 med Akrobatik 5 og ingen metall). Posisjon: bakfra +7, fra siden +3, liggende +5, ubevegelig +10. Lönnmördare bakfra: x1 ved bom, x2 lyckat, x4 perfekt, uten SB.
+- Grep: STY minst kravet gir én hånd, minst halve kravet krever to hender, ellers for tungt (`gripOf`). Utrustningsforslaget i skapingen bytter våpen som er for tunge (`fitKit`/`kitOf` i rules.js).
+- Fummel fra Expert (FUMMEL_NARSTRID, FUMMEL_AVSTAND), stridsmoral fra Expert (1T20 lik eller under moral, ellers flykt eller bärsärk), Skräcktabellen (1T20 - PSY + skräckslå + modifikasjon).
+- Magi: CL = S - 2(E-1). Koster E PSY, perfekt E/2, misslyckat 1, fummel E og Snedtändning. Ingen metall på kroppen. PSY kan aldri gå til 0 ved trylling. Skade bryter konsentrasjonen. PSY kommer tilbake med 1 per 20 s utenfor kamp (spillets eget).
+- Erfarenhet: første lyckade slag per ferdighet etter søvn gir 1 EP (perfekt 1T3+1). EP blir FV når du hviler en uke på vertshuset (`restWeek`, kostnad `fvCost`). Bonuspoeng i trappa.
+- Hjältepoäng: FV 21 gir 1T4, demon og Rødpels 10, oppdrag i byen 1. V gjør klar én, så blir neste slag ett trinn bedre. Hos Syster Jehanne (DÅDER): 5 HP gir +1 i en grundegenskap (`P.attrUp`), og åtte hjälteförmågor kan kjøpes (bare de koden bruker).
+- Medvetslös: røvere (vätte, orch, Rødpels) tar halve silveret og en verdisak og stikker, rotter biter 1T2 ganger, skjeletter og demoner får opptil seks runder. Så et svårt FYS-slag hvis noe var kritisk, et FYS-slag for blødning, og du våkner. Hjältepoäng-knappen reiser deg med 1 KP med en gang.
+- Bärförmåga er STY kg. Det du har på deg og i hendene, teller ikke. Legedrikker veier 0,5 kg. Överlastad: x0,75 fart og -5 på Smyga, Akrobatik, Hoppa og Klättra. Aldri mer enn 2 x STY.
+- Penger er silvermynt (sm), ganget med 10 fra 0.4.
 
 ## Versjon 0.4: Fristaden over bakken
 
@@ -85,7 +89,7 @@ Ting som er lurt å huske neste gang noen (menneske eller AI) jobber med prosjek
 - Herr Nansen bruker den gamle butikken (main.openShop) når han står bak disken i åpningstida. Ellers vanlig samtale.
 - Fred i byen: G.dungeon.peaceful stopper anfall, kast, evner og släktesförmåga i player.update.
 - Aidne-bakgrunn gir egne svar: Lösdrivare (Tobolt gratis), Prästerskap (Cassian gratis), Borgare og Högadel (laugspris hos Hvass), Lågadel og Fredlös (Jehanne og vakta), Torpare (Regin), Livegen og Kronobonde (Edegar).
-- Rykte (G.run.rykte): tyveri -2, almisse, oppdrag, offer og god opptreden +1. Under -2 blir alt 25 % dyrere, fra 3 og opp 10 % billigere. På -3 nekter Jehanne å hjelpe.
+- Rykte (G.run.rykte): tyveri -2, almisse, oppdrag, offer og god opptreden +1. Under -2 blir alt 25 % dyrere, fra 3 og opp 10 % billigere. På -3 nekter Jehanne å trene deg (hjältepoäng tar hun imot uansett).
 - Tegnekall i byen er omtrent 300. Folk lengre unna enn 34 (manhattan) skjules, småbiter på rollpersonene kaster ikke skygge.
 
 ## Testing
@@ -97,7 +101,10 @@ Ting som er lurt å huske neste gang noen (menneske eller AI) jobber med prosjek
 - Musikknivåer kan måles ved å rendre sangene i en OfflineAudioContext.
 - town.js (i tools/test): goto(tx, ty, sek) flytter spilleren og kameraet, setHour(h) stiller klokka og setter alle på plass, npc(id), talk(id), ask(ord), kws().
 - townstress.js: townWander(sek) rusler tilfeldig, talkAll() snakker med alle og kjøper fra alle tjenester. day.js: dayTest(timer) kjører døgnet og melder hvem som står fast.
-- stress.js starter nå i byen og tar kloakkluken ned.
+- stress.js starter nå i byen og tar kloakkluken ned. Medvetslös håndteres med koWake/koHero.
+- shot.mjs tar handlinger som JSON: {"t":"eval","js":"..."}, {"t":"shot"}, {"t":"key","k":"Enter"}, {"t":"wait","ms":300}. Logger skrives ut før det siste skjermbildet, som får 20 s.
+- combatfx-browser.mjs lokalt i denne sandkassen: PLAYWRIGHT_PATH=/home/claude/devenv/node_modules/playwright og CHROME=/opt/pw-browsers/chromium-1194/chrome-linux/chrome, ellers leter Playwright etter en nyere Chromium som ikke finnes.
+- Stresstest-boten holder nesten aldri parera eller dukker, så 0 pareringer i resultatet er normalt. Test parering med et eget skript: sett P.guard = 1, P.parryT = { vapen: 0, vapen2: 0 } og P.invuln = 0 før hvert anfall (invuln 0,12 s etter et treff stopper neste anfall).
 
 ## Gotchas
 
@@ -107,6 +114,9 @@ Ting som er lurt å huske neste gang noen (menneske eller AI) jobber med prosjek
 - Backspace og Escape i tittelen går tilbake, men ikke når du skriver i navnefeltet.
 - SphereGeometry med delvis kule må lages med HEMI() i kinmodels.js. SPH() i assets.js ignorerer ekstra argumenter.
 - Skjold i hånda til figurer med armer trenger rotation.x = 1.55, ellers ligger det flatt når albuen er bøyd.
+- Enemy.root er en THREE.Group. Ikke kall en metode root (ÖRTRANKOR feilet på det). Metoden heter entangle.
+- Ikke bruk svenske kroppsdelnavn i norsk loggtekst. Bruk LOC_SHORT.
+- Fiendens fv øker med dybden (fv + depth - 1), og kroppen skaleres med 1 + 0,1 x (depth - 1).
 
 ## Kampeffektlag (ChatGPT, 2026-10-08)
 
