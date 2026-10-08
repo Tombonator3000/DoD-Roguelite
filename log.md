@@ -139,6 +139,10 @@ Alt som gjøres i prosjektet loggføres her med tidsstempel (Europe/Oslo).
 - 09:08 (ChatGPT) Fire kampeffekt-tester bestått lokalt. Nettlesertesten besto start fra /DoD-Roguelite/, original and med 19 594 verts og tekstur, W-bevegelse, pause/Fortsett, fem nivåer og åtte oppryddinger uten konsoll- eller spillfeil. GitHub skal også teste det minifiserte bygget i PR #2.
 - 09:13 (ChatGPT) GitHub Actions på 0aa805b besto bygg (HTML 1336 KB), fire regresjonstester og hele nettlesertesten med ferdig HTML. Artefakt 11534585050 har bilder og resultat.json. PR #2 klargjøres for gjennomgang på egen gren; den allerede publiserte Pages-versjonen er 5232b06.
 
+## 2026-10-08: dialog mellom agentene (ChatGPT)
+
+- 09:23 (ChatGPT) Etter Toms bestilling: opprettet Dialog.md i repoets rot og oppdatert AGENTS.md med lesing ved øktstart, meldings-ID, tidspunkt, avsender/mottaker, emne, status, gren/PR og svar som nye innlegg. La igjen D001 til Claude om kampeffektene, Pages-testen og samordning etter DoD91. Oppdatert minne og oppgaveliste. PR #2 ble flettet inn underveis, så dialogendringen leveres på egen gren chatgpt/dialog med PR mot main. Bare dokumentasjon er endret; git diff --check er uten feil.
+
 ## 2026-10-08, versjon 0.5 fortsatt: DoD91-reglene (Claude)
 
 - 08:45 Pushet inventar og lagring til GitHub (commit 26cddf7). Herfra slapp ikke proxyen gjennom API-kallet som slår på GitHub Pages; ChatGPT fikk Pages i gang etterpå.
@@ -165,3 +169,4 @@ Alt som gjøres i prosjektet loggføres her med tidsstempel (Europe/Oslo).
 - 11:19 "Slumpa allt" ga en halvlängdsman med STY 4 en handyxe han ikke kan løfte. fitKit og kitOf i rules.js bytter våpen som er for tunge, og EP-fordelingen bruker det nye våpenet. 4000 tilfeldige rollpersoner: ingen for tunge våpen.
 - 11:23 Hjältepoäng kan brukes hos Syster Jehanne (DÅDER): +1 i en grundegenskap for 5 HP, og åtte hjälteförmågor. Projektilparering virker nå. Lagres med løpet.
 - 11:26 Oppdaterte memory.md (DoD91 slik det er implementert, fallgruver, testnotater), todo.md, README.md og versjon 0.5.0 i package.json.
+- 11:30 Flettet inn Dialog.md fra main (PR #3) og skrev D003 til ChatGPT: DoD91 er pushet, testene er grønne, og hva som har endret seg for testriggen.

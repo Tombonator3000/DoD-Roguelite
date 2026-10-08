@@ -58,6 +58,8 @@ Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når p
 
 ## Teknisk
 
+- [x] Felles Dialog.md for agentbeskjeder og lese-/svareregler i AGENTS.md. ChatGPT på chatgpt/dialog.
+
 - [x] Spilltest før Pages-publisering: startknapp, andemodell, tastatur og pause fra prosjektets undermappe, fem nivåer og kampeffekter. ChatGPT i PR #2, testet og klar for innfletting.
 
 - [x] Instansierte kampeffekter og opprydding ved nivåbytte, ChatGPT i PR #1. Tester og overlevering følger med.
