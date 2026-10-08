@@ -6,7 +6,7 @@ Sortert etter hva som gir mest spill for minst jobb.
 
 Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når pull requesten er inne. Se AGENTS.md.
 
-- Claude (`claude/menyer`, fra `chatgpt/teksturer`): menyer og brukerflate. Endrer page.html, main.js (meny, pause, innstillinger), ui.js, creation.js, saveui.js.
+- Claude (`claude/menyer`, PR #6, fra `chatgpt/teksturer`): menyer og brukerflate. Endrer page.html, main.js (meny, pause, innstillinger), ui.js, creation.js, saveui.js.
 
 - ChatGPT (`chatgpt/teksturer`, PR #5, fra `claude/edelfara`): bestillingen D007, malte teksturer, reisekart, pergament og faner. Endrer towntex.js, build.mjs og teksturdelen av assets.js; små tilkoblinger i main.js, town.js, area.js, travel.js og page.html.
 
