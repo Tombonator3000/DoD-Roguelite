@@ -30,12 +30,15 @@ import { Icons } from './icons.js';
 import { InvUI } from './invui.js';
 import { saveGame, readSave, latestSave, deleteSave, describe as describeSave } from './save.js';
 import { SaveUI } from './saveui.js';
+import { WaterFX } from './water.js';
+import { Weather } from './weather.js';
 
 const $ = s => document.querySelector(s);
 const CAM_OFF = new THREE.Vector3(10.4, 15.6, 10.4);
 const tmp = new THREE.Vector3();
 const tmp2 = new THREE.Vector3();
 const tmp3 = new THREE.Vector3();
+const tmp4 = new THREE.Color();
 const CLOSE_OFF = new THREE.Vector3(3.3, 1.75, 3.3);
 
 // Mester Flansens dojo: varige forbedringer mellom løpene, kjøpt for fjær (spillets eget lag, uv)
@@ -227,6 +230,7 @@ class Game {
     }
     G.fx = new FX(scene);
     G.ambient = new Ambient(scene);
+    G.weather = new Weather(scene);
     G.ui = new UI();
     G.icons = new Icons();
     G.inv = new InvUI();
@@ -234,6 +238,7 @@ class Game {
     G.audio = new Sound();
     G.input = new Input(renderer.domElement);
     G.world = new World();
+    G.water = new WaterFX();
     G.meta = loadMeta();
     this.chars = loadChars();
     try { this.selectedId = localStorage.getItem('svartnebb.lastchar') || 'svartnebb'; } catch (e) { this.selectedId = 'svartnebb'; }
@@ -523,6 +528,9 @@ class Game {
     G.post.uniforms.uGrain.value = q === 'lav' ? 0 : 0.045;
     G.post.uniforms.uCA.value = q === 'lav' ? 0 : 0.0025;
     G.ambient.setEnabled(q !== 'lav', q !== 'lav');
+    G.world?.fire?.setQuality(q);
+    G.weather?.setQuality(q);
+    G.post.setTilt(q === 'lav' ? 0 : q === 'middels' ? 0.7 : 1);
     this.resize();
   }
 
@@ -706,6 +714,9 @@ class Game {
     const look = BIOME_LOOK[info.biome];
     G.ambient.setLook(look.mist, look.motes, look.density);
     this.townNight = null;
+    G.weather.snap();
+    G.water.clear();
+    G.post.mood(info.biome);
     if (!title) {
       if (!town) G.run.depthReached = Math.max(G.run.depthReached, depth);
       G.ui.setDepth(depth, info.name);
@@ -820,11 +831,13 @@ class Game {
     k.position.set(P.pos.x + sky.dir.x, sky.dir.y, P.pos.z + sky.dir.z);
     k.target.position.set(P.pos.x, 0, P.pos.z);
     k.target.updateMatrixWorld();
+    const W = G.weather;
+    const cloud = W.cloud;
     k.color.copy(sky.sun);
-    k.intensity = sky.sunI * 1.15;
-    this.hemi.color.copy(sky.sky);
+    k.intensity = sky.sunI * 1.15 * (1 - cloud * 0.72);
+    this.hemi.color.copy(sky.sky).lerp(sky.fog, cloud * 0.5);
     this.hemi.groundColor.copy(sky.ground);
-    this.hemi.intensity = sky.hemiI * 1.4;
+    this.hemi.intensity = sky.hemiI * 1.4 * (1 - cloud * 0.2) + W.flash * W.flash * 5;
     this.fill.color.copy(sky.sky);
     this.fill.intensity = 0.22 + (1 - sky.night) * 0.3;
     this.fill.position.set(P.pos.x - 10, 14, P.pos.z + 12);
@@ -837,8 +850,10 @@ class Game {
     this.lantern.position.set(P.pos.x + 1.0, 2.3, P.pos.z + 1.0);
     G.scene.fog.color.copy(sky.fog);
     G.scene.background.copy(sky.fog);
-    G.scene.fog.near = 44 - n * 14;
-    G.scene.fog.far = 105 - n * 30;
+    G.scene.fog.near = (44 - n * 14) * (1 - W.rain * 0.35);
+    G.scene.fog.far = (105 - n * 30) * (1 - W.rain * 0.3);
+    if (cloud > 0.01) { G.scene.fog.color.lerp(tmp4.setRGB(0.32, 0.34, 0.38).multiplyScalar(1 - n * 0.8), cloud * 0.45); G.scene.background.copy(G.scene.fog.color); }
+    G.post.mood('stad', n, W.rain);
     const night = n > 0.6;
     G.audio.townNight = night;
     if (G.audio.music) {
@@ -1514,7 +1529,9 @@ class Game {
     } else if (G.state === 'sheet' && inp.wasPressed('KeyC')) this.resume();
     else if (G.state === 'inventory' && inp.wasPressed('KeyI')) G.inv.close();
 
+    G.post.tiltWant = inTitle ? 0.5 : G.state === 'inventory' ? 0 : 0.85;
     if (inTitle) {
+      G.post.mood('tittel');
       G.time += dt;
       if (this.title.leaving) this.title.leave = Math.min(1, this.title.leave + dt / 0.75);
       this.title.update(dt, G.camera);
@@ -1573,14 +1590,12 @@ class Game {
       G.fx.update(G.state === 'deathroll' ? dt * 0.2 : dt, G.camera);
     }
     G.ambient.update(dt, P.pos, G.time);
+    if (G.state !== 'title' && G.state !== 'splash') G.weather.update(G.state === 'play' || G.state === 'dialog' ? dt : dt * 0.3, this.camTarget, G.time);
     G.post.tick(dt, G.time);
     G.audio.update(dt);
     this.updateCamera(dt);
     this.updateLights(dt);
-    if (G.dungeon?.waterMat) {
-      G.dungeon.waterMat.uniforms.uTime.value = G.time;
-      G.dungeon.waterMat.uniforms.uPlayer.value.copy(P.pos);
-    }
+    G.water.update(dt);
     G.composer.render();
     inp.endFrame();
   }
@@ -1617,6 +1632,7 @@ class Game {
     const ck = this.closeK < 0.002 ? 0 : this.closeK;
     const ce = ck * ck * (3 - 2 * ck);
     this.camTarget.lerp(tmp.set(P.pos.x + lead.x, 0.6 + ce * 0.05, P.pos.z + lead.z), 1 - Math.exp(-7 * dt));
+    if (G.camLock) this.camTarget.copy(G.camLock); // feilsøking og skjermbilder
     const sh = G.fx.shake * G.fx.shake * (G.shakeMul ?? 1);
     const off = tmp3.copy(CAM_OFF).lerp(CLOSE_OFF, ce);
     cam.position.set(this.camTarget.x + off.x, this.camTarget.y + off.y, this.camTarget.z + off.z);

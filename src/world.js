@@ -9,6 +9,7 @@ import { Enemy } from './enemies.js';
 import { WALL, PILLAR } from './dungeon.js';
 import { decorate } from './decor.js';
 import { buildItemModel, rarityBeam, rarityRing } from './itemmodels.js';
+import { FireField } from './fire.js';
 import { giveItem, addToBag, makeValuable, makeCons, canCarry, isGear } from './inventory.js';
 
 const tmp = new THREE.Vector3();
@@ -24,6 +25,7 @@ export class World {
     }
     this.sources = [];
     this.flames = [];
+    this.fire = new FireField(G.scene);
     this.anim = [];
     this.shaftMats = [];
     this.shaftMotes = [];
@@ -62,6 +64,8 @@ export class World {
     G.interactables.length = 0;
     this.sources = [];
     this.flames = [];
+    this.fire.clear();
+    this.incense = [];
     this.anim = [];
     this.shaftMats = [];
     this.shaftMotes = [];
@@ -80,16 +84,11 @@ export class World {
     return o;
   }
 
-  flame(x, y, z, color, scale = 1) {
-    const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: G.assets.flameTex, color, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true }));
-    sp.position.set(x, y + 0.25 * scale, z);
-    sp.scale.set(0.42 * scale, 0.75 * scale, 1);
-    const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: G.assets.glowTex, color, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0.45 }));
-    glow.position.set(x, y + 0.2 * scale, z);
-    glow.scale.set(1.8 * scale, 1.8 * scale, 1);
-    this.addObj(sp);
-    this.addObj(glow);
-    this.flames.push({ sp, glow, base: scale, phase: Math.random() * 10, pos: new THREE.Vector3(x, y, z) });
+  // En flamme i ildfeltet (fire.js). Returnerer et objekt med pos, base, phase og visible.
+  flame(x, y, z, color, scale = 1, width = 1) {
+    const f = this.fire.add(x, y, z, color, scale, width);
+    this.flames.push(f);
+    return f;
   }
 
   buildLevel(dg) {
@@ -116,7 +115,9 @@ export class World {
       g.add(stand, bowl);
       g.position.set(b.x, 0, b.z);
       this.addObj(g);
-      this.flame(b.x, 1.15, b.z, info.alt, 1.5);
+      this.flame(b.x, 1.1, b.z, info.alt, 1.5, 2.2);
+      // krydder som brenner i fyrfatene hos Rødpels
+      if (info.biome === 'rev') this.incense.push({ x: b.x, y: 2.0, z: b.z, t: Math.random() });
       this.sources.push({ pos: new THREE.Vector3(b.x, 2.0, b.z), color: new THREE.Color(info.alt), intensity: 36, phase: Math.random() * 10, ember: true });
       G.props.push({ type: 'brazier', mesh: g, pos: g.position, radius: 0.6, breakable: false });
     }
@@ -980,10 +981,12 @@ export class World {
       l.distance = s.dist || 15;
       if (s.ember && Math.random() < dt * 8) G.fx.ember({ x: s.pos.x, y: 1.4, z: s.pos.z });
     }
-    for (const f of this.flames) {
-      const k = 0.9 + 0.12 * Math.sin(t * 13 + f.phase) + 0.06 * Math.sin(t * 29 + f.phase * 2);
-      f.sp.scale.set(0.42 * f.base * (2 - k), 0.75 * f.base * k, 1);
-      f.glow.material.opacity = 0.35 + 0.1 * k;
+    this.fire.update(t);
+    for (const r of this.incense || []) {
+      r.t -= dt;
+      if (r.t > 0 || Math.abs(r.x - P.pos.x) + Math.abs(r.z - P.pos.z) > 24) continue;
+      r.t = 0.22 + Math.random() * 0.15;
+      G.fx.burst('incense', r, 1);
     }
     if (this.stairsRing) {
       this.stairsRing.material.opacity = 0.55 + Math.sin(t * 2.5) * 0.2;
@@ -998,7 +1001,7 @@ export class World {
     for (const m of this.shaftMotes) { m.material.uniforms.uTime.value = t; m.material.uniforms.uScale.value = sc; }
     for (const d0 of this.drips) if (Math.random() < dt * 1.2 && Math.abs(d0.x - P.pos.x) + Math.abs(d0.z - P.pos.z) < 24) G.fx.burst('drip', d0, 1);
     for (const f of this.flames) {
-      if (f.base < 0.5) continue;
+      if (f.base < 0.5 || !f.visible) continue;
       if (Math.abs(f.pos.x - P.pos.x) + Math.abs(f.pos.z - P.pos.z) > 18) continue;
       if (Math.random() < dt * 1.4) G.fx.burst('torchsmoke', { x: f.pos.x, y: f.pos.y + 0.7 * f.base, z: f.pos.z }, 1);
       if (Math.random() < dt * 2.2) G.fx.ember({ x: f.pos.x, y: f.pos.y + 0.4, z: f.pos.z });

@@ -170,3 +170,15 @@ Alt som gjøres i prosjektet loggføres her med tidsstempel (Europe/Oslo).
 - 11:23 Hjältepoäng kan brukes hos Syster Jehanne (DÅDER): +1 i en grundegenskap for 5 HP, og åtte hjälteförmågor. Projektilparering virker nå. Lagres med løpet.
 - 11:26 Oppdaterte memory.md (DoD91 slik det er implementert, fallgruver, testnotater), todo.md, README.md og versjon 0.5.0 i package.json.
 - 11:30 Flettet inn Dialog.md fra main (PR #3) og skrev D003 til ChatGPT: DoD91 er pushet, testene er grønne, og hva som har endret seg for testriggen.
+
+## 2026-10-08, versjon 0.5 fortsatt: shadere, vær og partikler (Claude)
+
+- 11:36 GitHub Actions på da7dac7 er grønn, og Pages viser DoD91. Begynner på grafikken: ild, vann, vind, regn og lyn, våte flater, flere partikler, tilt-shift og fargegradering.
+- 11:52 src/fire.js: all ild er nå én instansiert flate med støy i shaderen (fakler, fyrfat, lykter, ildsteder, stearinlys). Formen har tunger som river seg løs, glorien ligger i samme flate, og tåka demper den. Ett tegnekall i stedet for to sprites per flamme. Fyrfat og ildsteder får bredere flammer.
+- 12:05 src/water.js: nytt vann. Normalen regnes fra høyden (to lag støy som flyter, ringer fra plask og fra den som går i vannet, regndråper), med Fresnel-refleks av himmelen, solglimt og speilbilder av de seks nærmeste lyskildene. Elva renner sørover. Lyktene speiler seg i elva om natta.
+- 12:20 src/weather.js: vær i byen etter klokka (klart, skyet, regn, uvær, nytt hver tredje time, første kveld stille). Regn som streker med fast bredde i piksler, plask på bakken, lyn med blink og torden, vind med kast. Takene stopper regn og løv (tekstur med høyden under taket per flis). Løv som blåser, fugler som kretser om dagen, flaggermus om natta og i hallene. Sporer i kloakken, glør i smia og hos Rødpels, damp fra vannet.
+- 12:28 src/wet.js: bakken i byen blir mørk og blank i regnet, med sølepytter som speiler himmelen og får ringer av dråpene. Vegger og treverk blir mørkere. Gress, blomster og trekroner beveger seg med vinden. Uvær gjør sola svakere, tåka tettere og fargene kaldere.
+- 12:36 Lyd: torden (smell når den er nær, rumling ellers) og regn som skrus opp og ned, dempet inne i husene. Fugler og sirisser tier i regnet. Klokka i HUD-en viser været.
+- 12:44 post.js: tilt-shift (uskarpt øverst og nederst) og fargestemning per sted: grønnkalde skygger i kloakken, varmt i hallene, rødt hos Rødpels, og dag, skumring, natt og regn i byen. Av på lav kvalitet, svakere på middels, og av når packningen er åpen.
+- 12:48 Lysstråle gjennom taket i tempelet når du står inne om dagen, røkelse fra fyrfatene der og krydderrøyk hos Rødpels. Røyk driver med vinden.
+- 12:55 Tegnekall målt med én composer-render: byen om natta 320 før, 322 nå (uvær 321), kloakken 155 før, 160 nå. CI-testene er grønne med det nye.

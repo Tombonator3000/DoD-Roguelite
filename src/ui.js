@@ -145,7 +145,9 @@ export class UI {
     const day = Math.floor(clock / 24) + 1;
     const hh = Math.floor(h), mm = Math.floor((h - hh) * 6) * 10;
     const part = h < 5 ? 'natt' : h < 10 ? 'morgen' : h < 17 ? 'dag' : h < 21 ? 'kveld' : 'natt';
-    const txt = `dag ${day}, kl. ${String(hh).padStart(2, '0')}.${String(mm).padStart(2, '0')} (${part})`;
+    const W = G.weather;
+    const wx = G.dungeon?.isTown && W && W.kind !== 'klart' ? `, ${W.label}` : '';
+    const txt = `dag ${day}, kl. ${String(hh).padStart(2, '0')}.${String(mm).padStart(2, '0')} (${part}${wx})`;
     if (txt === this.clockTxt) return;
     this.clockTxt = txt;
     const el = $('#clock');

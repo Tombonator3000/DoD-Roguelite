@@ -3,10 +3,12 @@
 import * as THREE from 'three';
 import { G, T } from './state.js';
 import { Dungeon, makeWaterMaterial } from './dungeon.js';
+import { addWetness, addSway } from './wet.js';
 import { addCutaway, buildBarrel, buildCrate, buildChest, buildPillar, hash2 } from './assets.js';
 import { townTextures, signTexture } from './towntex.js';
 import { WALL, FLOOR, WATER, PILLAR, HOUSE, FENCE, GR, TW, TH, RING, RIVER, GATE, BUILDINGS, TREES, SPOTS, buildTownLayout } from './townmap.js';
 import { TownLife } from './townfolk.js';
+import { shaftMaterial } from './gfx.js';
 
 export { HOUSE, FENCE, GR, SPOTS };
 
@@ -135,6 +137,20 @@ function materials() {
   MAT.flower = new THREE.MeshStandardMaterial({ roughness: 0.6 });
   MAT.paper = new THREE.MeshStandardMaterial({ color: 0xe8dcc0, roughness: 0.95 });
   MAT.roofs = {};
+  // regn: bakken blir blank og får pytter, vegger og treverk blir mørkere
+  addWetness(MAT.ground[GR.COBBLE]);
+  addWetness(MAT.ground[GR.DIRT], { k: 0.9 });
+  addWetness(MAT.ground[GR.FLAG]);
+  addWetness(MAT.ground[GR.GRASS], { puddles: false, k: 0.45 });
+  addWetness(MAT.ground[GR.WOOD], { puddles: false, k: 0.8 });
+  addWetness(MAT.plank, { puddles: false, k: 0.8 });
+  addWetness(MAT.stone, { puddles: false, k: 0.5 });
+  addWetness(MAT.timber, { puddles: false, k: 0.4 });
+  addWetness(MAT.city, { puddles: false, k: 0.5 });
+  // vind i gress, blomster og trekroner
+  addSway(MAT.tuft, 'grass');
+  addSway(MAT.flower, 'flower');
+  addSway(MAT.leaf, 'leaf');
   MAT.ready = true;
   return MAT;
 }
@@ -204,6 +220,7 @@ export class Town extends Dungeon {
     this.smokers = [];
     this.lampSrc = [];
     this.innerSrc = [];
+    this.incense = [];
     this.timeT = 0;
   }
 
@@ -1316,7 +1333,7 @@ export class Town extends Dungeon {
     this.lampFlames = W.flames.slice();
     // ildsteder og smia
     for (const h of this.hearths) {
-      W.flame(h.x, 0.12, h.z, h.forge ? 0xff7a30 : 0xff9a40, h.forge ? 0.9 : 0.8);
+      W.flame(h.x, 0.12, h.z, h.forge ? 0xff7a30 : 0xff9a40, h.forge ? 0.9 : 0.8, 1.8);
       const b = this.insideAt(h.x, h.z);
       const s = { pos: new THREE.Vector3(h.x, 1.2, h.z), color: new THREE.Color(h.forge ? 0xff7a38 : 0xff9a50), intensity: 22, base: 22, phase: Math.random() * 10, ember: true, dist: 9, inside: b?.id };
       W.sources.push(s);
@@ -1331,8 +1348,9 @@ export class Town extends Dungeon {
         const stand = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.18, 0.9, 8), MAT.gold);
         stand.position.set(wx, 0.45, wz);
         this.group.add(bowl, stand);
-        W.flame(wx, 1.1, wz, col, 1.1);
+        W.flame(wx, 1.1, wz, col, 1.1, 1.8);
         this.addBlock(wx - 0.35, wz - 0.35, wx + 0.35, wz + 0.35);
+        this.incense.push({ x: wx, y: 1.75, z: wz, t: Math.random() });
       } else if (inside === 'tower') {
         const orb = new THREE.Mesh(new THREE.SphereGeometry(0.22, 18, 14), new THREE.MeshStandardMaterial({ color: 0x2a1a5a, emissive: 0x8a6aff, emissiveIntensity: 1.6, roughness: 0.1 }));
         orb.position.set(wx, 1.06, wz);
@@ -1349,6 +1367,20 @@ export class Town extends Dungeon {
       const s = { pos: new THREE.Vector3(wx, 1.8, wz), color: new THREE.Color(col), intensity: 18 * k, base: 18 * k, phase: Math.random() * 10, dist: 9, inside, steady: inside === 'tower' };
       W.sources.push(s);
       this.innerSrc.push(s);
+    }
+    // lys gjennom taket i tempelet, synlig om dagen når du står inne
+    {
+      const mat = shaftMaterial(0xffe2a8, 0.36);
+      const h = 4.6;
+      const geo = new THREE.CylinderGeometry(0.75, 1.5, h, 24, 1, true).translate(0, h / 2, 0);
+      const shaft = new THREE.Mesh(geo, mat);
+      shaft.position.set(U(25), 0, U(9.6));
+      shaft.rotation.z = 0.16;
+      shaft.renderOrder = 7;
+      const pool = new THREE.Mesh(new THREE.CircleGeometry(1.7, 28).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ map: G.assets.glowTex, color: 0xffd8a0, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending, depthWrite: false }));
+      pool.position.set(U(25) + 0.35, 0.03, U(9.6));
+      this.group.add(shaft, pool);
+      this.templeShaft = { shaft, pool, mat };
     }
     this.buildSquareProps(W);
     this.life = new TownLife(this, W);
@@ -1590,7 +1622,7 @@ export class Town extends Dungeon {
     const night = sky ? sky.night : 0.5;
     const lit = Math.min(1, Math.max(0, (night - 0.15) / 0.5));
     for (const s of this.lampSrc) s.intensity = s.base * lit;
-    for (const f of this.lampFlames || []) { f.sp.visible = lit > 0.05; f.glow.visible = lit > 0.05; }
+    for (const f of this.lampFlames || []) f.visible = lit > 0.05;
     MAT.lampGlass.emissiveIntensity = 0.15 + lit * 2.2;
     MAT.glass.emissiveIntensity = 0.06 + lit * 1.5;
     for (const s of this.innerSrc) s.enabled = !s.inside || s.inside === this.insideId;
@@ -1599,6 +1631,21 @@ export class Town extends Dungeon {
       this.waterMat.uniforms.uShallow.value.setHex(0x2a6272).lerp(cA.setHex(0x1a3a52), night);
     }
     if (this.orb) this.orb.scale.setScalar(1 + Math.sin(this.timeT * 2) * 0.06);
+    // røkelse fra fyrfatene i tempelet
+    for (const r of this.incense) {
+      r.t -= dt;
+      if (r.t > 0 || Math.abs(r.x - P.pos.x) + Math.abs(r.z - P.pos.z) > 24) continue;
+      r.t = 0.16 + Math.random() * 0.12;
+      G.fx.burst('incense', r, 1);
+    }
+    if (this.templeShaft) {
+      const day = Math.max(0, 1 - night * 1.6) * (1 - (G.weather?.cloud || 0) * 0.6);
+      const on = this.insideId === 'temple' && day > 0.05;
+      this.templeShaft.shaft.visible = this.templeShaft.pool.visible = on;
+      this.templeShaft.mat.uniforms.uTime.value = this.timeT;
+      this.templeShaft.mat.uniforms.uStr.value = 0.36 * day;
+      this.templeShaft.pool.material.opacity = 0.4 * day;
+    }
     if (this.forgeCoal) this.forgeCoal.material.emissiveIntensity = 0.9 + Math.sin(this.timeT * 5) * 0.2 + Math.sin(this.timeT * 13) * 0.08;
     if (this.life) this.life.update(dt, P, sky);
   }

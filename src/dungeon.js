@@ -1,6 +1,9 @@
 import * as THREE from 'three';
 import { G, T } from './state.js';
 import { buildPillar } from './assets.js';
+import { makeWaterMaterial } from './water.js';
+
+export { makeWaterMaterial };
 
 export const WALL = 0, FLOOR = 1, WATER = 2, PILLAR = 3;
 const TALL = 3.2, LOW = 0.85, WATER_BOTTOM = -0.75, WATER_Y = -0.24;
@@ -692,35 +695,4 @@ class GeoBuilder {
     g.computeBoundingSphere();
     return g;
   }
-}
-
-export function makeWaterMaterial() {
-  return new THREE.ShaderMaterial({
-    transparent: true,
-    depthWrite: false,
-    uniforms: {
-      uTime: { value: 0 },
-      uPlayer: { value: new THREE.Vector3() },
-      uDeep: { value: new THREE.Color(0x041a15) },
-      uShallow: { value: new THREE.Color(0x0f4436) },
-      uGlint: { value: new THREE.Color(0x4fe6b4) },
-    },
-    vertexShader: `varying vec3 vW; void main(){ vec4 w = modelMatrix * vec4(position,1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }`,
-    fragmentShader: `
-      uniform float uTime; uniform vec3 uPlayer, uDeep, uShallow, uGlint; varying vec3 vW;
-      float h(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7))) * 43758.5453); }
-      float n(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.0-2.0*f);
-        return mix(mix(h(i),h(i+vec2(1,0)),f.x), mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x), f.y); }
-      void main(){
-        vec2 p = vW.xz;
-        float a = n(p*0.7 + vec2(uTime*0.18, uTime*0.06));
-        float b = n(p*1.9 - vec2(uTime*0.11, -uTime*0.15));
-        float m = a*0.6 + b*0.4;
-        float caust = pow(1.0 - abs(m*2.0-1.0), 7.0);
-        vec3 col = mix(uDeep, uShallow, m) + uGlint * caust * 0.55;
-        float pd = distance(p, uPlayer.xz);
-        col += vec3(0.32,0.22,0.12) * smoothstep(8.0, 0.0, pd) * (0.25 + caust*0.8);
-        gl_FragColor = vec4(col, 0.9);
-      }`,
-  });
 }

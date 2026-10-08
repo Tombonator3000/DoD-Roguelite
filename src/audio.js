@@ -267,6 +267,62 @@ export class Sound {
     }
   }
 
+  // Torden: lavpasset støy som ruller. k nær 1 er nært (med et smell først).
+  thunder(k = 0.6) {
+    if (!this.ok) return;
+    const c = this.ctx;
+    const t = c.currentTime;
+    if (k > 0.55) {
+      const s = this._noiseSrc();
+      const f = c.createBiquadFilter();
+      f.type = 'highpass';
+      f.frequency.value = 900;
+      const g = c.createGain();
+      this._env(g, t, 0.005, 0.35, 0.3 * k);
+      s.connect(f); f.connect(g); g.connect(this.master);
+      s.start(t, Math.random()); s.stop(t + 0.45);
+    }
+    const s = this._noiseSrc();
+    const f = c.createBiquadFilter();
+    f.type = 'lowpass';
+    f.frequency.setValueAtTime(320 * (0.6 + k * 0.6), t);
+    f.frequency.exponentialRampToValueAtTime(70, t + 3.2);
+    f.Q.value = 0.9;
+    const g = c.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.9 * (0.4 + k * 0.6), t + 0.12 + (1 - k) * 0.4);
+    g.gain.exponentialRampToValueAtTime(0.25 * k + 0.05, t + 1.2);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 3.8);
+    s.connect(f); f.connect(g); g.connect(this.master);
+    s.start(t, Math.random()); s.stop(t + 4);
+  }
+
+  // Regnet: en støysløyfe som skrus opp og ned. Dempet og mørkere inne i husene.
+  setRain(level, inside = false) {
+    if (!this.ctx) return;
+    const c = this.ctx;
+    if (!this.rainNode) {
+      if (level < 0.02) return;
+      const s = this._noiseSrc();
+      const bp = c.createBiquadFilter();
+      bp.type = 'bandpass';
+      bp.frequency.value = 2200;
+      bp.Q.value = 0.5;
+      const lp = c.createBiquadFilter();
+      lp.type = 'lowpass';
+      lp.frequency.value = 6000;
+      const g = c.createGain();
+      g.gain.value = 0;
+      s.connect(bp); bp.connect(lp); lp.connect(g); g.connect(this.master);
+      s.start();
+      this.rainNode = { s, g, lp };
+    }
+    this.rainLevel = level;
+    const target = this.muted ? 0 : Math.min(1, level) * (inside ? 0.05 : 0.11);
+    this.rainNode.g.gain.setTargetAtTime(target, c.currentTime, 0.4);
+    this.rainNode.lp.frequency.setTargetAtTime(inside ? 900 : 6000, c.currentTime, 0.3);
+  }
+
   coin() {
     if (!this.ok) return;
     const c = this.ctx;
@@ -504,7 +560,9 @@ export class Sound {
     if (this.biome === 'stad') {
       this.ambT = (this.ambT || 0) - dt;
       if (this.ambT <= 0) {
-        if (this.townNight) { this.cricket(); this.ambT = 0.6 + Math.random() * 1.8; }
+        // fugler og sirisser tier når det regner
+        if (this.rainLevel > 0.3) this.ambT = 2;
+        else if (this.townNight) { this.cricket(); this.ambT = 0.6 + Math.random() * 1.8; }
         else { this.bird(); this.ambT = 1.4 + Math.random() * 4; }
       }
       return;

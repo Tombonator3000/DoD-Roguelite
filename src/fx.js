@@ -80,6 +80,8 @@ class Particles {
   }
 
   update(dt, t) {
+    const wind = G.weather?.wind;
+    const wx = wind ? wind.x * 0.35 : 0, wz = wind ? wind.y * 0.35 : 0;
     for (let i = 0; i < this.n; i++) {
       this.life[i] -= dt;
       if (this.life[i] <= 0) { this._kill(i); i--; continue; }
@@ -87,6 +89,7 @@ class Particles {
       const dr = Math.exp(-this.drag[i] * dt);
       this.vel[k] *= dr; this.vel[k + 2] *= dr;
       this.vel[k + 1] = this.vel[k + 1] * dr - this.grav[i] * dt;
+      if (this.grav[i] < 0 && (wx || wz)) { this.vel[k] += wx * dt; this.vel[k + 2] += wz * dt; }
       let sx = 0, sz = 0;
       if (this.sway[i]) { sx = Math.sin(t * 5 + i) * this.sway[i]; sz = Math.cos(t * 4.3 + i * 1.7) * this.sway[i]; }
       this.pos[k] += (this.vel[k] + sx) * dt;
@@ -110,7 +113,7 @@ const COL = {
   blood: C(0x6a0a0a), blood2: C(0x9a1410), bone: C(0xd8ceb0), spark: C(0xffc860), white: C(0xffffff),
   feather: C(0xf2efe6), featherDark: C(0x2a2622), splash: C(0x9fe8d0), dust: C(0x7a7064), heal: C(0x60ff9a),
   rage: C(0xff3a1a), gold: C(0xffd060), fire: C(0xff7a20), ember: C(0xff5010), will: C(0x6a8cff), wood: C(0x6a4a2a),
-  poison: C(0x7aff40), smoke: C(0x2a2624),
+  poison: C(0x7aff40), smoke: C(0x2a2624), steam: C(0xb8c8c4), incense: C(0x9aa4c0),
   csmoke: C(0x8a8680), portal: C(0x6ab4ff), portal2: C(0xc8e4ff), drip: C(0x6ad8a8), tsmoke: C(0x2e2824), dissolve: C(0xff7a2a), ghostly: C(0x6affd0),
 };
 
@@ -159,6 +162,7 @@ export class FX {
 
   burst(kind, p, n = 12, dir = null) {
     const R = Math.random;
+    if (kind === 'splash') G.water?.ripple(p.x, p.z, Math.min(1.5, 0.4 + n / 10));
     for (let i = 0; i < n; i++) {
       const a = R() * Math.PI * 2;
       let sp = 2 + R() * 4;
@@ -224,6 +228,12 @@ export class FX {
           break;
         case 'chimney':
           this.norm.spawn(p.x + (R() - 0.5) * 0.2, p.y, p.z + (R() - 0.5) * 0.2, 0.22 + R() * 0.2, 0.65 + R() * 0.35, -0.12 + R() * 0.2, COL.csmoke, 3.6 + R() * 1.6, 0.4, 2.3, -0.08, 0.45, 0.25, 0, 0.32);
+          break;
+        case 'steam':
+          this.norm.spawn(p.x + (R() - 0.5) * 0.5, y, p.z + (R() - 0.5) * 0.5, (R() - 0.5) * 0.15, 0.35 + R() * 0.3, (R() - 0.5) * 0.15, COL.steam, 2.6 + R() * 1.4, 0.5, 1.9, -0.05, 0.7, 0.18, 0, 0.16);
+          break;
+        case 'incense':
+          this.norm.spawn(p.x + (R() - 0.5) * 0.08, y, p.z + (R() - 0.5) * 0.08, (R() - 0.5) * 0.05, 0.45 + R() * 0.2, (R() - 0.5) * 0.05, COL.incense, 3.2 + R() * 1.2, 0.12, 0.75, -0.04, 0.3, 0.32, 0, 0.3);
           break;
         case 'smoke':
           this.norm.spawn(p.x + (R() - 0.5) * 0.6, y, p.z + (R() - 0.5) * 0.6, vx * 0.15, 0.6 + R() * 0.6, vz * 0.15, COL.smoke, 1.0 + R() * 0.6, 0.4, 1.2, -0.3, 1.5, 0, 0, 0.6);
