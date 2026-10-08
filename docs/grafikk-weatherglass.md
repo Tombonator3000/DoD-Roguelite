@@ -14,7 +14,7 @@ Den viktigste grunnen er at hele bildebudsjettet går til én scene på 12 x 8 m
    - Sollys mot fyll blir omtrent 6 til 1 på flat mark.
    - Eksponeringen går mykt mellom 1 og 1,65, så natta blir lettere i stedet for svart.
    - Miljøkartet er laget med PMREM fra et mørkt fotostudio med fire lysbokser. Det står på bare 0,17, så det gir myke glansflater uten å flate ut lyset.
-   - Hos oss følger et spotlys spilleren (110, kjegle 0,62). Halvkulelyset er 0x6f8f88 over 0x0b0806 på 0,55, og den nederste fargen er nesten svart. Vi har ikke noe miljøkart. Materialene får dermed ingen refleksjoner fra omgivelsene og ser matte og plastaktige ut.
+   - Hos oss følger et spotlys spilleren. I byen og områdene står sola i spotlyset, og halvkulelyset har allerede himmelfarge og varm bakke fra `skyAt` i town.js. I kloakken er bakkefargen 0x0b0806, nesten svart, med vilje. Vi hadde ikke noe miljøkart. Materialene fikk dermed ingen refleksjoner fra omgivelsene og så matte og plastaktige ut.
 2. **De har kantutjevning, og det har ikke vi.** De tegner scenen til en HalfFloat-target med `samples: 4` før etterbehandlingen. Vi har `antialias: true` på rendereren. EffectComposer i r170 tegner likevel til sin egen target uten MSAA (`new WebGLRenderTarget(..., { type: HalfFloatType })`). I praksis har vi derfor ingen kantutjevning, og alle kanter hakker.
 3. **Bare de sterkeste glimtene gløder.**
    - Bloom-terskelen deres er 1,45 om dagen og 1,0 om natta, og styrken er rundt 0,3. Bare HDR-glimt gløder: sol i vann, lyn og lamper.
@@ -52,7 +52,7 @@ Den viktigste grunnen er at hele bildebudsjettet går til én scene på 12 x 8 m
 - **MSAA i komposeren.** Gi EffectComposer en `WebGLRenderTarget` med `type: HalfFloatType` og `samples: 4` på høy kvalitet, 2 på middels og 0 på lav. Det virker i r170 og er den største gevinsten for minst jobb.
 - **Bloom.** Sett terskelen til 1,0 til 1,2 og styrken til 0,3 til 0,4. Ild, magi, runer og lykter får emissive over 1, så de gløder fortsatt.
 - **Miljøkart.** Bruk `PMREMGenerator.fromScene` med `RoomEnvironment` (finnes i r170 addons) eller et lite mørkt rom vi lager selv. Sett `scene.environmentIntensity` til 0,15 til 0,3. Våt brostein, metall, rustning og vann får glans.
-- **Halvkulelyset.** La himmelfargen komme fra `skyAt`, som allerede har fargene. Gjør bakkefargen til en varm refleks i stedet for nesten svart.
+- **Halvkulelyset.** Det gjør vi allerede i byen og områdene (`skyAt`). I kloakken skal det være mørkt.
 - **Eksponering etter tid på døgnet**, med en lettere natt.
 
 ### Middels, en til tre økter
@@ -79,3 +79,29 @@ Glassmonteret, messingrammen, bordet og studioet rundt hører til et leketøy, i
 - **Versjon.** Vi står på r170 (se AGENTS.md). Skyggefilteret deres bruker API fra r186 (`sampler2DShadow` i `getShadow`, `vogelDiskSample`, `USE_REVERSED_DEPTH_BUFFER`). I r170 må PCSS lages etter eksemplet `webgl_shadowmap_pcss`. Resten av teknikkene virker i r170, men sjekk navnene på shader-chunkene før du patcher dem.
 - **Ytelse.** De velger ett av tre kvalitetsnivåer fra navnet på skjermkortet og justerer DPR mens spillet går. Hvert 0,75 sekund måler de: under 50 fps ganger de med 0,9, under 35 fps med 0,8, og over 58 fps med 1,06. Vi bør ha det samme på plass før vi legger på mer.
 - **Opphav.** Artifacten heter «(Copy)» og kan være laget av noen andre. Vi tar ideene og tallene og skriver koden selv. Ikke lim inn store biter av den.
+
+## Gjort i 0.7 (9. oktober 2026)
+
+- **Kantutjevning.** Komposeren har fått en HalfFloat-target med MSAA: 4 prøver på høy, 2 på middels og 0 på lav (`applySettings`). Rendereren har ikke lenger `antialias`, fordi den aldri tegnet scenen rett til lerretet.
+- **Bloom følger stedet** (`bloomLook`).
+
+  | Sted | Terskel | Styrke |
+  | --- | --- | --- |
+  | By og områder om dagen | 1,12 | 0,32 |
+  | By og områder om natta | 0,98 | 0,52 |
+  | Kloakken | 0,88 | 0,55 |
+  | Tittelen (som før) | 0,78 | 0,65 |
+
+  Markiser og hvite vegger gløder ikke lenger midt på dagen. Lamper og vinduer om natta er over 1 i HDR og gløder fortsatt.
+- **Miljøkart** (src/envlight.js). En himmelkule med farger fra `skyAt` og en myk solflekk gjøres om til PMREM.
+  - Kartet bygges på nytt når himmelen har endret seg, høyst hvert sjette sekund.
+  - Styrken er `(0,3 - natt * 0,22) * (1 - sky * 0,35)`.
+  - Kloakken har ikke noe miljøkart.
+- **Eksponering.** Den går mykt mot 1,15 om dagen og opptil 1,36 om natta. Kloakken og tittelen har 1,15.
+- **Trekroner** (src/treegeo.js).
+  - Klumpete kuler med normaler halvveis ut fra midten.
+  - Graner med takket nederkant.
+  - AO og flekker i hjørnefargene. Fargen ganges med fargen per instans.
+  - `flatShading` er av for løv og gran.
+  - Hvor fine kronene er, følger kvaliteten (`leafDetail`). Ekeskogen har 524 000 trekanter på høy (før 239 000) og 135 000 på lav (som før). Antall tegnekall er uendret.
+

@@ -256,3 +256,13 @@ Alt som gjøres i prosjektet loggføres her med tidsstempel (Europe/Oslo).
 - 22:18 Fant en feil hos oss: EffectComposer i r170 tegner til en target uten MSAA, så antialias: true på rendereren gjør ingenting. Spillet har i praksis ingen kantutjevning.
 - 22:22 Skrev docs/grafikk-weatherglass.md med grunnene, tallene, hva vi kan ta med (raskt, middels, stort) og fallgruver (r186-API i skyggefilteret, ytelse, opphav). Bildet av Ekeskogen ligger i docs/grafikk-weatherglass/. La oppgavene inn i todo.md.
 
+## 2026-10-09, versjon 0.7: grafikk etter Weatherglass og verdenskartet
+
+- 00:18 Tom ba om grafikkfiksene først, så verdenskartet. Ingen nye innlegg i Dialog.md, og main er uendret siden 452d20a.
+- 00:22 MSAA i komposeren: HalfFloat-target med 4, 2 eller 0 prøver etter kvalitet. antialias er tatt av rendereren, siden den aldri tegnet rett til lerretet.
+- 00:23 Bloom følger stedet og tiden: terskel 1,12 og styrke 0,32 om dagen ute, 0,98 og 0,52 om natta, 0,88 og 0,55 i kloakken, tittelen som før. Eksponeringen går mykt mot 1,15 om dagen og 1,36 om natta.
+- 00:24 Nytt miljøkart (src/envlight.js): himmelkule fra skyAt med en myk solflekk, PMREM, bygges høyst hvert sjette sekund når himmelen har endret seg. Styrke 0,3 om dagen og 0,08 om natta. Ingen i kloakken.
+- 00:26 Myke trekroner (src/treegeo.js): klumpete kuler og graner med takket kant, AO og flekker i hjørnefargene, uten flatShading. Brukes i områdene og rundt Fristaden.
+- 00:29 Bilder før og etter (forrige commit bygget i en egen worktree): markisen på torget gløder ikke lenger midt på dagen, kantene er glatte, natta er litt lysere, kloakken er som før. Kronene ble 2,2 ganger så mange trekanter på høy kvalitet, så hvor fine de er, følger nå kvaliteten (lav er som før).
+- 00:31 Skrev hva som er gjort i docs/grafikk-weatherglass.md, og rettet en feil der: halvkulelyset i byen hadde allerede himmelfarge og varm bakke. Det er bare i kloakken bakken er nesten svart, og det er med vilje.
+

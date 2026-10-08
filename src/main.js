@@ -39,6 +39,7 @@ import { ARRIVE } from './arealife.js';
 import { Travel } from './travel.js';
 import { Q, fl, journalHTML, hoursLeft } from './ivan.js';
 import { WorldView } from './worldview.js';
+import { EnvLight } from './envlight.js';
 import { W as worldState, tickHunger, regionAt as worldRegionAt, terrainAt as worldTerrainAt, roadAt as worldRoadAt } from './worldtravel.js';
 import { PLACES as WORLD_PLACES, ENCOUNTERS } from './worldmap.js';
 import { encounterLayout, villageLayout, siteLayout, wildLayout } from './areatemplates.js';
@@ -194,7 +195,9 @@ class Game {
   }
 
   init() {
-    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    // Kantutjevningen ligger i komposerens egen target (applySettings), ikke på lerretet:
+    // EffectComposer tegner aldri scenen rett til lerretet, så antialias her gjorde ingenting.
+    const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
     renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
     renderer.setSize(innerWidth, innerHeight);
     renderer.shadowMap.enabled = true;
@@ -225,15 +228,19 @@ class Game {
     scene.add(this.fill);
     this.lantern = new THREE.PointLight(0xffb070, 9, 8, 2);
     scene.add(this.lantern);
-    const composer = new EffectComposer(renderer);
+    const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(innerWidth, innerHeight, { type: THREE.HalfFloatType, samples: 4 }));
     this.renderPass = new RenderPass(scene, cam);
     composer.addPass(this.renderPass);
+    // Bloom: bare det som er lysere enn 1 i HDR gløder (ild, lamper, vinduer om natta, magi).
+    // Terskelen og styrken følger stedet og tiden på døgnet (bloomLook).
     this.bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth / 2, innerHeight / 2), 0.65, 0.6, 0.78);
     composer.addPass(this.bloom);
     composer.addPass(new OutputPass());
     G.post = new GradePass();
     composer.addPass(G.post);
     G.composer = composer;
+    this.env = new EnvLight(renderer);
+    this.expWant = 1.15;
 
     G.gfx = new Gfx();
     G.assets = new SharedAssets();
@@ -539,6 +546,11 @@ class Game {
     const dpr = devicePixelRatio || 1;
     G.renderer.setPixelRatio(q === 'lav' ? 1 : q === 'middels' ? Math.min(dpr, 1.25) : Math.min(dpr, 2));
     this.bloom.enabled = q !== 'lav';
+    // MSAA i komposeren: 4 prøver på høy, 2 på middels, ingen på lav
+    const samples = q === 'hoy' ? 4 : q === 'middels' ? 2 : 0;
+    for (const rt of [G.composer.renderTarget1, G.composer.renderTarget2]) {
+      if (rt.samples !== samples) { rt.samples = samples; rt.dispose(); }
+    }
     const shadows = q !== 'lav';
     const size = q === 'hoy' ? 2048 : 1024;
     for (const l of [this.key, this.title.spot]) {
@@ -1110,6 +1122,10 @@ class Game {
       k.shadow.normalBias = 0.035;
       this.hemi.groundColor.setHex(0x0b0806);
       this.hemi.intensity = 0.55;
+      // kloakken: ikke noe miljøkart, og lykta og faklene får gløde mer enn i dagslys
+      G.scene.environment = null;
+      this.bloomLook(0.88, 0.55);
+      this.expWant = 1.15;
       this.fill.color.setHex(0x8aa0c0);
       this.fill.intensity = 0.22;
       G.scene.fog.near = 30;
@@ -1149,6 +1165,12 @@ class Game {
     G.scene.fog.far = (105 - n * 30) * (1 - W.rain * 0.3);
     if (cloud > 0.01) { G.scene.fog.color.lerp(tmp4.setRGB(0.32, 0.34, 0.38).multiplyScalar(1 - n * 0.8), cloud * 0.45); G.scene.background.copy(G.scene.fog.color); }
     G.post.mood('stad', n, W.rain);
+    // miljøkart fra himmelen, svakt om dagen og nesten borte om natta (docs/grafikk-weatherglass.md)
+    G.scene.environment = this.env.update(dt, sky, cloud);
+    G.scene.environmentIntensity = (0.3 - n * 0.22) * (1 - cloud * 0.35);
+    // om dagen gløder bare lamper og ild; om natta litt mer. Natta er litt lysere enn før.
+    this.bloomLook(1.12 - n * 0.14, 0.32 + n * 0.2);
+    this.expWant = 1.15 * (1 + n * 0.18);
     const night = n > 0.6;
     G.audio.townNight = night;
     if (G.audio.music) {
@@ -1160,8 +1182,12 @@ class Game {
       if (night) G.ambient.setLook(0x2a3448, 0xd8ff7a, 0.5);
       else G.ambient.setLook(0x9aa0b0, 0xfff2c0, 0.12);
     }
-    void dt;
     return sky;
+  }
+
+  bloomLook(threshold, strength) {
+    this.bloom.threshold = threshold;
+    this.bloom.strength = strength;
   }
 
   applyPendingBoon() {
@@ -1851,7 +1877,9 @@ class Game {
     else if (G.state === 'inventory' && inp.wasPressed('KeyI')) G.inv.close();
 
     G.post.tiltWant = inTitle ? 0.5 : G.state === 'inventory' ? 0 : 0.85;
+    G.renderer.toneMappingExposure += ((inTitle ? 1.15 : this.expWant) - G.renderer.toneMappingExposure) * Math.min(1, dt * 1.5);
     if (inTitle) {
+      this.bloomLook(0.78, 0.65);
       G.post.mood('tittel');
       G.time += dt;
       if (this.title.leaving) this.title.leave = Math.min(1, this.title.leave + dt / 0.75);

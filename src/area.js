@@ -9,6 +9,7 @@ import { WALL, FLOOR, WATER, HOUSE, FENCE, GR, TW, TH } from './townmap.js';
 import { hash2, buildChest, buildBarrel, buildCrate } from './assets.js';
 import { townTextures, signTexture } from './towntex.js';
 import { addWetness, addSway } from './wet.js';
+import { leafBlob, leafDetail, spruceCone } from './treegeo.js';
 import { imageTexture } from './textures.js';
 import { AreaLife } from './arealife.js';
 import { buildAreaGrid, K_FOREST, K_DEEP, K_HILL, K_WALL } from './areagrid.js';
@@ -158,7 +159,7 @@ export class Area extends Town {
       M.hill = new THREE.MeshStandardMaterial({ map: TX.grass.map, normalMap: TX.grass.normalMap, roughness: 1, color: TX.grass.map.isCanvasTexture ? 0xdce4c8 : 0xf2f2e8 });
       M.rock = new THREE.MeshStandardMaterial({ map: TX.rock.map, normalMap: TX.rock.normalMap, roughness: 0.95, color: TX.rock.map.isCanvasTexture ? 0x8a867c : 0xeae6dd, flatShading: true });
       M.tent = new THREE.MeshStandardMaterial({ ...TX.canvas, roughness: 0.95, vertexColors: true, side: THREE.DoubleSide });
-      M.spruce = new THREE.MeshStandardMaterial({ roughness: 0.9, flatShading: true });
+      M.spruce = new THREE.MeshStandardMaterial({ roughness: 0.9, vertexColors: true });
       addWetness(M.forestFloor, { puddles: false, k: 0.45 });
       addWetness(M.hill, { puddles: false, k: 0.45 });
       addSway(M.spruce, 'leaf');
@@ -325,8 +326,10 @@ export class Area extends Town {
       chunks.get(key).push(t);
     }
     const trunkG = new THREE.CylinderGeometry(0.16, 0.26, 2.2, 6).translate(0, 1.1, 0);
-    const leafHi = new THREE.IcosahedronGeometry(1, 1), leafLo = new THREE.IcosahedronGeometry(1, 0);
-    const coneG = new THREE.ConeGeometry(1, 1, 7).translate(0, 0.5, 0);
+    // myke kroner med AO i hjørnefargene (treegeo.js)
+    const [dHi, dLo] = leafDetail();
+    const leafHi = leafBlob(dHi, 1), leafLo = leafBlob(dLo, 2);
+    const coneG = spruceCone(10, 3);
     const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), s = new THREE.Vector3(), p = new THREE.Vector3();
     const c = new THREE.Color();
     let n = 0;
