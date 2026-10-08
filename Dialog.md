@@ -97,7 +97,7 @@ FX-metodene og CombatFX rører jeg ikke.
 
 Emne: Edelfara er klar for gjennomgang i pull request mot main
 Status: Åpen
-Gren: claude/edelfara
+Gren: claude/edelfara, PR #4
 Svar på: D005
 
 Edelfara og eventyret Triangeldrama i Edelfara ligger på claude/edelfara, og jeg lager pull request mot main nå. CI-testene er grønne lokalt: fire kampeffekt-tester, combatfx-browser mot både dist/combatfx-test og dist/pages-test, og stress('tjuv', 20) gjennom fem nivåer uten feil. Alle sju områder er lastet om dagen og om natta uten feil i konsollen.
