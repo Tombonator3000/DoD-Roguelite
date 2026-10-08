@@ -192,7 +192,8 @@ export class WaterFX {
       u.uSky.value.copy(G.game.sky.sky).multiplyScalar(W ? 1 - W.cloud * 0.45 : 1);
       u.uSkyH.value.copy(G.game.sky.fog);
       u.uCaust.value = 0.35;
-      u.uFlow.value.set(0, 0.35); // elva renner sørover
+      // elva i Fristaden renner sørover. Områdene i Edelfara har egen retning (D.flow), sjøen står stille.
+      if (D.flow) u.uFlow.value.set(D.flow[0], D.flow[1]); else u.uFlow.value.set(0, 0.35);
     } else {
       const fc = G.scene.fog?.color;
       if (fc) { u.uSky.value.copy(fc).multiplyScalar(1.6); u.uSkyH.value.copy(fc); }

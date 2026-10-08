@@ -4,6 +4,16 @@ En spillbar prototype av et roguelite i stil med Diablo og Hades, med litt Ultim
 
 Laget med three.js r170. Alt annet er skrevet for hånd: teksturer, musikk, lyd, fiendemodeller og effekter genereres i nettleseren. Den eneste eksterne ressursen er 3D-modellen av anda, som er pakket inn i HTML-fila.
 
+## Nytt i 0.6: Edelfara og Triangeldrama i Edelfara
+
+- Nordporten i Fristaden åpner et reisekart over Edelfara i hertugdømmet Pharynx. Klikk på et sted og trykk Reis. Reisen tar timer på klokka: ni timer gjennom Torilskogen til Ekeskogen, og videre til Sortmund, Akershus og Glimming.
+- Eventyret «Triangeldrama i Edelfara» fra Drakar och Demoner Ivanhoe. Første tur stopper i Ekeskogen, der hertigens kurir ligger død med en depesj: Riddar Kettil er drept og markisens pengekiste er borte. Tre adelsmenn mistenker hverandre, og grevens soldater beleirer Akershus. Om sju dager stormer de borgen.
+- Sju områder i 3D tegnet etter kartene i boka: Ekeskogen, Sortmund med markisens plakater og vindmølla, Ridderskors borg, Akershus med grevens leir under borgkullen, Akershus borg, Glimming og Lekhs leir i skogen sør for Akershus.
+- Over førti personer med samtaler etter modulen. Ledetråder, villspor og bevis samles i journalen i pausemenyen: ulvespor, tygde papirbiter, hullingpiler, myntene i ledarorchens pung, brevet til Trigorm og brevet til mjølneren.
+- Nye fiender etter statblokkene: orcher på veien, ledarorchen, elitorcher, orcher med armborst, svartalfer, ulver og Lekh med arbalest. Lekh flykter på en ulv hvis det går dårlig.
+- Overtal grevens riddarkapten med bevisene, så slutter greven og baronen fred og følger deg mot leiren. Eller gå inn alene. Kisten kan bæres tilbake til markisen, eller brytes opp.
+- Fire slutter når du rapporterer til hertigens vaktkaptein i Pharynx, etter hva som skjedde med Akershus, freden og kisten.
+
 ## Nytt i 0.5: DoD91, inventar og lagring
 
 - Reglene er byttet fra DoD 2023 til DoD 4.0 (1991) med Expert og Gigant. Sju grundegenskaper med STO, FV per ferdighet, yrkene og rasene fra Bok I, stridskonster fra Gigant (Quack-fu for anka).
@@ -109,6 +119,14 @@ src/
   towntex.js    teksturer for byen
   townpeople.js folk i byen, samtaletekst, rykter, oppslagstavla
   townfolk.js   døgnrytme, tjenester, tyveri, oppdrag
+  area.js       områdene utenfor byen: skog, vann, kuller med borg, telt, leirer, faner (arver Town)
+  areagrid.js   maler rutenettet for et område fra layouten
+  edelmap.js    de sju områdene i Edelfara og veiene mellom dem
+  edelfolk.js   folk og samtaler i Edelfara
+  arealife.js   livet i områdene: utganger, scener, allierte, storming, rapporten i Pharynx
+  edelmodels.js orcher, svartalfer, ulver og Lekh
+  ivan.js       oppdraget Triangeldrama i Edelfara: ledetråder, frist, journal
+  travel.js     reisekartet
   talk.js       samtaler med nøkkelord
   dod.js        regeldata fra DoD 4.0, Expert og Gigant: raser, yrker, färdigheter, våpen, rustning, besvärjelser, tabeller
   body.js       kroppsdelene: KP per träffområde, blødning, lammelser

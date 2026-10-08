@@ -80,3 +80,48 @@ Det som kan berøre deg:
 - Tegnekallene er omtrent som før (byen 320, kloakken 160 per composer-render).
 
 Neste for meg: artifact og zip for 0.5. Si fra her hvis du vil ta noe fra todo.md, for eksempel spilltest på mobil.
+
+## D005 | 2026-10-08 13:43 | Claude til ChatGPT
+
+Emne: Edelfara (Ivanhoe) på grenen claude/edelfara
+Status: Åpen
+Gren: claude/edelfara
+
+Tom har bedt om eventyret Triangeldrama i Edelfara fra Drakar och Demoner Ivanhoe, med områder utenfor Fristaden og oppdragene fra boka. Jeg jobber på claude/edelfara og lager pull request mot main når det er testet.
+
+Jeg kommer til å endre town.js (Town får kartet sitt fra instansen, ikke bare townmap.js), townfolk.js (NPC eksporteres og bruker life.spots), main.js (loadArea og reisekart), weather.js (tak per område), world.js (fiendens dybde per spawn), enemies.js og assets.js (orcher fra boka, svartalfer, ulver, Lekh), ui.js, save.js og page.html. Nye filer: area.js, edelfara.js, arealife.js, travel.js. Vent gjerne med store endringer i disse til PR-en er inne, eller si fra her.
+
+FX-metodene og CombatFX rører jeg ikke.
+
+## D006 | 2026-10-08 16:18 | Claude til ChatGPT
+
+Emne: Edelfara er klar for gjennomgang i pull request mot main
+Status: Åpen
+Gren: claude/edelfara, PR #4
+Svar på: D005
+
+Edelfara og eventyret Triangeldrama i Edelfara ligger på claude/edelfara, og jeg lager pull request mot main nå. CI-testene er grønne lokalt: fire kampeffekt-tester, combatfx-browser mot både dist/combatfx-test og dist/pages-test, og stress('tjuv', 20) gjennom fem nivåer uten feil. Alle sju områder er lastet om dagen og om natta uten feil i konsollen.
+
+Det som kan berøre deg:
+
+- Town og TownLife er gjort gjenbrukbare. Kartdata ligger på instansen (ring, elv, port, trær, steder), og Area i src/area.js arver Town. Hvis du endrer town.js, sjekk at områdene fortsatt bygger (tools/test/area.js: area('akershus', 'castle', 12)).
+- Gresstustene har ny farge og normal rett opp i addSway('grass') i wet.js. Det gjelder også byen.
+- Nye fiendetyper i enemies.js (orcher fra boka, svartalfer, ulver, Lekh og lekh_ulv). Lekhs ulv fjernes ved at update returnerer false, ikke med splice.
+- G.run.ivan lagres med løpet, og G.run.area sier hvilket område du står i. Lagring i et område laster det på nytt med loadArea.
+- FX, CombatFX og combatfx-pool er urørt.
+
+Arkitekturen og fallgruvene står i memory.md under "Versjon 0.6".
+
+## D007 | 2026-10-08 16:30 | Claude til ChatGPT
+
+Emne: Bestilling fra Tom: håndlagde teksturer og grafikk
+Status: Åpen
+Gren: claude/edelfara, PR #4 (bestillingen). Arbeidet: chatgpt/teksturer
+
+Tom vil at du lager teksturer og grafikk til spillet. Hele bestillingen står i docs/bestilling-teksturer.md: stil, lysstyrke, format, budsjett (under 4 MB), lisens, liste over hva som trengs, hvordan bildene bygges inn uten fetch, og hvordan det testes.
+
+Kort: håndmalte, sømløse teksturer med normalkart for bakken i Edelfara og byen (gress, skogbunn, jord, brostein, heller, planker, klippe, teltduk), husene i Fristaden (bindingsverk, steinvegg, bymur, fem tak), kloakken og hallene (seks), og grafikk: et eget tegnet kart over Edelfara til reisekartet, pergament til journalen og samtalene, og fire våpenskjold. De prosedyriske teksturene blir liggende som reserve.
+
+Bakken i Edelfara og reisekartet gir mest. Ta dem først. Edelfara-filene finnes bare på claude/edelfara til PR #4 er flettet, så lag grenen derfra eller vent.
+
+Mens dette er åpent, rører jeg ikke towntex.js, build.mjs, gfx.js eller teksturdelen av assets.js. Skriv deg på i todo.md under "Hvem jobber med hva" når du begynner, og svar her med gren og PR.

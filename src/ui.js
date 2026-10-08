@@ -118,6 +118,7 @@ export class UI {
   }
 
   showBoss(e) {
+    if (this.boss !== e) $('#bossbar .name').textContent = e.def.barName || 'Rødpels, revehøvdingen';
     this.boss = e;
     $('#bossbar').hidden = false;
     $('#bossbar .fill').style.width = `${Math.max(0, (e.kp / e.maxKP) * 100)}%`;
@@ -127,14 +128,16 @@ export class UI {
     $('#bossbar').hidden = true;
   }
 
-  setDepth(depth, name) {
+  // o.region: et sted utenfor Fristaden (Edelfara). o.town: fredelig, uten angrepsknapper på mobil.
+  setDepth(depth, name, o = {}) {
     const eb = $('#depth .eyebrow');
-    eb.innerHTML = depth === 0 ? '<span class="ebp">Zorakin, Aidne · </span><span id="clock"></span>' : `Nivå <span id="depthNum">${depth}</span> av 5<span class="ebp"> · </span><span id="clock" class="ebp"></span>`;
-    document.body.classList.toggle('in-town', depth === 0);
+    const region = o.region || 'Zorakin, Aidne';
+    eb.innerHTML = depth === 0 ? `<span class="ebp">${region} · </span><span id="clock"></span>` : `Nivå <span id="depthNum">${depth}</span> av 5<span class="ebp"> · </span><span id="clock" class="ebp"></span>`;
+    document.body.classList.toggle('in-town', depth === 0 && o.town !== false);
     this.clockTxt = null;
     $('#depthName').textContent = name;
     const b = $('#banner');
-    b.innerHTML = `<div class="eyebrow">${depth === 0 ? 'Zorakin, Aidnehalvøya' : `Nivå ${depth} av 5`}</div><div class="title">${name}</div>`;
+    b.innerHTML = `<div class="eyebrow">${depth === 0 ? (o.region ? o.region : 'Zorakin, Aidnehalvøya') : `Nivå ${depth} av 5`}</div><div class="title">${name}</div>`;
     b.classList.remove('on');
     void b.offsetWidth;
     b.classList.add('on');
@@ -482,6 +485,13 @@ export class UI {
       const k = D.idx(x, y), v = D.grid[k];
       if (v === WATER) { ctx.fillStyle = 'rgba(60,130,170,0.6)'; ctx.fillRect(x, y, 1, 1); continue; }
       if (D.cityMask[k]) { ctx.fillStyle = 'rgba(201,163,90,0.75)'; ctx.fillRect(x, y, 1, 1); continue; }
+      // områdene i Edelfara: skog, dypt vann, åser og stein
+      if (v === WALL && D.kind) {
+        const kk = D.kind[k];
+        ctx.fillStyle = kk === 2 ? 'rgba(60,130,170,0.6)' : kk === 3 ? 'rgba(120,130,80,0.55)' : kk === 5 ? 'rgba(110,104,96,0.5)' : 'rgba(28,48,26,0.7)';
+        ctx.fillRect(x, y, 1.02, 1.02);
+        continue;
+      }
       if (v === WALL) continue;
       const g = D.ground[k];
       if (col[g]) { ctx.fillStyle = col[g].replace('A', a); ctx.fillRect(x, y, 1.02, 1.02); }
@@ -512,6 +522,11 @@ export class UI {
     const dot = (wx, wz, c, r) => { ctx.fillStyle = c; ctx.beginPath(); ctx.arc(wx / T, wz / T, r, 0, Math.PI * 2); ctx.fill(); };
     if (D.grate) dot(D.grate.x, D.grate.z, '#6ab4ff', 0.9);
     for (const n of D.life?.npcs || []) if (!n.hidden) dot(n.pos.x, n.pos.z, n.mode === 'sleep' ? 'rgba(200,190,160,0.5)' : '#f0dc90', mini ? 0.45 : 0.4);
+    if (D.isArea) {
+      for (const it of D.life?.exits || []) if (it.label) dot(it.pos.x, it.pos.z, '#6ab4ff', 0.8);
+      for (const a of D.life?.allies || []) if (!a.dead) dot(a.pos.x, a.pos.z, '#8ac0ff', 0.4);
+      for (const e of G.enemies) if (!e.dead && e.alerted) dot(e.pos.x, e.pos.z, e.fleeing ? '#c0a040' : '#c0392b', e.def.leader ? 0.8 : 0.45);
+    }
     ctx.fillStyle = '#ffffff';
     ctx.beginPath();
     ctx.arc(P.pos.x / T, P.pos.z / T, mini ? 0.7 : 0.75, 0, Math.PI * 2);

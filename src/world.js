@@ -157,7 +157,7 @@ export class World {
       G.run.cacheHint = 0;
       G.ui.log(`Tobolt hadde rett. Du vet om ${n === 1 ? 'et gjemmested' : n + ' gjemmesteder'} på dette nivået. Se på kartet.`);
     }
-    dg.spawnList.forEach((s, i) => { const e = new Enemy(s.type, s.x, s.z, dg.depth); e.spawnIdx = i; G.enemies.push(e); });
+    dg.spawnList.forEach((s, i) => { const e = new Enemy(s.type, s.x, s.z, s.depth ?? dg.depth); e.spawnIdx = s.id ?? i; if (s.setup) s.setup(e); G.enemies.push(e); });
     if (dg.bossSpawn) { const b = new Enemy('boss', dg.bossSpawn.x, dg.bossSpawn.z, dg.depth); b.spawnIdx = 'boss'; G.enemies.push(b); }
   }
 
@@ -370,7 +370,9 @@ export class World {
     g.position.set(enemy.pos.x + dir.x * 0.6, 1.0, enemy.pos.z + dir.z * 0.6);
     g.rotation.y = yaw;
     G.scene.add(g);
-    G.projectiles.push({ kind: 'arrow', mesh: g, pos: g.position, dir, speed: 17, life: 1.1, owner: 'enemy', src: enemy, skill: enemy.fv + (enemy.fvMod || 0), dmg: enemy.weapon?.dmg || 'D6', wname: enemy.weapon?.name?.toLowerCase(), startX: enemy.pos.x, startZ: enemy.pos.z });
+    // hullingpiler gjør ekstra skade (dmgPlus, svartfolket i Edelfara)
+    const dmg = (enemy.weapon?.dmg || 'D6') + (enemy.def.dmgPlus ? `+${enemy.def.dmgPlus}` : '');
+    G.projectiles.push({ kind: 'arrow', mesh: g, pos: g.position, dir, speed: 17, life: 1.1, owner: 'enemy', src: enemy, skill: enemy.fv + (enemy.fvMod || 0), dmg, wname: enemy.weapon?.name?.toLowerCase(), startX: enemy.pos.x, startZ: enemy.pos.z });
   }
 
   updateProjectiles(dt) {
@@ -558,15 +560,18 @@ export class World {
     this.dropSilver(e.pos.x, e.pos.z, s);
     if (Math.random() < 0.1) this.spawnPickup('bread', e.pos.x, e.pos.z);
     if (Math.random() < 0.05) this.spawnPickup('potion', e.pos.x, e.pos.z);
-    if (Math.random() < 0.05 + G.depth * 0.012 + (greed ? 0.05 : 0)) this.spawnPickup('entry', e.pos.x, e.pos.z, { entry: makeValuable(G.depth) });
-    const chance = 0.07 + G.depth * 0.02 + (greed ? 0.08 : 0) + (e.type === 'orc' ? 0.12 : 0) + (e.type === 'demon' ? 0.6 : 0);
+    // områdene i Edelfara har dybde 0, men byttet skal være som på nivå 2 (lootDepth i area.js)
+    const LD = G.dungeon?.lootDepth ?? G.depth;
+    if (e.def.noLoot) return;
+    if (Math.random() < 0.05 + LD * 0.012 + (greed ? 0.05 : 0)) this.spawnPickup('entry', e.pos.x, e.pos.z, { entry: makeValuable(LD) });
+    const chance = 0.07 + LD * 0.02 + (greed ? 0.08 : 0) + (e.type === 'orc' ? 0.12 : 0) + (e.def.lootBonus || 0) + (e.type === 'demon' ? 0.6 : 0);
     if (e.def.boss) {
       this.spawnPickup('item', e.pos.x, e.pos.z, { item: makeItem(5, this.lootOpts({ unique: true })) });
       this.spawnPickup('item', e.pos.x, e.pos.z, { item: makeItem(5, this.lootOpts({ rarity: 'sjelden' })) });
       this.spawnPickup('potion', e.pos.x, e.pos.z);
       this.spawnPickup('entry', e.pos.x, e.pos.z, { entry: makeValuable(5) });
     } else if (Math.random() < chance) {
-      this.spawnPickup('item', e.pos.x, e.pos.z, { item: makeItem(G.depth, this.lootOpts({ luck: greed ? 0.2 : 0 })) });
+      this.spawnPickup('item', e.pos.x, e.pos.z, { item: makeItem(LD, this.lootOpts({ luck: greed ? 0.2 : 0 })) });
     }
   }
 

@@ -292,6 +292,8 @@ export const WEAPONS = {
   slunga: W('slunga', 'Slunga', 'slunga', 'D6', 9, { ranged: true, range: 90, kg: 0.5, price: 40, types: ['b'], kind: 'sling', metal: false, dur: 0 }),
   lattarmborst: W('lattarmborst', 'Lätt armborst', 'armborst', '2D4+2', 25, { ranged: true, range: 150, reload: 3, kg: 5, price: 1300, types: ['p'], kind: 'xbow', metal: false, dur: 0 }),
   tungtarmborst: W('tungtarmborst', 'Tungt armborst', 'armborst', '2D6+2', 27, { ranged: true, range: 225, reload: 6, kg: 6, price: 2250, types: ['p'], kind: 'xbow', metal: false, dur: 0 }),
+  // Lekhs arbalest, 3T6+3 (Triangeldrama i Edelfara s. 10). Brukes med Tungt armborst. STY-krav, vekt og pris står ikke der (uv).
+  arbalest: { ...W('arbalest', 'Arbalest', 'armborst', '3D6+3', 31, { skill: 'Tungt armborst', ranged: true, range: 250, reload: 8, kg: 9, price: 4000, types: ['p'], kind: 'xbow', metal: false, dur: 0 }), uv: true },
   // kastvapen: én hånd, rekkevidde STY rutor. Kan pareres med skjold.
   kastkniv: W('kastkniv', 'Kastkniv', 'kastvapen', 'D4+1', 9, { thrown: true, kg: 0.5, price: 100, types: ['p'], kind: 'knife', dur: 9 }),
   kastyxa: W('kastyxa', 'Kastyxa', 'kastvapen', 'D6+2', 9, { thrown: true, kg: 3, price: 90, types: ['s'], kind: 'axe', dur: 11 }),

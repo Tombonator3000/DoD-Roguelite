@@ -706,7 +706,7 @@ export class Player {
       if (!this.peaceT || G.time > this.peaceT) {
         this.peaceT = G.time + 3;
         G.fx.float('Ikke her', this.pos, 'miss');
-        if (!this.peaceTold) { this.peaceTold = true; G.ui.log('Vaktene i Fristaden holder øye med deg. Du lar våpenet være i byen.'); }
+        if (!this.peaceTold || G.dungeon?.peaceText) { this.peaceTold = true; G.ui.log(G.dungeon?.peaceText || 'Vaktene i Fristaden holder øye med deg. Du lar våpenet være i byen.'); }
       }
     }
     const wantDodge = free && able && (input.wasPressed('Space') || input.wasPressed('TDash'));

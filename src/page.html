@@ -281,6 +281,20 @@ input[type=range]:focus-visible { box-shadow: 0 0 0 2px rgba(201,163,90,.5); }
 #pause-quests h3 { margin: 0 0 6px; }
 #pause-quests .qrow { font-size: 14.5px; padding: 4px 0; color: var(--parch); border-bottom: 1px solid rgba(107,90,62,.3); }
 #pause-quests .qrow.done { color: var(--dim); text-decoration: line-through; }
+#pause-quests .qrow.goal { color: var(--gild); font-style: italic; }
+#pause-quests .qrow.dl { color: #e8a080; font-size: 13.5px; }
+#pause-quests .qrow.clue { font-size: 13.5px; color: var(--parch); padding-left: 10px; border-left: 3px solid rgba(160,140,100,.5); }
+#pause-quests .qrow.clue.svart { border-left-color: #8a3a2a; }
+#pause-quests .qrow.clue.falsk { border-left-color: #4a5a7a; color: #c8c0b0; }
+#pause .panel { max-height: calc(100vh - 48px); overflow-y: auto; }
+#travel .panel { width: min(980px, 100%); padding: 20px 22px 22px; }
+#travel-wrap { position: relative; width: 100%; border: 1px solid var(--gild-dim); box-shadow: inset 0 0 40px rgba(60,40,20,.5); }
+#travel-map { display: block; width: 100%; height: auto; }
+#travel-go { display: flex; align-items: center; gap: 14px; margin-top: 12px; flex-wrap: wrap; }
+#travel-go[hidden] { display: none; }
+#travel-info { flex: 1 1 320px; display: flex; flex-direction: column; gap: 2px; font-size: 14.5px; color: var(--parch); }
+#travel-info b { font-family: var(--ui); letter-spacing: .1em; text-transform: uppercase; color: var(--gild); }
+#travel-info span { color: var(--dim); }
 .floater.say { color: #f2e6c8; font-family: var(--body); font-style: italic; font-weight: 600; font-size: 15px; text-shadow: 0 1px 3px #000, 0 0 8px rgba(0,0,0,.9); }
 #clock { color: var(--parch); opacity: .85; }
 @media (max-width: 700px) { #depth .ebp { display: none; } #depth .eyebrow { max-width: 58vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } }
@@ -886,10 +900,19 @@ body.inv-open #hud, body.inv-open #labels, body.inv-open #touch, body.inv-open #
       <kbd>H</kbd><span>Första hjälpen</span>
       <kbd>1 / E / I</kbd><span>Legedrikk / bruk / packning</span>
       <kbd>C / Tab / M</kbd><span>Rollformulär / kart / lyd</span>
-      <kbd>E + ord</kbd><span>Snakk med folk i Fristaden: skriv eller klikk</span>
+      <kbd>E + ord</kbd><span>Snakk med folk i Fristaden og Edelfara: skriv eller klikk</span>
     </div>
     <div id="pause-quests"></div>
     <div class="row"><button class="btn primary" id="btn-resume">Fortsett</button><button class="btn" id="btn-save">Lagre spill</button><button class="btn" id="btn-load">Last spill</button><button class="btn" id="btn-sheet">Rollformulär</button><button class="btn" id="btn-mute">Slå av lyd</button><button class="btn" id="btn-quit">Avslutt løpet</button></div>
+  </div>
+</section>
+
+<section class="screen" id="travel" hidden>
+  <div class="panel">
+    <div class="eyebrow">Reise</div>
+    <h2>Edelfara</h2>
+    <div id="travel-wrap"><canvas id="travel-map" width="900" height="620"></canvas></div>
+    <div id="travel-go"><div id="travel-info"></div><button class="btn primary" id="btn-travel-go">Reis</button><button class="btn" id="btn-travel-stay">Bli her</button></div>
   </div>
 </section>
 

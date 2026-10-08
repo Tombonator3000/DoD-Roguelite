@@ -22,9 +22,13 @@ const OV = 0.45; // takutstikk
 const U = v => v * T;
 
 const MAT = {};
+const SIGNS = [
+  ['inn', 'DEN FEITE GÅSEN', 'vertshus'], ['shop', 'HVASS HANDEL', 'krambod'], ['smithy', 'SMIE', 'Bataar fra Karad Batur'],
+  ['dojo', 'KVAKK-FU', 'Mester Flansen'], ['tower', 'GYNERVA', 'trollkyndig'],
+];
 
 // --- geometribygger med RGB-farger -------------------------------------------------
-class Mesher {
+export class Mesher {
   constructor() { this.p = []; this.n = []; this.uv = []; this.c = []; this.i = []; }
   get empty() { return this.p.length === 0; }
   quad(P, N, UV, C) {
@@ -213,7 +217,8 @@ export class Town extends Dungeon {
     this.isTown = true;
     this.peaceful = true;
     this.arrival = arrival;
-    const sp = arrival === 'grate' ? { x: 13.6, y: 22.4 } : { x: 12.8, y: 16.5 };
+    // start: torget. grate: opp fra kloakken. gate: inn gjennom Nordporten fra Edelfara.
+    const sp = arrival === 'grate' ? { x: 13.6, y: 22.4 } : arrival === 'gate' ? { x: 18.5, y: 6.4 } : { x: 12.8, y: 16.5 };
     this.start = { x: U(sp.x), z: U(sp.y) };
     this.explored.fill(1);
     this.insideId = null;
@@ -225,6 +230,12 @@ export class Town extends Dungeon {
   }
 
   gen() {
+    // Fristadens kart. Area (area.js) har egne kart og overstyrer gen().
+    this.ring = RING;
+    this.river = RIVER;
+    this.gate = GATE;
+    this.treeList = TREES;
+    this.spots = SPOTS;
     const L = buildTownLayout();
     this.grid.set(L.grid);
     this.ground = L.ground;
@@ -237,7 +248,8 @@ export class Town extends Dungeon {
     this.cityMask = new Uint8Array(TW * TH);
     for (let y = 0; y < TH; y++) for (let x = 0; x < TW; x++) {
       if (this.get(x, y) !== WALL) continue;
-      const ring = (x === RING.x0 || x === RING.x1) && y >= RING.y0 && y <= RING.y1 || (y === RING.y0 || y === RING.y1) && x >= RING.x0 && x <= RING.x1;
+      const R = this.ring;
+      const ring = (x === R.x0 || x === R.x1) && y >= R.y0 && y <= R.y1 || (y === R.y0 || y === R.y1) && x >= R.x0 && x <= R.x1;
       const tower = this.isTower(x, y);
       if (ring || tower) this.cityMask[this.idx(x, y)] = 1;
     }
@@ -258,7 +270,8 @@ export class Town extends Dungeon {
     return (x >= 15 && x <= 16 && y >= 3 && y <= 4) || (x >= 20 && x <= 21 && y >= 3 && y <= 4) || (x <= 4 && y <= 4 && x >= 3 && y >= 3) || (x >= 41 && x <= 42 && y >= 3 && y <= 4);
   }
   isGate(x, y) {
-    return y === GATE.y && x >= GATE.x0 && x <= GATE.x1;
+    const g = this.gate;
+    return !!g && y === g.y && x >= g.x0 && x <= g.x1;
   }
 
   buildingOf(tx, ty) {
@@ -556,6 +569,7 @@ export class Town extends Dungeon {
 
   buildWater() {
     const bottom = new Mesher(), side = new Mesher(), surf = new Mesher();
+    const RIVER = this.river, RING = this.ring;
     const river = (x, y) => x >= RIVER.x0 && x <= RIVER.x1 && (y < RING.y0 || y > RING.y1 || this.get(x, y) === WATER || this.bridgeMap[this.idx(x, y)] > 0 || this.cityMask[this.idx(x, y)]);
     const y0 = -40, y1 = TH + 40;
     for (let y = y0; y < y1; y++) for (let x = RIVER.x0; x <= RIVER.x1; x++) {
@@ -586,6 +600,7 @@ export class Town extends Dungeon {
   }
 
   buildCityWall(M) {
+    const RING = this.ring || { x0: -99, y0: -99, x1: 999, y1: 999 }, RIVER = this.river, GATE = this.gate;
     const W = new Mesher(), merl = new Mesher();
     const heightOf = (x, y) => {
       if (!this.cityMask[this.idx(x, y)]) return 0;
@@ -599,7 +614,7 @@ export class Town extends Dungeon {
       if (!this.cityMask[this.idx(x, y)]) continue;
       const h = heightOf(x, y);
       const X0 = x * T, Z0 = y * T, X1 = X0 + T, Z1 = Z0 + T;
-      const overRiver = x >= RIVER.x0 && x <= RIVER.x1;
+      const overRiver = !!RIVER && x >= RIVER.x0 && x <= RIVER.x1;
       const base = overRiver ? WATER_BOTTOM : 0;
       if (this.isGate(x, y)) {
         // porten: buen over og fallgitteret
@@ -634,6 +649,7 @@ export class Town extends Dungeon {
     }
     this.addMesh(W, M.city, true, true);
     this.addMesh(merl, M.city, true, true);
+    if (!GATE) return;
     // fallgitter i porten
     const iron = new Mesher();
     const gz = (GATE.y + 0.5) * T;
@@ -745,8 +761,9 @@ export class Town extends Dungeon {
 
   windows(b, backWood, backGlass) {
     const stone = b.style === 'stone';
-    const shutterCol = { inn: [0.25, 0.42, 0.3], shop: [0.5, 0.22, 0.16], dojo: [0.6, 0.18, 0.14], home: [0.24, 0.32, 0.5], farm: [0.32, 0.4, 0.26], guard: [0.3, 0.32, 0.44], manor: [0.18, 0.3, 0.5] }[b.id];
-    const rows = b.id === 'tower' ? [1.7, 3.9, 6.1] : b.id === 'temple' ? [2.5] : stone ? [1.8] : b.wallH >= 4 ? [1.5, 3.55] : [1.5];
+    // b.shutter og b.rows: egne farger og vindusrader for hus utenfor Fristaden (area.js)
+    const shutterCol = b.shutter !== undefined ? b.shutter : { inn: [0.25, 0.42, 0.3], shop: [0.5, 0.22, 0.16], dojo: [0.6, 0.18, 0.14], home: [0.24, 0.32, 0.5], farm: [0.32, 0.4, 0.26], guard: [0.3, 0.32, 0.44], manor: [0.18, 0.3, 0.5] }[b.id];
+    const rows = b.rows || (b.id === 'tower' ? [1.7, 3.9, 6.1] : b.id === 'temple' ? [2.5] : stone ? [1.8] : b.wallH >= 4 ? [1.5, 3.55] : [1.5]);
     const ww = b.id === 'temple' ? 0.55 : stone ? 0.6 : 0.82, wh = b.id === 'temple' ? 1.7 : stone ? 0.85 : 0.9;
     const isDoor = (x, y) => this.doorMap[this.idx(x, y)] === b.index + 1;
     for (let y = b.y0; y <= b.y1; y++) for (let x = b.x0; x <= b.x1; x++) {
@@ -1045,6 +1062,8 @@ export class Town extends Dungeon {
     };
     this.hearths = [];
     this.interior = [];
+    // områdene i Edelfara møblerer selv (edelmap.js), eller ikke i det hele tatt
+    if (this.L) { this.L.furnish?.({ W, table, bench, bed, shelf, hearth, F, U }, this); return; }
     // vertshuset
     W(6.0, 7.1, 9.7, 7.45, 0, 1.05, [0.5, 0.34, 0.22]);
     W(5.95, 7.05, 9.75, 7.5, 1.05, 1.12, [0.42, 0.28, 0.18], false);
@@ -1197,6 +1216,7 @@ export class Town extends Dungeon {
     // gress utenfor muren, delt rundt elva så vannet synes
     const S = 130;
     const cx = TW * T / 2, cz = TH * T / 2;
+    const RIVER = this.river, RING = this.ring, GATE = this.gate;
     const rx0 = RIVER.x0 * T, rx1 = (RIVER.x1 + 1) * T;
     const out = new Mesher();
     for (const [x0, x1] of [[cx - S, rx0], [rx1, cx + S]]) out.quadUp(x0, cz - S, x1, cz + S, -0.03, [1, 1, 1], 0.12);
@@ -1218,7 +1238,8 @@ export class Town extends Dungeon {
   }
 
   buildTrees(M) {
-    const pts = TREES.map(([x, y]) => ({ x: U(x), z: U(y), inside: true }));
+    const RIVER = this.river, RING = this.ring, GATE = this.gate;
+    const pts = this.treeList.map(([x, y]) => ({ x: U(x), z: U(y), inside: true }));
     // trær utenfor muren
     const R = (i, k) => hash2(i, k, 77);
     for (let i = 0; i < 70; i++) {
@@ -1261,17 +1282,27 @@ export class Town extends Dungeon {
     trunks.receiveShadow = leaves.receiveShadow = true;
     this.group.add(trunks, leaves);
     this.treePts = pts.filter(t => t.inside);
-    // gresstuster og blomster
+    this.buildTufts(M);
+  }
+
+  // gresstuster og blomster på gressflisene. k: tetthet (områdene i Edelfara har mer gress, og færre tuster per flis)
+  buildTufts(M, dens = 1) {
+    const R = (i, k) => hash2(i, k, 77);
+    const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), s = new THREE.Vector3(), p = new THREE.Vector3();
+    const c = new THREE.Color();
     const tuftG = new THREE.PlaneGeometry(0.7, 0.5).translate(0, 0.25, 0);
     const tg2 = tuftG.clone().rotateY(Math.PI / 2);
     const tg = mergeTwo(tuftG, tg2);
+    // normalene peker opp, så tustene får samme lys som bakken og ikke blir svarte silhuetter
+    const nrm = tg.attributes.normal;
+    for (let i = 0; i < nrm.count; i++) nrm.setXYZ(i, 0, 1, 0);
     const spots = [];
     for (let y = 0; y < TH; y++) for (let x = 0; x < TW; x++) {
       const k = this.idx(x, y);
       if (this.grid[k] !== FLOOR || this.ground[k] !== GR.GRASS || this.buildingOf(x, y)) continue;
       let edge = 0;
       for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) if (this.ground[this.idx(x + dx, y + dy)] !== GR.GRASS || this.grid[this.idx(x + dx, y + dy)] !== FLOOR) edge++;
-      const n = 2 + edge * 2;
+      const n = Math.round((2 + edge * 2) * dens);
       for (let j = 0; j < n; j++) spots.push([(x + R(k, j * 2)) * T, (y + R(k, j * 2 + 1)) * T, R(k, j + 50)]);
     }
     const tufts = new THREE.InstancedMesh(tg, M.tuft, spots.length);
@@ -1283,7 +1314,8 @@ export class Town extends Dungeon {
       p.set(x, 0, z);
       m4.compose(p, q, s);
       tufts.setMatrixAt(i, m4);
-      c.setHSL(0.22 + r * 0.06, 0.4, 0.42 + r * 0.12);
+      // fargen ganges med teksturen, som allerede er grønn. Nesten hvit her, ellers blir tustene svarte.
+      c.setHSL(0.2 + r * 0.08, 0.35, 0.78 + r * 0.16);
       tufts.setColorAt(i, c);
     });
     tufts.receiveShadow = true;
@@ -1544,11 +1576,7 @@ export class Town extends Dungeon {
     for (const k in F) this.addMesh(F[k], k === 'wood' ? M.wood : k === 'stone' ? M.stone : k === 'cloth' ? M.cloth : k === 'iron' ? M.iron : M.paint, true, true);
   }
 
-  signs(F) {
-    const list = [
-      ['inn', 'DEN FEITE GÅSEN', 'vertshus'], ['shop', 'HVASS HANDEL', 'krambod'], ['smithy', 'SMIE', 'Bataar fra Karad Batur'],
-      ['dojo', 'KVAKK-FU', 'Mester Flansen'], ['tower', 'GYNERVA', 'trollkyndig'],
-    ];
+  signs(F, list = SIGNS) {
     for (const [id, text, sub] of list) {
       const b = this.buildings.find(x => x.id === id);
       const [dx, dy] = b.doors[0];
@@ -1673,7 +1701,7 @@ function pushBox(p, r, x0, z0, x1, z1) {
   return true;
 }
 
-function mergeTwo(a, b) {
+export function mergeTwo(a, b) {
   const g = new THREE.BufferGeometry();
   const pos = [...a.attributes.position.array, ...b.attributes.position.array];
   const nrm = [...a.attributes.normal.array, ...b.attributes.normal.array];
@@ -1687,4 +1715,4 @@ function mergeTwo(a, b) {
   return g;
 }
 
-export { U as tileToWorld };
+export { U as tileToWorld, materials, roofMats, pushBox, HT, WATER_BOTTOM, WATER_Y, CITY_TALL, TOWER_H };
