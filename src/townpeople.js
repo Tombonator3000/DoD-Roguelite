@@ -181,6 +181,7 @@ export const PEOPLE = [
       NAVN: 'Bataar. Fra [Karad Batur]. Mäster for dere, Bataar for venner, ingenting for orcher.',
       JOBB: 'Jeg smir. [Handel] hvis du vil kjøpe, [reparere] hvis du har ødelagt noe, [slipe] hvis du vil ødelegge noe annet.',
       HANDEL: { act: 'smithShop', always: true },
+      SELGE: { act: 'sellGear', always: true },
       REPARERE: { act: 'repair', always: true },
       SLIPE: { act: 'sharpen', always: true },
       'KARAD BATUR': 'Riket mitt ligger dypt under fjellene. Hallene under Fristaden er gamle, fra den tiden byen var vår handelspost. Vi dro. Vi tok ikke med alt. [Runene] er der fortsatt.',

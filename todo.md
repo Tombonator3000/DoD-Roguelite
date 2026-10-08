@@ -6,9 +6,14 @@ Sortert etter hva som gir mest spill for minst jobb.
 
 Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når pull requesten er inne. Se AGENTS.md.
 
-- Claude (`main`, versjon 0.5): inventar med sekk og bärförmåga, 3D-ikoner, lagre/laste-meny med lagringsplasser, shadere (ild, vann, vind, våte flater), vær og flere partikler, tilt-shift og fargegradering. Rører mest inventory.js, itemmodels.js, icons.js, save.js, world.js, player.js, main.js, ui.js, page.html, fx.js, post.js, town.js.
+- Claude (`main`): bytter reglene fra DoD 2023 til DoD91 (4.0) med Expert og Gigant der det trengs, med fulle träffområden. Rører nesten alt i regelkoden: dod.js, rules.js, player.js, enemies.js, creation.js, ui.js, loot.js, townfolk.js. Vent med endringer i disse til det er pushet.
+- Claude (`main`, etterpå): shadere (ild, vann, vind, våte flater), vær og flere partikler, tilt-shift og fargegradering. fx.js, post.js, town.js, world.js.
 
 ## Nå
+
+- [x] Inventar med sekk, belte, 3D-ikoner og dra og slipp (0.5)
+- [x] Lagre og laste med autolagring og tre plasser (0.5)
+- [ ] DoD91-regler (4.0) med Expert og Gigant: egenskaper, färdigheter i T20, träffområden med egne KP, skadebonus, magi med PSY/KP-kostnad, yrken og raser fra Bok I. Lagrede spill fra 2023-reglene kan ikke lastes etterpå.
 
 - [ ] Sjekke de uverifiserte verdiene (`uv: true` i src/dod.js) mot grunnboka: WP-kostnader og krav for hjälteförmågor, svenske navn, tabellen for svåra skador, noen våpen. Lista står i memory.md.
 - [ ] Spilltest balansen på ekte maskin med flere rollpersoner. Spesielt: svake rollpersoner (FYS 6-8) på nivå 1, ridder i plåt mot Rødpels, magiker uten våpen, hvor ofte pressa-boksen dukker opp.
@@ -36,11 +41,11 @@ Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når p
 - [x] Hub i Fristaden: dojoen, fars butikk og oppslagstavla med oppdrag finnes i byen (0.4).
 - [ ] Flere oppdrag i byen, gjerne med valg: Gaspard som smugler, Hvass som skylder penger, Pimpa som forsvinner i kloakken.
 - [ ] Låste dører om natta (Fingerfärdighet eller dyrkar), og at folk reagerer hvis du står inne hos dem mens de sover.
-- [ ] Lagre byens tilstand (oppdrag, rykte, klokke) sammen med resten av løpet.
+- [x] Lagre byens tilstand (oppdrag, rykte, klokke) sammen med resten av løpet (0.5). Butikkenes lager i byen lagres ikke ennå.
 - [ ] Lyd for dører, steg på planker og stein i byen, og stemmer for byfolk (korte grynt og hmm som i Ultima VII).
 - [ ] Flere romtyper: fellerom (Upptäcka fara, Hoppa & klättra), skattekammer, rom med fanger å befri (Övertala).
 - [ ] Følgesvenner du kan leie på Den feite gåsen, så evner som Livvakt og Tonkonst får noe å gjøre.
-- [ ] Lagre løp midt i (etasje, utstyr, gaver) slik at man kan fortsette senere.
+- [x] Lagre løp midt i (etasje, utstyr, gaver) slik at man kan fortsette senere (0.5).
 - [ ] Gamepad-støtte (Gamepad API, venstre stikke går, høyre sikter).
 - [ ] Vise slaget (T20 mot verdi) som liten terning ved siden av skadetallet når det er Drake eller Demon.
 

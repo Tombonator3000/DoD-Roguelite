@@ -114,6 +114,8 @@ const COL = {
   csmoke: C(0x8a8680), portal: C(0x6ab4ff), portal2: C(0xc8e4ff), drip: C(0x6ad8a8), tsmoke: C(0x2e2824), dissolve: C(0xff7a2a), ghostly: C(0x6affd0),
 };
 
+const SPARK_COL = new Map();
+
 export class FX {
   constructor(scene) {
     this.add = new Particles(2500, true);
@@ -228,6 +230,13 @@ export class FX {
           break;
       }
     }
+  }
+
+  // Glitring rundt gjenstander på bakken
+  spark(x, y, z, hex) {
+    const c = SPARK_COL.get(hex) || SPARK_COL.set(hex, new THREE.Color(hex).lerp(COL.white, 0.35)).get(hex);
+    const R = Math.random;
+    this.add.spawn(x, y, z, (R() - 0.5) * 0.15, 0.35 + R() * 0.4, (R() - 0.5) * 0.15, c, 0.8 + R() * 0.6, 0.11, 0.0, -0.05, 0.6, 0.12);
   }
 
   ember(p) {

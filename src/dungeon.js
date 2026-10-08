@@ -35,6 +35,7 @@ const ENEMY_TABLE = {
 export class Dungeon {
   constructor(depth, seed) {
     this.depth = depth;
+    this.seed = seed;
     this.info = FLOORS[depth];
     this.biome = this.info.biome;
     this.rng = mulberry32(seed);

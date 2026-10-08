@@ -8,7 +8,7 @@ const $ = s => document.querySelector(s);
 const BASE = ['NAVN', 'JOBB', 'FARVEL'];
 const ALIAS = {
   NAME: 'NAVN', HETER: 'NAVN', JOB: 'JOBB', ARBEID: 'JOBB', YRKE: 'JOBB', BYE: 'FARVEL', HADET: 'FARVEL', 'HA DET': 'FARVEL', ADJØ: 'FARVEL',
-  KJØPE: 'HANDEL', KJØP: 'HANDEL', SELGE: 'HANDEL', BUY: 'HANDEL', TRADE: 'HANDEL', VARER: 'HANDEL',
+  KJØPE: 'HANDEL', KJØP: 'HANDEL', SELGE: 'HANDEL', SELG: 'HANDEL', SALG: 'HANDEL', SELL: 'HANDEL', BUY: 'HANDEL', TRADE: 'HANDEL', VARER: 'HANDEL',
   REV: 'REVEN', RØDPELS: 'REVEN', ROTTE: 'ROTTER', SAFFRAN: 'SAFRAN',
 };
 
@@ -130,11 +130,12 @@ export class Talk {
   match(raw) {
     let w = normWord(raw);
     if (!w) return null;
-    if (ALIAS[w]) w = ALIAS[w];
     const def = this.def;
     const keys = Object.keys(def.topics || {});
     if (def.board) keys.push('FARVEL');
     else keys.push(...BASE);
+    if (ALIAS[w] && !keys.includes(w) && !(w.startsWith('SEL') && keys.includes('SELGE'))) w = ALIAS[w];
+    if (w.startsWith('SEL') && keys.includes('SELGE')) return 'SELGE';
     if (keys.includes(w)) return w;
     if (w.length < 3) return null;
     const pre = w.slice(0, 4);

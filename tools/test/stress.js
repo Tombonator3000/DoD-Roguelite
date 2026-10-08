@@ -25,7 +25,7 @@ window.stress = (profId, secsPerFloor = 20, seedName = 'x') => {
   out.heroic = sheet.heroic;
   out.spells = sheet.spells;
   out.weapons = sheet.gear.w;
-  const keys = ['KeyR', 'KeyG', 'KeyT', 'KeyF', 'KeyQ', 'KeyZ', 'ShiftLeft', 'Digit1', 'Space', 'KeyV', 'KeyH'];
+  const keys = ['KeyR', 'KeyG', 'KeyT', 'KeyF', 'KeyQ', 'KeyZ', 'ShiftLeft', 'Digit1', 'Space', 'KeyV', 'KeyH', 'KeyE', 'KeyX'];
   for (let depth = 1; depth <= 5; depth++) {
     const P = G.player;
     P.kp = P.maxKP; // hold liv i testen

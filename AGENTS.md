@@ -23,11 +23,16 @@ Instrukser for alle som jobber i dette repoet, mennesker og AI-agenter (Claude, 
 
 ## Samarbeid mellom flere agenter
 
-- Jobb på en egen gren: `claude/<tema>`, `chatgpt/<tema>` og så videre. Lag pull request mot `main`. Ikke push rett til `main` uten at Tom har sagt det.
+- Jobb på en egen gren: `claude/<tema>`, `chatgpt/<tema>` og så videre. Lag pull request mot `main`. Ikke push rett til `main` uten at Tom har sagt det. (Claude har fått lov til å pushe versjon 0.5 rett til `main`.)
 - Før du begynner på noe stort: skriv navnet ditt bak oppgaven i `todo.md` under "Hvem jobber med hva", så to ikke skriver om den samme fila samtidig.
 - Små, avgrensede commits med beskjed som sier hva og hvorfor.
 - Ikke formater om eller flytt kode du ikke endrer. Store filer (`main.js`, `player.js`, `town.js`) får fort konflikter.
 - `dist/` er bygget kode og ligger ikke i git. GitHub Actions bygger og publiserer spillet til GitHub Pages ved hver push til `main`.
+
+## Kilder
+
+- Reglene er fra DoD 2023 (Dragonbane). Hvor hver verdi kommer fra, står i `memory.md` under "Kilder for reglene".
+- Tom har pekt på https://kingafw.no/Drakar/index.html: et bibliotek med de eldre utgavene (DoD 1.0 til 5.0, Expert, Chronopia) på svensk. Bruk det til verden, lore og monstre (Ereb Altor, Monsterboken 1 og 2, Svartfolk, Tjuvar och lönnmördare, Kopparhavets Kapare). Ikke bruk tallene derfra som 2023-regler: skadetabeller, egenskaper og förmågor er annerledes. Skriv kilden i en kommentar når du henter noe derfra.
 
 ## Teknikk
 
