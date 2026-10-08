@@ -1,0 +1,57 @@
+{
+  "scenes": {
+    "fristaden-12": {
+      "calls": 155,
+      "frameMs": 2.050000000046566,
+      "textures": 34
+    },
+    "fristaden-22": {
+      "calls": 69,
+      "frameMs": 0.6999999999534339,
+      "textures": 34
+    },
+    "nivaa-1": {
+      "calls": 665,
+      "frameMs": 2.299999999930151,
+      "textures": 38
+    },
+    "nivaa-3": {
+      "calls": 527,
+      "frameMs": 2.349999999976717,
+      "textures": 43
+    },
+    "nivaa-5": {
+      "calls": 58,
+      "frameMs": 0.5999999999767169,
+      "textures": 50
+    },
+    "akershus-12": {
+      "calls": 178,
+      "frameMs": 0.8000000000465661,
+      "textures": 57
+    },
+    "sortmund-12": {
+      "calls": 86,
+      "frameMs": 0.5500000000465661,
+      "textures": 60
+    },
+    "ekeskogen-12": {
+      "calls": 174,
+      "frameMs": 1.3999999999068677,
+      "textures": 60
+    },
+    "ridderskors-12": {
+      "calls": 117,
+      "frameMs": 1.0500000000465661,
+      "textures": 61
+    },
+    "akershus-20": {
+      "calls": 106,
+      "frameMs": 1.150000000023283,
+      "textures": 61
+    }
+  },
+  "errors": [],
+  "resourceRequests": [],
+  "assets": 50
+}
