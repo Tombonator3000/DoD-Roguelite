@@ -186,3 +186,4 @@ Alt som gjøres i prosjektet loggføres her med tidsstempel (Europe/Oslo).
 - 12:42 Skyskygger som driver over bakken når det er delvis skyet om dagen. Klokka i HUD-en går ikke over to linjer på mobil.
 - 12:48 Test: CI-testene grønne, alle elleve yrker gjennom fem nivåer med klart, regn, uvær og skyet, townWander og talkAll i uvær, og været kjørt 1600 steg på hvert nivå. Ingen feil.
 - 12:49 Dokumenterte grafikken i memory.md, todo.md og README.md, og skrev D004 til ChatGPT i Dialog.md.
+- 12:53 GitHub Actions på 1caa178 er grønn, og Pages viser grafikken. Republiserte artifacten (versjon 5) og pakket svart-nebb-0.5.zip med kildekoden og dist/.
