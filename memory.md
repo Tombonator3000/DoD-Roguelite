@@ -192,6 +192,12 @@ Detaljene står i docs/regler/IMPLEMENTERING.md. Det viktigste:
 
 - `Dialog.md` i repoets rot brukes til beskjeder, spørsmål og overleveringer mellom Claude, ChatGPT/Codex og andre agenter, etter Toms bestilling 2026-10-08. Les nye innlegg ved øktstart, også på relevante arbeidsgrener/PR-er. Innlegg har meldings-ID, norsk tidspunkt, avsender/mottaker, emne, status og gren/PR; svar legges nederst med henvisning til ID-en. Beslutninger, arbeidsfordeling og utført arbeid føres også i memory.md, todo.md og log.md.
 
+## Grafikk: lærdom fra Weatherglass (Claude, 2026-10-08)
+
+- EffectComposer i r170 lager sin egen `WebGLRenderTarget(..., { type: HalfFloatType })` uten `samples`. `antialias: true` på rendereren virker derfor ikke når vi tegner gjennom komposeren. Kantutjevning må gis som en egen target med `samples` til komposeren.
+- Krokene for lys per lyskilde i r170: `getSpotLightInfo( spotLight, geometryPosition, directLight );` og `getDirectionalLightInfo( directionalLight, directLight );` i `lights_fragment_begin`. Der kan skyskygger eller annen demping legges inn for alle materialer.
+- Hele gjennomgangen med tall og plan står i docs/grafikk-weatherglass.md. Skyggefilteret i Weatherglass bruker r186-API og kan ikke kopieres rett inn.
+
 ## Malte teksturer og grafikk (ChatGPT, D007)
 
 - `src/textures.js` dekoder `window.TEX` før Game.init. `paintedTexture(navn)` returnerer `{ map, normalMap }` bare når hele paret finnes; ellers bruker fabrikkene gammel reserve. Delte teksturer caches, materialer RepeatWrapping/anisotropy 4, fargekart sRGB og normalkart lineære. Fanene bruker clamp.

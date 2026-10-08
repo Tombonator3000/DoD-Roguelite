@@ -6,7 +6,7 @@ Sortert etter hva som gir mest spill for minst jobb.
 
 Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når pull requesten er inne. Se AGENTS.md.
 
-Ingen arbeider på noe nå. PR #4, #5 og #6 er flettet inn i main 2026-10-08.
+- Claude (`claude/verdenskart`, PR #7): verdenskart over Aidne med reise, tåke, møter og proviant. Nye filer worldmap.js, world.js, worldview.js, areatemplates.js. Endrer main.js, travel.js, edelmap.js, arealife.js, inventory.js, townfolk.js, page.html, player.js.
 
 ## Nå
 
@@ -24,6 +24,9 @@ Ingen arbeider på noe nå. PR #4, #5 og #6 er flettet inn i main 2026-10-08.
 - [ ] Spilltest menyene på ekte mobil: er knappene i pausemenyen store nok, og er tekststørrelsen Størst for mye i loggen?
 - [ ] Pilnavigering (opp og ned) i pausemenyen som i tittelen.
 - [ ] Spilltest grafikken på ekte maskin og mobil: er regnet for tett, tilt-shift for sterk, natta for mørk i uvær?
+- [ ] Grafikk etter Weatherglass (docs/grafikk-weatherglass.md), raske ting først: MSAA i komposeren (HalfFloat, samples 4/2/0 etter kvalitet; nå har vi ingen kantutjevning), bloom-terskel 1,0 til 1,2 og styrke 0,3 til 0,4, miljøkart med PMREM på 0,15 til 0,3, halvkulelys med himmelfarge og varm bakkerefleks, eksponering etter tid på døgnet.
+- [ ] Grafikk etter Weatherglass, middels: sol som retningslys ute med skyggekamera snappet til texler, trær uten flatShading (ellipsoide-normaler, AO i kronen, lys gjennom bladene), bakkeshader som bryter opp flisene, enkel AO nederst på vegger og steiner, skyskygger på alle materialer.
+- [ ] Grafikk etter Weatherglass, stort: trær med greiner og bladkort, gresstrå med vind, lav dis med lyssøyler, adaptiv DPR med tre nivåer.
 - [ ] Mer grafikk: tåke som ligger lavt over elva om morgenen, snø om vinteren, lysstråler gjennom vinduene i flere hus, varmeflimmer over smia, skyggen av fuglene på bakken.
 
 - [ ] Sjekke det som er merket `uv` mot bøkene: rottene (finnes ikke i Bok II), Rødpels og demonen, prisene i byen, sanntidsoversettelsene i docs/regler/IMPLEMENTERING.md.
