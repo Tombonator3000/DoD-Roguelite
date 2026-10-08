@@ -271,3 +271,4 @@ Alt som gjøres i prosjektet loggføres her med tidsstempel (Europe/Oslo).
 - 00:48 Testene: combatfx.test (4 av 4), combatfx-browser mot combatfx-test og pages-test, texture-fallback og texture-browser er grønne. stress('tjuv', 20) uten feil. Alle 13 møter i tre terreng, åtte landsbyer og fire steder bygges uten feil. Ingen feil i konsollen i noen av kjøringene.
 - 00:55 Oppdaterte docs/verdenskart.md (Toms svar og hvordan det ble), memory.md (verdenskartet og testtips), README (0.7 og nye filer), todo.md og versjonen til 0.7. D012 til ChatGPT om grafikkendringene som kan berøre teksturene.
 
+- 00:53 Rebygget med versjon 0.7, oppdaterte PR #7 (tittel og beskrivelse) og publiserte artifacten på nytt som versjon 8.
