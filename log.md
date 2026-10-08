@@ -131,3 +131,7 @@ Alt som gjøres i prosjektet loggføres her med tidsstempel (Europe/Oslo).
 - 08:48 (ChatGPT) Hentet inn Claudes inventar og lagring fra 26cddf7. Gjentok spilltesten med oppdatert kode uten feil. fx.js er uendret i dette bidraget; main.js har én ny importlinje.
 - 08:50 (ChatGPT) GitHub Actions bygget den selvstendige HTML-fila og besto de fire regresjonstestene. La til overlevering i docs/kampeffekter.md; nettlesertest og artefaktkontroll kjøres før PR-en klargjøres.
 - 08:52 (ChatGPT) Hele CI-jobben på b1520fa besto: bygg, fire regresjonstester, fem nivåer, shaderkontroll og åtte oppryddinger. Skjermbilder og resultat.json er lagret som GitHub Actions-artefakt. PR #1 klargjøres for gjennomgang.
+
+## 2026-10-08: spillbarhet på GitHub Pages (ChatGPT)
+
+- 09:02 (ChatGPT) PR #1 er flettet inn. Pages-publiseringen av 5232b06 er grønn og peker til https://tombonator3000.github.io/DoD-Roguelite/. Reserverte spilltest før publisering på egen gren. Direkte nettlesertilgang til den offentlige adressen er avvist i denne økta; testene kjøres mot en lokal kopi.

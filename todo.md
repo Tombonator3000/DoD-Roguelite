@@ -6,6 +6,7 @@ Sortert etter hva som gir mest spill for minst jobb.
 
 Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når pull requesten er inne. Se AGENTS.md.
 
+- ChatGPT (`chatgpt/pages-spilltest`): spilltest før GitHub Pages-publisering, startknapp og tastatur fra prosjektets nettadresse. .github/workflows/pages.yml, .github/workflows/kampeffekter.yml, tools/test/combatfx-browser.mjs og dokumentasjon.
 - Claude (`main`): bytter reglene fra DoD 2023 til DoD91 (4.0) med Expert og Gigant der det trengs, med fulle träffområden. Rører nesten alt i regelkoden: dod.js, rules.js, player.js, enemies.js, creation.js, ui.js, loot.js, townfolk.js. Vent med endringer i disse til det er pushet.
 - Claude (`main`, etterpå): shadere (ild, vann, vind, våte flater), vær og flere partikler, tilt-shift og fargegradering. fx.js, post.js, town.js, world.js.
 
