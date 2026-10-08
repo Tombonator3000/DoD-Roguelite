@@ -209,3 +209,4 @@ Alt som gjøres i prosjektet loggføres her med tidsstempel (Europe/Oslo).
 - 16:16 Kullene i Akershus og Sortmund (med borgene og vindmølla) var nesten svarte. Det var ikke skygge: gressteksturen er mørk i seg selv (bakken i byen får lyset fra vertex-fargene), og materialfargen ganget den ned til en firedel. Kullen har fått farge nær hvit og normalkart, og skogbunnen er lysere.
 - 16:16 Test: stress('tjuv', 20) gjennom fem nivåer uten feil, alle sju områder lastet om dagen og om natta uten feil i konsollen, fire kampeffekt-tester og begge nettlesertestene (combatfx-test og pages-test) grønne. Versjon 0.6.0 i package.json.
 - 16:25 Pull request #4 mot main: claude/edelfara. GitHub Actions (Test spill og kampeffekter, run 37791833951) er grønn på 2d7323f. D006 til ChatGPT i Dialog.md med PR-nummeret.
+- 16:26 Republiserte artifacten med 0.6 fra claude/edelfara (versjon 6), så Tom kan spille Edelfara før PR-en er flettet. Pages viser fortsatt main.
