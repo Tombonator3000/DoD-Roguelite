@@ -116,3 +116,10 @@ Ting som er lurt å huske neste gang noen (menneske eller AI) jobber med prosjek
 - Nye tester: `node --test tools/test/combatfx.test.mjs` og `node tools/test/combatfx-browser.mjs dist/combatfx-test`. Sistnevnte krever Playwright og et ferdig bygg; TEST_SOURCE=1 kjører kildemodulene direkte. CHROME og PLAYWRIGHT_PATH er valgfrie lokale stier.
 - Lokalt på Chrome 154/SwiftShader: fire regresjonstester bestått, `stress('tjuv', 20)` gjennom fem nivåer uten feil, åtte umiddelbare oppryddinger med null gjenværende effekter. Testet sammen med inventar/lagring fra 26cddf7. GitHub Actions på b1520fa har også bygget den selvstendige HTML-fila og bestått alle regresjons- og nettlesertestene.
 - Ingen DoD-regler eller lore er endret. Se `docs/kampeffekter.md` for metodegrensene ved videre grafikkarbeid.
+
+## GitHub Pages (ChatGPT, 2026-10-08)
+
+- Spilladresse: https://tombonator3000.github.io/DoD-Roguelite/. Pages bruker GitHub Actions, ikke en egen publiseringsgren. Bygg og publiser på main må lykkes før ny versjon vises.
+- pages.yml kjører kampeffekt-regresjonstester og tools/test/combatfx-browser.mjs mot ferdig dist/index.html før upload-pages-artifact. Testen serverer HTML fra /DoD-Roguelite/, bruker den synlige startknappen, sjekker den innebygde anda, tastatur og pause/Fortsett, og kjører stress('tjuv', 20), shadere og opprydding. Et mislykket teststeg stopper deploy-jobben.
+- Playwright 1.62.1 og Chromium installeres kun i CI med --no-save. Three r170 rutes til node_modules og skriftene erstattes i testen. Dette sjekker spillbygget og prosjektstien, men ikke CDN-tilgjengelighet eller den offentlige Pages-tjenesten. Actions-artefakten pages-spilltest inneholder bilder og resultat.json; HTML-fila som publiseres er uendret av testrutingen.
+- Validering i PR #2: GitHub Actions 37741626256 på 0aa805b besto det minifiserte HTML-bygget, fire regresjonstester og hele nettlesertesten. /DoD-Roguelite/ startet med original and (19 594 verts), bevegelse og pause/Fortsett virket, alle fem nivåer og åtte oppryddinger besto, ingen konsoll- eller ressursfeil. PR-artefakten heter kampeffekter-test; Pages-artefakten heter pages-spilltest.

@@ -131,3 +131,10 @@ Alt som gjøres i prosjektet loggføres her med tidsstempel (Europe/Oslo).
 - 08:48 (ChatGPT) Hentet inn Claudes inventar og lagring fra 26cddf7. Gjentok spilltesten med oppdatert kode uten feil. fx.js er uendret i dette bidraget; main.js har én ny importlinje.
 - 08:50 (ChatGPT) GitHub Actions bygget den selvstendige HTML-fila og besto de fire regresjonstestene. La til overlevering i docs/kampeffekter.md; nettlesertest og artefaktkontroll kjøres før PR-en klargjøres.
 - 08:52 (ChatGPT) Hele CI-jobben på b1520fa besto: bygg, fire regresjonstester, fem nivåer, shaderkontroll og åtte oppryddinger. Skjermbilder og resultat.json er lagret som GitHub Actions-artefakt. PR #1 klargjøres for gjennomgang.
+
+## 2026-10-08: spillbarhet på GitHub Pages (ChatGPT)
+
+- 09:02 (ChatGPT) PR #1 er flettet inn. Pages-publiseringen av 5232b06 er grønn og peker til https://tombonator3000.github.io/DoD-Roguelite/. Reserverte spilltest før publisering på egen gren. Direkte nettlesertilgang til den offentlige adressen er avvist i denne økta; testene kjøres mot en lokal kopi.
+- 09:05 (ChatGPT) La inn startknapp, modell og tekstur, W-bevegelse og pause/Fortsett i den eksisterende nettlesertesten. Spillet serveres fra /DoD-Roguelite/ som på Pages. Pages-jobben må bestå disse kontrollene, fem nivåer og kampeffektopprydding før HTML-fila lastes opp; testbilder og resultat lagres også ved feil. README har direkte spilladresse.
+- 09:08 (ChatGPT) Fire kampeffekt-tester bestått lokalt. Nettlesertesten besto start fra /DoD-Roguelite/, original and med 19 594 verts og tekstur, W-bevegelse, pause/Fortsett, fem nivåer og åtte oppryddinger uten konsoll- eller spillfeil. GitHub skal også teste det minifiserte bygget i PR #2.
+- 09:13 (ChatGPT) GitHub Actions på 0aa805b besto bygg (HTML 1336 KB), fire regresjonstester og hele nettlesertesten med ferdig HTML. Artefakt 11534585050 har bilder og resultat.json. PR #2 klargjøres for gjennomgang på egen gren; den allerede publiserte Pages-versjonen er 5232b06.
