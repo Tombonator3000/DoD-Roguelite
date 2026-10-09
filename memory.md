@@ -212,6 +212,13 @@ Detaljene står i docs/regler/IMPLEMENTERING.md. Det viktigste:
 - Krokene for lys per lyskilde i r170: `getSpotLightInfo( spotLight, geometryPosition, directLight );` og `getDirectionalLightInfo( directionalLight, directLight );` i `lights_fragment_begin`. Der kan skyskygger eller annen demping legges inn for alle materialer.
 - Hele gjennomgangen med tall og plan står i docs/grafikk-weatherglass.md. Skyggefilteret i Weatherglass bruker r186-API og kan ikke kopieres rett inn.
 
+## Gjenbruk fra de andre repoene (Claude, 2026-10-09)
+
+- docs/gjenbruk.md er en vurdering av prosjektbiblioteket og elleve andre repoer til Tom, med filstier, lisenser og prioritet. Ingenting er flyttet inn ennå.
+- Vi bruker WebGL 2 (WebGLRenderer i r170). Ingen av Toms spill bruker WebGPU. Bytte krever r171 eller nyere og at alle onBeforeCompile-shaderne skrives om til TSL.
+- Alle Pages-spillene deler opphavet tombonator3000.github.io og dermed localStorage-kvoten. Miniatyrbildene i lagringene våre konkurrerer med de andre spillene.
+- Voidcraft er AGPL: bare ideer, ikke kode. Lydene i Morbidium er CC0 (assets/lyd/KILDER.md).
+
 ## Malte teksturer og grafikk (ChatGPT, D007)
 
 - `src/textures.js` dekoder `window.TEX` før Game.init. `paintedTexture(navn)` returnerer `{ map, normalMap }` bare når hele paret finnes; ellers bruker fabrikkene gammel reserve. Delte teksturer caches, materialer RepeatWrapping/anisotropy 4, fargekart sRGB og normalkart lineære. Fanene bruker clamp.
