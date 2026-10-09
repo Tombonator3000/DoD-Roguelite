@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import { G, T } from './state.js';
 import { Dungeon, makeWaterMaterial } from './dungeon.js';
 import { addWetness, addSway } from './wet.js';
+import { leafBlob, leafDetail } from './treegeo.js';
 import { addCutaway, buildBarrel, buildCrate, buildChest, buildPillar, hash2 } from './assets.js';
 import { townTextures, signTexture } from './towntex.js';
 import { WALL, FLOOR, WATER, PILLAR, HOUSE, FENCE, GR, TW, TH, RING, RIVER, GATE, BUILDINGS, TREES, SPOTS, buildTownLayout } from './townmap.js';
@@ -135,7 +136,7 @@ function materials() {
   MAT.coal = new THREE.MeshStandardMaterial({ color: 0x1a0a04, emissive: 0xff5a10, emissiveIntensity: 1.6, roughness: 0.9 });
   MAT.outside = new THREE.MeshStandardMaterial({ map: TX.grass.map, normalMap: TX.grass.normalMap, roughness: 1, color: TX.grass.map.isCanvasTexture ? 0x9aa884 : 0xf2f2e8 });
   MAT.field = new THREE.MeshStandardMaterial({ map: TX.dirt.map, roughness: 1, color: 0xa08a6a });
-  MAT.leaf = stdMat({ roughness: 0.85, flatShading: true });
+  MAT.leaf = stdMat({ roughness: 0.85, vertexColors: true });
   MAT.bark = stdMat({ color: 0x4a3424, roughness: 0.95 });
   MAT.tuft = new THREE.MeshStandardMaterial({ map: TX.tuft, alphaTest: 0.45, side: THREE.DoubleSide, roughness: 1 });
   MAT.flower = new THREE.MeshStandardMaterial({ roughness: 0.6 });
@@ -1250,7 +1251,7 @@ export class Town extends Dungeon {
       pts.push({ x, z, inside: false, s: 1.2 + R(i, 3) * 0.8 });
     }
     const trunkG = new THREE.CylinderGeometry(0.16, 0.26, 2.2, 7).translate(0, 1.1, 0);
-    const leafG = new THREE.IcosahedronGeometry(1, 1);
+    const leafG = leafBlob(leafDetail()[0], 4);
     const trunks = new THREE.InstancedMesh(trunkG, M.bark, pts.length);
     const leaves = new THREE.InstancedMesh(leafG, M.leaf, pts.length * 3);
     const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), s = new THREE.Vector3(), p = new THREE.Vector3();

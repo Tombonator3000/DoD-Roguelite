@@ -4,6 +4,15 @@ En spillbar prototype av et roguelite i stil med Diablo og Hades, med litt Ultim
 
 Laget med three.js r170. Musikk, lyd, fiendemodeller og effekter genereres i nettleseren. Materialene har egne AI-genererte bilder i malt stil, med prosedyriske teksturer som reserve. Anda og bildesettet bygges inn i HTML-fila. Se [teksturleveransen med før-/etterbilder](docs/teksturer.md) og [kilder og lisens](assets/tex/KILDER.md).
 
+## Nytt i 0.7: verdenskart og bedre grafikk
+
+- Nordporten fører ut på et verdenskart over Aidne og Drakdjupet i stil med Fallout 1 og 2, tegnet etter 2024-kartet. Klikk på et sted og trykk Reis. Ruta går én time av gangen på veien, lengre i skog og fjell.
+- Land du ikke har sett, er blankt pergament. Byer, landsbyer og skjulte steder (gravhaugen, orchleiren, Svarta Tornet og vraket) dukker opp når du ser dem eller hører om dem.
+- Underveis kan du møte ulver, orcher, svartalfer, vetter, stråtrøvere og gjengangere, eller kjøpmenn, pilegrimer, Tornväktare, dverger, bønder og jegere. Upptäcka fara avgjør om du ser fienden først, så du kan smyge forbi (Smyga) eller gå rundt. Orientering gjelder når du går uten vei i skog og fjell.
+- Proviant og sult fra start: ett måltid i døgnet, sulten etter 24 timer og utsultet etter 48. Du kan slå leir eller lete etter mat (Överlevnad).
+- Landsbyene har vertshus og handelsbod. Edelfara er et eget lokalkart.
+- Grafikken har fått ekte kantutjevning, bloom bare på lamper og ild, miljøkart fra himmelen, eksponering som følger døgnet og myke trekroner. Se [verdenskartet](docs/verdenskart.md) og [grafikken etter Weatherglass](docs/grafikk-weatherglass.md).
+
 ## Nytt i 0.6: Edelfara og Triangeldrama i Edelfara
 
 - Nordporten i Fristaden åpner et reisekart over Edelfara i hertugdømmet Pharynx. Klikk på et sted og trykk Reis. Reisen tar timer på klokka: ni timer gjennom Torilskogen til Ekeskogen, og videre til Sortmund, Akershus og Glimming.
@@ -129,7 +138,13 @@ src/
   arealife.js   livet i områdene: utganger, scener, allierte, storming, rapporten i Pharynx
   edelmodels.js orcher, svartalfer, ulver og Lekh
   ivan.js       oppdraget Triangeldrama i Edelfara: ledetråder, frist, journal
-  travel.js     reisekartet
+  travel.js     reisekartet over Edelfara
+  worldmap.js   verdenskartet over Aidne: terreng, veier, steder, regioner, møter (ren data)
+  worldtravel.js reisen på verdenskartet: tåke, veivalg, tid, møter, proviant og sult
+  worldview.js  verdenskartet på skjermen
+  areatemplates.js møter, landsbyer og steder fra mal
+  envlight.js   miljøkart fra himmelen (PMREM)
+  treegeo.js    myke trekroner med AO
   talk.js       samtaler med nøkkelord
   dod.js        regeldata fra DoD 4.0, Expert og Gigant: raser, yrker, färdigheter, våpen, rustning, besvärjelser, tabeller
   body.js       kroppsdelene: KP per träffområde, blødning, lammelser

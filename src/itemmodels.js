@@ -210,6 +210,16 @@ const ENTRY = {
     const cg = geo('score', () => new THREE.BoxGeometry(0.012, 0.02, 0.14));
     for (const x of [-0.08, 0, 0.08]) { const s = mesh(cg, M.crust(), x, 0.068, 0, g); s.rotation.y = 0.5; }
   },
+  // proviant: en bylt i lerret, knyttet med hyssing, og en pølsesnipp som stikker ut
+  ration(g) {
+    mesh(geo('ration', () => new THREE.SphereGeometry(0.12, 12, 9)), M.cloth(), 0, -0.02, 0, g).scale.set(1.25, 0.72, 0.95);
+    const t = mesh(geo('rationtie', () => new THREE.TorusGeometry(0.1, 0.008, 4, 16)), M.twine(), 0, 0.01, 0, g);
+    t.rotation.x = Math.PI / 2;
+    t.scale.set(1.2, 0.95, 1);
+    mesh(geo('rationknot', () => new THREE.SphereGeometry(0.022, 6, 5)), M.twine(), 0, 0.075, 0, g);
+    const s = mesh(geo('rationsaus', () => new THREE.CapsuleGeometry(0.025, 0.06, 3, 8)), M.sausage(), 0.13, 0.02, 0.02, g);
+    s.rotation.z = 1.2;
+  },
   sausage(g) {
     const s = mesh(geo('saus', () => new THREE.TorusGeometry(0.12, 0.045, 8, 16, Math.PI * 1.1)), M.sausage(), 0, -0.04, 0, g);
     s.rotation.z = -0.15;

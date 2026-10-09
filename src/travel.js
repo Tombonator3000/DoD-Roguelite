@@ -67,9 +67,11 @@ export class Travel {
     return h;
   }
 
-  open(from) {
+  // o.world: åpnet fra verdenskartet. Bli her går tilbake dit.
+  open(from, o = {}) {
     if (G.state !== 'play') return;
     this.from = from;
+    this.fromWorld = !!o.world;
     this.sel = null;
     this.anim = null;
     G.state = 'travel';
@@ -82,6 +84,7 @@ export class Travel {
 
   close() {
     if (this.anim) return;
+    if (this.fromWorld) { this.fromWorld = false; G.game.openWorld(); return; }
     G.ui.hideScreens();
     G.state = 'play';
   }

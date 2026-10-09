@@ -10,6 +10,7 @@ import { SPOTS } from './townmap.js';
 import { PEOPLE, BOARD, RUMORS } from './townpeople.js';
 import { Talk } from './talk.js';
 import { giveItem, makeCons, renderSellList } from './inventory.js';
+import { hungerLevel, ate } from './worldtravel.js';
 
 const U = v => v * T;
 const tmp = new THREE.Vector3();
@@ -598,9 +599,10 @@ export class TownLife {
       talk.say(`${night} sm natta, sju netter for en uke. Frokost er ikke inkludert, men lukten av den er gratis.`);
     } else if (act === 'innMeal') {
       const refresh = () => talk.wares([
-        { name: 'Svartsoppa', desc: 'Kokt på gåseblod, med kanel i stedet for galle. Helbreder 1T6+2 KP.', price: this.price(id, 3), buy: () => { const got = P.heal(d(6) + 2); fx('heal', 12); return got ? `Den smaker bedre enn den ser ut. +${got} KP.` : 'Du er mett, men du spiser opp likevel.'; } },
-        { name: 'Brød og ost', desc: 'Helbreder 3 KP.', price: this.price(id, 2), buy: () => { const got = P.heal(3 + (P.mods?.breadHeal || 0)); return got ? `+${got} KP. Mester Flansen hadde godkjent.` : 'Du er allerede mett.'; } },
-        { name: 'Gåsestek', desc: 'Husets stolthet. Helbreder 2T6 KP. Én gang per besøk.', price: this.price(id, 9), disabled: once('stek'), buy: () => { mark('stek'); const got = P.heal(rollDice('2D6')); fx('heal', 24); return `Den feite gåsen. Du forstår navnet nå.${got ? ` +${got} KP.` : ''}`; } },
+        { name: 'Svartsoppa', desc: 'Kokt på gåseblod, med kanel i stedet for galle. Helbreder 1T6+2 KP, og du er mett et døgn.', price: this.price(id, 3), buy: () => { const got = P.heal(d(6) + 2); ate(); fx('heal', 12); return got ? `Den smaker bedre enn den ser ut. +${got} KP.` : 'Du er mett, men du spiser opp likevel.'; } },
+        { name: 'Brød og ost', desc: 'Helbreder 3 KP, og du er mett et døgn.', price: this.price(id, 2), buy: () => { const got = P.heal(3 + (P.mods?.breadHeal || 0)); ate(); return got ? `+${got} KP. Mester Flansen hadde godkjent.` : 'Mett for et døgn. Mester Flansen hadde godkjent.'; } },
+        { name: 'Gåsestek', desc: 'Husets stolthet. Helbreder 2T6 KP. Én gang per besøk.', price: this.price(id, 9), disabled: once('stek'), buy: () => { mark('stek'); const got = P.heal(rollDice('2D6')); ate(); fx('heal', 24); return `Den feite gåsen. Du forstår navnet nå.${got ? ` +${got} KP.` : ''}`; } },
+        { name: 'Proviant til veien', desc: 'Mat for et døgn på reise: tørket gås, brød og ost. Spises av seg selv når det er tid.', price: this.price(id, 1.5), buy: () => { giveItem(makeCons('proviant')); return 'Rosmynda knyter en klut rundt det. «Ikke sett deg på den.»'; } },
       ], { note: this.priceNote(id), refresh, barter: this.barterFn(id, talk, () => refresh()) });
       refresh();
       talk.say('Vi har svartsoppa, brød og gåsestek. Svartsoppaen er tradisjon. Gåsesteken er grunnen til at folk kommer.');
@@ -887,8 +889,9 @@ export class TownLife {
   sleep(where) {
     const P = G.player;
     this.passTime(1, () => {
-      // en natt i senga gir litt tilbake, ikke alt (DoD91: KP gror sakte, PSY kommer tilbake med hvile)
-      const got = P.heal(d(3));
+      // en natt i senga gir litt tilbake, ikke alt (DoD91: KP gror sakte, PSY kommer tilbake med hvile).
+      // Sulten gror ingenting (verdenskartet, uv).
+      const got = hungerLevel() > 0 ? 0 : P.heal(d(3));
       P.gainPSY(P.maxPSY);
       G.fx.burst('heal', P.pos, 24);
       G.audio.heal();
@@ -902,6 +905,7 @@ export class TownLife {
   restWeek() {
     const P = G.player;
     this.passTime(7, () => {
+      ate();
       const txt = P.restWeek();
       G.fx.burst('heal', P.pos, 30);
       G.audio.heal();

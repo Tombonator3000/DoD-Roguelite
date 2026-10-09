@@ -38,6 +38,11 @@ import { AREAS, NODES } from './edelmap.js';
 import { ARRIVE } from './arealife.js';
 import { Travel } from './travel.js';
 import { Q, fl, journalHTML, hoursLeft } from './ivan.js';
+import { WorldView } from './worldview.js';
+import { EnvLight } from './envlight.js';
+import { W as worldState, tickHunger, regionAt as worldRegionAt, terrainAt as worldTerrainAt, roadAt as worldRoadAt } from './worldtravel.js';
+import { PLACES as WORLD_PLACES, ENCOUNTERS } from './worldmap.js';
+import { encounterLayout, villageLayout, siteLayout, wildLayout } from './areatemplates.js';
 
 const $ = s => document.querySelector(s);
 const CAM_OFF = new THREE.Vector3(10.4, 15.6, 10.4);
@@ -190,7 +195,9 @@ class Game {
   }
 
   init() {
-    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    // Kantutjevningen ligger i komposerens egen target (applySettings), ikke på lerretet:
+    // EffectComposer tegner aldri scenen rett til lerretet, så antialias her gjorde ingenting.
+    const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
     renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
     renderer.setSize(innerWidth, innerHeight);
     renderer.shadowMap.enabled = true;
@@ -221,15 +228,19 @@ class Game {
     scene.add(this.fill);
     this.lantern = new THREE.PointLight(0xffb070, 9, 8, 2);
     scene.add(this.lantern);
-    const composer = new EffectComposer(renderer);
+    const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(innerWidth, innerHeight, { type: THREE.HalfFloatType, samples: 4 }));
     this.renderPass = new RenderPass(scene, cam);
     composer.addPass(this.renderPass);
+    // Bloom: bare det som er lysere enn 1 i HDR gløder (ild, lamper, vinduer om natta, magi).
+    // Terskelen og styrken følger stedet og tiden på døgnet (bloomLook).
     this.bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth / 2, innerHeight / 2), 0.65, 0.6, 0.78);
     composer.addPass(this.bloom);
     composer.addPass(new OutputPass());
     G.post = new GradePass();
     composer.addPass(G.post);
     G.composer = composer;
+    this.env = new EnvLight(renderer);
+    this.expWant = 1.15;
 
     G.gfx = new Gfx();
     G.assets = new SharedAssets();
@@ -253,6 +264,7 @@ class Game {
     G.inv = new InvUI();
     G.saveui = new SaveUI();
     G.travel = new Travel();
+    G.worldview = new WorldView();
     G.audio = new Sound();
     G.input = new Input(renderer.domElement);
     G.world = new World();
@@ -534,6 +546,11 @@ class Game {
     const dpr = devicePixelRatio || 1;
     G.renderer.setPixelRatio(q === 'lav' ? 1 : q === 'middels' ? Math.min(dpr, 1.25) : Math.min(dpr, 2));
     this.bloom.enabled = q !== 'lav';
+    // MSAA i komposeren: 4 prøver på høy, 2 på middels, ingen på lav
+    const samples = q === 'hoy' ? 4 : q === 'middels' ? 2 : 0;
+    for (const rt of [G.composer.renderTarget1, G.composer.renderTarget2]) {
+      if (rt.samples !== samples) { rt.samples = samples; rt.dispose(); }
+    }
     const shadows = q !== 'lav';
     const size = q === 'hoy' ? 2048 : 1024;
     for (const l of [this.key, this.title.spot]) {
@@ -692,6 +709,8 @@ class Game {
     G.meta.runs++;
     saveMeta(G.meta);
     G.run = this.freshRun();
+    worldState();
+    this.pauseFromWorld = false;
     this.endRunCleanup();
     G.player.newRun(G.meta);
     G.depth = 1;
@@ -737,6 +756,13 @@ class Game {
 
   openTravel(from) {
     if (G.state !== 'play' || this.wiping) return;
+    // Nordporten: ut på verdenskartet. Reisekartet over Edelfara åpnes når du kommer dit.
+    if (from === 'fristaden' && G.dungeon?.isTown && !G.dungeon.isArea) {
+      const w = worldState(), f = WORLD_PLACES.fristaden;
+      w.x = f.x; w.y = f.y;
+      this.leaveToWorld('Du går ut gjennom Nordporten. Folkard løfter hånden. Kongeveien går nordover mot Ardesch og vestover mot Tyndal og Edelfara.');
+      return;
+    }
     G.travel.open(from);
   }
 
@@ -759,10 +785,11 @@ class Game {
         G.run.clock += hours;
         if (dest !== to) G.ui.log('Halvveis gjennom Torilskogen ser du noe under en busk ved veiskillet. Du stopper.');
         if (dest === 'fristaden') {
-          this.loadFloor(0, null, false, 'gate');
-          G.ui.buildBar();
-          G.audio.playMusic('town');
-          G.ui.log(`Du kommer inn gjennom Nordporten etter ${hours} timer på veien. Folkard nikker til deg.`);
+          // landeveien ut av Edelfara: videre på verdenskartet
+          const w = worldState(), e = WORLD_PLACES.edelfara;
+          w.x = e.x; w.y = e.y;
+          tickHunger();
+          this.openWorld({ note: 'Du følger landeveien ut av Torilskogen. Herfra går Kongeveien nordøstover mot Galastan og Fristaden.' });
           return;
         }
         if (dest === 'pharynx') {
@@ -789,9 +816,11 @@ class Game {
     });
   }
 
+  // opts.layout: et område fra mal (verdenskartet). Uten layout er det et av Edelfaras områder.
   loadArea(id, arrival, opts = {}) {
-    const L0 = AREAS[id];
+    const L0 = opts.layout || AREAS[id];
     if (!L0) return;
+    if (!opts.layout) G.run.areaSpec = null;
     if (G.dungeon) G.dungeon.dispose();
     G.fx.clearLevel();
     G.ui.hideBoss();
@@ -821,16 +850,118 @@ class Game {
     G.weather.snap();
     G.water.clear();
     G.post.mood('stad');
-    G.ui.setDepth(0, L.name, { region: 'Edelfara, Pharynx', town: !!L.peaceful });
+    G.ui.setDepth(0, L.name, { region: L.region || 'Edelfara, Pharynx', town: !!L.peaceful });
     G.ui.buildBar();
     G.audio.playMusic(L.music === 'town' ? 'town' : 'explore');
     const seen = G.run.seenAreas || (G.run.seenAreas = []);
-    if (!seen.includes(id)) { seen.push(id); if (L.intro) G.ui.log(L.intro); else G.ui.log(AREA_INTRO[id] || L.name + '.'); }
+    if (opts.layout) { if (!this.loadingSave && L.intro) G.ui.log(L.intro); }
+    else if (!seen.includes(id)) { seen.push(id); if (L.intro) G.ui.log(L.intro); else G.ui.log(AREA_INTRO[id] || L.name + '.'); }
     if (!this.loadingSave && !opts.noSave) setTimeout(() => { if (G.state === 'play' && !G.player.dead) saveGame('auto', true); }, 400);
   }
 
   onEnemyDied(e) {
     G.dungeon?.life?.onEnemyDied?.(e);
+  }
+
+  // --- verdenskartet -------------------------------------------------------------------------
+
+  // står du på verdenskartet (også med pause, rollformulär eller inventar oppe over det)?
+  onWorldNow() {
+    return G.state === 'world' || ((G.state === 'pause' || G.state === 'sheet') && !!this.pauseFromWorld) || (G.state === 'inventory' && !!G.inv.fromWorld) || (G.state === 'travel' && !!G.travel.fromWorld);
+  }
+
+  openWorld(o = {}) {
+    G.inv?.isOpen && G.inv.close();
+    G.worldview.open(o);
+  }
+
+  // Ut av et område eller en by og opp på kartet. Posisjonen på kartet står i G.run.world.
+  leaveToWorld(note) {
+    if (this.wiping) return;
+    G.state = 'transition';
+    document.activeElement?.blur?.();
+    this.wipe(() => {
+      G.run.clock += 0.25;
+      this.openWorld({ note });
+      setTimeout(() => { if (G.state === 'world' && !G.player.dead) saveGame('auto', true); }, 300);
+    });
+  }
+
+  // Et område fra mal: spec lagres i G.run.areaSpec, så et lagret spill kan bygge det på nytt
+  layoutFor(s) {
+    if (!s) return null;
+    if (s.kind === 'enc') { const enc = ENCOUNTERS.find(e => e.id === s.enc); return enc ? encounterLayout(enc, s) : null; }
+    if (s.kind === 'by') return WORLD_PLACES[s.id] ? villageLayout(s.id) : null;
+    if (s.kind === 'sted') return WORLD_PLACES[s.id] ? siteLayout(s.id, !!worldState().cleared[s.id], s.depth || 1) : null;
+    if (s.kind === 'vill') return wildLayout(s);
+    return null;
+  }
+
+  loadTemplate(spec, arrival) {
+    G.run.areaSpec = spec;
+    const L = this.layoutFor(spec);
+    if (!L) return false;
+    this.loadArea(L.id, arrival, { layout: L });
+    return true;
+  }
+
+  // Inn i ruta du står på: en by, et sted, Edelfara, eller bare landskapet rundt deg
+  enterSquare(pid) {
+    if (this.wiping || G.state !== 'world') return;
+    const w = worldState();
+    const p = pid ? WORLD_PLACES[pid] : null;
+    const h = ((G.run.clock % 24) + 24) % 24;
+    if (p?.kind === 'port') { G.ui.log(p.text); return; }
+    if (p?.kind === 'fristaden' && (h >= 22 || h < 5)) { G.ui.log('Nordporten er stengt om natta. Folkard åpner når det lysner, rundt klokka fem. Du kan slå leir utenfor muren.'); return; }
+    if (p?.kind === 'pharynx' && (Q().stage || 0) < 1) { G.ui.log('Pharynx, hertigens by. Vaktene i porten spør hva du vil. Du har ikke noe ærend her ennå.'); return; }
+    if (p?.kind === 'edelfara') {
+      // Edelfara har sitt eget kart med områdene fra eventyret
+      G.state = 'play';
+      G.travel.open('fristaden', { world: true });
+      return;
+    }
+    G.state = 'transition';
+    document.activeElement?.blur?.();
+    this.wipe(() => {
+      G.ui.hideScreens();
+      G.state = 'play';
+      if (p?.kind === 'fristaden') {
+        this.loadFloor(0, null, false, 'gate');
+        G.ui.buildBar();
+        G.audio.playMusic('town');
+        G.ui.log('Du kommer inn gjennom Nordporten. Folkard nikker til deg.');
+        return;
+      }
+      if (p?.kind === 'pharynx') {
+        // rapporten, og så rir du tilbake til Glimming i Edelfara
+        const e = WORLD_PLACES.edelfara;
+        w.x = e.x; w.y = e.y;
+        G.run.clock += 3;
+        this.loadArea('glimming', 'east');
+        G.dungeon.life?.reportPharynx?.();
+        return;
+      }
+      const seed = (w.x * 73 + w.y * 151 + Math.floor(G.run.clock)) | 0;
+      if (p?.kind === 'by') this.loadTemplate({ kind: 'by', id: pid }, 'west');
+      else if (p?.kind === 'sted') this.loadTemplate({ kind: 'sted', id: pid, depth: Math.max(1, worldRegionAt(w.x, w.y).danger) }, 'south');
+      else this.loadTemplate({ kind: 'vill', x: w.x, y: w.y, terr: worldTerrainAt(w.x, w.y), road: !!worldRoadAt(w.x, w.y), seed }, 'south');
+    });
+  }
+
+  // Et møte på veien. o: { enc, x, y, terr, road, depth, seed, ambush }
+  enterEncounter(o) {
+    if (this.wiping) return;
+    Q().dead._mote = [];
+    const spec = { kind: 'enc', enc: o.enc.id, x: o.x, y: o.y, terr: o.terr, road: o.road, depth: o.depth, seed: o.seed, ambush: !!o.ambush };
+    if (o.enc.once) worldState().done[o.enc.id] = true;
+    G.state = 'transition';
+    document.activeElement?.blur?.();
+    this.wipe(() => {
+      G.ui.hideScreens();
+      G.state = 'play';
+      this.loadTemplate(spec, 'south');
+      if (o.ambush) G.ui.log('<b class="c-boss">Bakhold!</b> De er over deg før du rekker å tenke.');
+    });
   }
 
   // fra trappa og opp til byen
@@ -851,7 +982,7 @@ class Game {
 
   loadFloor(depth, seed, title = false, arrival = 'start') {
     if (G.dungeon) G.dungeon.dispose();
-    if (G.run) G.run.area = null;
+    if (G.run) { G.run.area = null; G.run.areaSpec = null; }
     G.fx.clearLevel();
     G.ui.hideBoss();
     G.depth = depth;
@@ -891,7 +1022,7 @@ class Game {
     if (!title) {
       if (!town) G.run.depthReached = Math.max(G.run.depthReached, depth);
       G.ui.setDepth(depth, info.name);
-      G.ui.log(FLOOR_INTRO[depth]);
+      if (!this.quietLoad) G.ui.log(FLOOR_INTRO[depth]);
       if (!this.loadingSave) setTimeout(() => { if (G.state === 'play' && !G.player.dead) saveGame('auto', true); }, 400);
     }
   }
@@ -924,7 +1055,10 @@ class Game {
     if (fromTitle) this.title.leaving = true;
     this.wipe(() => {
       this.endRunCleanup();
+      this.pauseFromWorld = false;
       this.loadingSave = true;
+      // lagret på verdenskartet: området bak kartet bygges stille
+      this.quietLoad = !!d.onWorld;
       G.run = { ...this.freshRun(), ...d.run, known: new Set(d.run.known || []), t0: performance.now() };
       const P = G.player;
       if (d.player.sheet?.id) { try { this.selectedId = d.player.sheet.id; localStorage.setItem('svartnebb.lastchar', d.player.sheet.id); } catch (e) { /* valgfritt */ } }
@@ -940,7 +1074,9 @@ class Game {
       this.applyViewOffset();
       this.title.leaving = false;
       $('#title').hidden = true;
+      const tpl = d.area && !AREAS[d.area] ? this.layoutFor(G.run.areaSpec) : null;
       if (d.area && AREAS[d.area]) this.loadArea(d.area, null);
+      else if (tpl) this.loadArea(tpl.id, null, { layout: tpl });
       else this.loadFloor(d.depth, d.seed, false, 'start');
       // onFloor() nullstilte disse, så de settes tilbake etter at nivået er bygd
       P.floor = JSON.parse(JSON.stringify(d.player.floor || P.floor));
@@ -955,9 +1091,11 @@ class Game {
       this.camTarget.copy(P.pos);
       G.camera.position.copy(P.pos).add(CAM_OFF);
       this.loadingSave = false;
+      this.quietLoad = false;
       G.ui.buildBar();
       G.audio.playMusic(G.dungeon.isArea ? (G.dungeon.L.music === 'town' ? 'town' : 'explore') : G.dungeon.isTown ? 'town' : 'explore');
-      G.ui.log(`Fortsetter: ${describeSave(d).title}${G.dungeon.isArea ? ', ' + G.dungeon.L.name : G.dungeon.isTown ? ', Fristaden' : ''}.`);
+      G.ui.log(`Fortsetter: ${describeSave(d).title}${d.onWorld ? ', på verdenskartet' : G.dungeon.isArea ? ', ' + G.dungeon.L.name : G.dungeon.isTown ? ', Fristaden' : ''}.`);
+      if (d.onWorld) this.openWorld();
     }, fromTitle ? 0.7 : 0.55);
   }
 
@@ -987,6 +1125,10 @@ class Game {
       k.shadow.normalBias = 0.035;
       this.hemi.groundColor.setHex(0x0b0806);
       this.hemi.intensity = 0.55;
+      // kloakken: ikke noe miljøkart, og lykta og faklene får gløde mer enn i dagslys
+      G.scene.environment = null;
+      this.bloomLook(0.88, 0.55);
+      this.expWant = 1.15;
       this.fill.color.setHex(0x8aa0c0);
       this.fill.intensity = 0.22;
       G.scene.fog.near = 30;
@@ -1026,6 +1168,12 @@ class Game {
     G.scene.fog.far = (105 - n * 30) * (1 - W.rain * 0.3);
     if (cloud > 0.01) { G.scene.fog.color.lerp(tmp4.setRGB(0.32, 0.34, 0.38).multiplyScalar(1 - n * 0.8), cloud * 0.45); G.scene.background.copy(G.scene.fog.color); }
     G.post.mood('stad', n, W.rain);
+    // miljøkart fra himmelen, svakt om dagen og nesten borte om natta (docs/grafikk-weatherglass.md)
+    G.scene.environment = this.env.update(dt, sky, cloud);
+    G.scene.environmentIntensity = (0.3 - n * 0.22) * (1 - cloud * 0.35);
+    // om dagen gløder bare lamper og ild; om natta litt mer. Natta er litt lysere enn før.
+    this.bloomLook(1.12 - n * 0.14, 0.32 + n * 0.2);
+    this.expWant = 1.15 * (1 + n * 0.18);
     const night = n > 0.6;
     G.audio.townNight = night;
     if (G.audio.music) {
@@ -1037,8 +1185,12 @@ class Game {
       if (night) G.ambient.setLook(0x2a3448, 0xd8ff7a, 0.5);
       else G.ambient.setLook(0x9aa0b0, 0xfff2c0, 0.12);
     }
-    void dt;
     return sky;
+  }
+
+  bloomLook(threshold, strength) {
+    this.bloom.threshold = threshold;
+    this.bloom.strength = strength;
   }
 
   applyPendingBoon() {
@@ -1645,7 +1797,9 @@ class Game {
   // --- pause og rollformulär ---------------------------------------------
 
   pause() {
-    if (G.state !== 'play') return;
+    if (G.state !== 'play' && G.state !== 'world') return;
+    this.pauseFromWorld = G.state === 'world';
+    if (this.pauseFromWorld && (G.worldview.moving || !$('#w-enc').hidden)) return;
     G.state = 'pause';
     const P = G.player;
     const qs = Object.entries(G.run.quests || {}).filter(([, q]) => q.state === 'active' || q.state === 'done');
@@ -1653,7 +1807,7 @@ class Game {
     $('#pause-quests').innerHTML = journal || `<div class="pz-empty">Ingen oppdrag ennå. ${G.dungeon.isTown && !G.dungeon.isArea ? 'Oppslagstavla på torget har arbeid, og folk i byen vet ting.' : 'Folk i Fristaden har arbeid, og oppslagstavla på torget henger fullt.'}</div>`;
     // løpet i korte trekk
     const D = G.dungeon;
-    const place = D.isArea ? D.L.name : D.isTown ? 'Fristaden' : FLOORS[G.depth]?.name || '';
+    const place = this.pauseFromWorld ? 'Verdenskartet' : D.isArea ? D.L.name : D.isTown ? 'Fristaden' : FLOORS[G.depth]?.name || '';
     const c = G.run.clock, h = ((c % 24) + 24) % 24;
     const when = `Dag ${Math.floor(c / 24) + 1}, ${String(Math.floor(h)).padStart(2, '0')}.${String(Math.floor((h % 1) * 6) * 10).padStart(2, '0')}`;
     const cells = [['Sted', place], ['Tid', when], ['Silver', `${P.silver} sm`], ['Hjältepoäng', P.hjp ?? 0]];
@@ -1668,7 +1822,9 @@ class Game {
     $('#btn-resume').focus({ preventScroll: true });
   }
   openSheet() {
-    if (G.state !== 'play' && G.state !== 'pause') return;
+    if (G.state !== 'play' && G.state !== 'pause' && G.state !== 'world') return;
+    if (G.state === 'play') this.pauseFromWorld = false;
+    else if (G.state === 'world') this.pauseFromWorld = true;
     G.state = 'sheet';
     G.ui.renderSheet();
     G.ui.show('sheet');
@@ -1678,6 +1834,7 @@ class Game {
     if (G.state === 'pause' || G.state === 'sheet' || G.state === 'dialog') {
       G.ui.hideScreens();
       G.state = 'play';
+      if (this.pauseFromWorld) { this.pauseFromWorld = false; G.state = 'world'; G.ui.show('world'); G.worldview.refresh(); }
     }
   }
 
@@ -1704,6 +1861,7 @@ class Game {
     else if (inp.wasPressed('Escape')) {
       if (G.state === 'inventory') G.inv.close();
       else if (G.state === 'travel') G.travel.close();
+      else if (G.state === 'world') { if (!$('#w-enc').hidden) { /* et møte må avgjøres */ } else if (G.worldview.moving) G.worldview.stop(); else this.pause(); }
       else if (!$('#saves').hidden) this.closeSaves();
       else if (!$('#opts').hidden) this.closeOpts();
       else if (G.state === 'play') this.pause();
@@ -1715,11 +1873,16 @@ class Game {
       if (inp.wasPressed('KeyC')) this.openSheet();
       if (inp.wasPressed('Tab')) G.ui.toggleBigMap();
       if (inp.wasPressed('KeyI') && !typing) G.inv.open();
+    } else if (G.state === 'world' && !typing && $('#w-enc').hidden) {
+      if (inp.wasPressed('KeyC')) this.openSheet();
+      if (inp.wasPressed('KeyI')) G.inv.open();
     } else if (G.state === 'sheet' && inp.wasPressed('KeyC')) this.resume();
     else if (G.state === 'inventory' && inp.wasPressed('KeyI')) G.inv.close();
 
     G.post.tiltWant = inTitle ? 0.5 : G.state === 'inventory' ? 0 : 0.85;
+    G.renderer.toneMappingExposure += ((inTitle ? 1.15 : this.expWant) - G.renderer.toneMappingExposure) * Math.min(1, dt * 1.5);
     if (inTitle) {
+      this.bloomLook(0.78, 0.65);
       G.post.mood('tittel');
       G.time += dt;
       if (this.title.leaving) this.title.leave = Math.min(1, this.title.leave + dt / 0.75);
@@ -1739,6 +1902,8 @@ class Game {
       if (G.slowmo > 0) { G.slowmo -= dt; gdt *= 0.3; }
       G.time += gdt;
       G.run.clock += gdt / 120;
+      this.hungerT = (this.hungerT || 0) - gdt;
+      if (this.hungerT <= 0) { this.hungerT = 5; tickHunger(); }
       this.updateAim();
       if (inp.wasPressed('KeyE')) G.world.interact();
       else if (inp.wasPressed('KeyX') && G.world.nearItem?.kind === 'item') G.world.interact(true);

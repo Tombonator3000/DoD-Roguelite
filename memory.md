@@ -137,6 +137,24 @@ Detaljene står i docs/regler/IMPLEMENTERING.md. Det viktigste:
 - Journalen (ivan.js) viser fargen for fakta, svart og villspor først når `reported` er satt.
 - Testriggen med ekte skrifter: Google Fonts nås ikke fra sandkassen, så skjermbilder viser reserveskriftene. `npm install @fontsource/grenze-gotisch @fontsource/alegreya @fontsource/alegreya-sans-sc` i en egen mappe og svar på forespørslene til fonts.googleapis.com og fonts.gstatic.com med CSS og woff2 derfra (page.route i Playwright), så ser bildene ut som i en vanlig nettleser.
 
+## Ereb Altor: geografi til verdenskartet
+
+- Fristaden ligger innerst i Dakkilobukten (Drakdjupet i 2024-kartet) nordøst på Aidne-halvøya, ved foten av fjellet, med Karad Batur like ved. Pharynx er et hertugdømme midt i Zorakin ved Caddobukten, omtrent 1 100 km fra Fristaden. Edelfara er sørvest i Pharynx ved Torilskogen på Grindanu. Før 0.7 var det bare 9 timers reise mellom dem. Nå går reisen over verdenskartet.
+- To lag med kanon: 1985 til 1991 (Ivanhoe, Spelledarboken og Kampanjboken 1989, Svartfolk) har Pharynx, Torilskogen og Kardien. 2024 til 2025 (Helmgast) har Karad Batur og Kardunien, men ikke Pharynx. Ereno ligger nord eller nordøst for Fristaden i de gamle bøkene og sør i 2024-kartet.
+- Avstander og sjøreiser, farer per område og kildene står i docs/verdenskart.md. Reiseregler i Bok II s. 5: gang 20 km, marsj 30 km, ritt 25 km, hard ritt 40 km per 12 timer, dårlig vær -25 %, elendig -50 %. Hemvistkoder for monstre i Bok II s. 24.
+
+## Verdenskartet (Claude, 0.7)
+
+- Toms valg 8. oktober: sammenpresset målestokk (1 rute er omtrent 1 time på vei), 2024-kartet (Ereno sør for Fristaden), proviant og sult fra start. Alt om reglene og tallene står i docs/verdenskart.md under «Slik ble det».
+- Filer: worldmap.js (TERRAIN 50 x 30, TERR, ROADS, RIVERS, PLACES, REGIONS, ENCOUNTERS), worldtravel.js (W(), look, reveal, findPath, rollEncounter, sult, forage), worldview.js (skjermen #world, canvas #world-map), areatemplates.js (encounterLayout, villageLayout, siteLayout, wildLayout).
+- Tilstanden ligger i `G.run.world`: x, y, seen (0 ukjent, 1 sett, 2 gått), known, fed (klokka for siste måltid), starveT, done (engangsmøter), cleared (ryddede steder), route. Den lagres med resten av G.run.
+- G.state er 'world' når kartet er oppe. G.game.onWorldNow() sier om du står på kartet bak pause, rollformulär, packning eller Edelfara-kartet. Lagringen har onWorld, og loadSave åpner kartet igjen.
+- Områder fra mal: G.run.areaSpec er { kind: 'enc' | 'by' | 'sted' | 'vill', ... }, og G.game.layoutFor(spec) bygger layouten på nytt. loadArea(id, arrival, { layout }) tar en layout direkte. Møter har id '_mote', og Q().dead._mote nullstilles for hvert nytt møte. Utganger med world: true går til kartet.
+- AreaLife.fromWorld er sann for alt fra mal. Da gjelder ikke Edelfaras scener og stormingen av Akershus (checkStorm). checkCleared gir belønningen på stedene.
+- Loggen speiles til #w-log (G.ui.mirror), fordi kartskjermen dekker HUD-en.
+- Fallgruve: `.screen` sentrerer med place-items, og høye paneler fikk toppen klippet bort på mobil. #world bruker place-items: start center og margin-block: auto på panelet.
+- Fallgruve: travel.js sin node 'fristaden' heter nå Landeveien, og travelTo(…'fristaden') går til verdenskartet ved Edelfara-ruta. G.travel.open(from, { world: true }) gjør at Bli her går tilbake til kartet.
+
 ## Testing
 
 - Testriggen ligger i tools/test. shot.mjs åpner siden i headless Chromium med SwiftShader og ruter three.js til lokal node_modules (stien THREE_DIR må peke riktig). NOANIM=1 slår av CSS-animasjoner (de står på 0 fordi hvert bilde tar over et sekund), LOWQ=1 setter lav grafikk og stille lyd, INIT="$(cat sim.js)" legger inn hjelpere, VW/VH/TOUCH for mobil.
@@ -152,6 +170,8 @@ Detaljene står i docs/regler/IMPLEMENTERING.md. Det viktigste:
 - stress() kjører sim(), som ikke kaller G.weather.update. Test været med en egen løkke, eller med skjermbilder (rAF-løkka kjører mellom handlingene i shot.mjs).
 - area.js (i tools/test, fra 0.6): area(id, ankomst, time) laster et område, at(tx, ty) flytter spilleren, its() lister det du kan bruke, useIt(tekst) bruker det, ivan() viser oppdragets tilstand. Sammen med talk, ask og kws fra town.js kan hele kjeden kjøres: kureren, depesjen, orchene, Kettil, markisen, brevene, Ulfmar, leiren, kisten og Pharynx. node tools/test/areamap.mjs tegner områdene som tekst.
 - Testriggen med skjermbilder: SwiftShader bruker 5 til 30 s per bilde i områdene. Skriv utdata til en loggfil i stedet for å pipe til tail (alt forsvinner ved timeout), og bruk absolutte stier til skjermbildene. Ikke bruk pkill -f med et mønster som også treffer ditt eget skall. Spilleren dør i lange sim-kjøringer; sett P.invuln og kroppens KP på nytt mellom stegene hvis du tester noe annet enn kamp.
+- Verdenskartet i testriggen: G.game.openTravel('fristaden') går gjennom en wipe, så vent til G.state === 'world' før du reiser (5 s holder ikke alltid). G.debugNoEnc = true gir reiser uten møter. trip() i testene venter til G.worldview.moving er null eller et møte er oppe.
+- Bilder før og etter en grafikkendring: git worktree add <scratch>/before HEAD, lenk node_modules inn, node build.mjs der, og kjør testriggen med ROOT pekt dit. Byen og området blir like, men kloakken er tilfeldig.
 - Stresstest-boten holder nesten aldri parera eller dukker, så 0 pareringer i resultatet er normalt. Test parering med et eget skript: sett P.guard = 1, P.parryT = { vapen: 0, vapen2: 0 } og P.invuln = 0 før hvert anfall (invuln 0,12 s etter et treff stopper neste anfall).
 
 ## Gotchas
@@ -185,6 +205,19 @@ Detaljene står i docs/regler/IMPLEMENTERING.md. Det viktigste:
 ## Dialog mellom agentene
 
 - `Dialog.md` i repoets rot brukes til beskjeder, spørsmål og overleveringer mellom Claude, ChatGPT/Codex og andre agenter, etter Toms bestilling 2026-10-08. Les nye innlegg ved øktstart, også på relevante arbeidsgrener/PR-er. Innlegg har meldings-ID, norsk tidspunkt, avsender/mottaker, emne, status og gren/PR; svar legges nederst med henvisning til ID-en. Beslutninger, arbeidsfordeling og utført arbeid føres også i memory.md, todo.md og log.md.
+
+## Grafikk: lærdom fra Weatherglass (Claude, 2026-10-08)
+
+- EffectComposer i r170 lager sin egen `WebGLRenderTarget(..., { type: HalfFloatType })` uten `samples`. `antialias: true` på rendereren virker derfor ikke når vi tegner gjennom komposeren. Kantutjevning må gis som en egen target med `samples` til komposeren.
+- Krokene for lys per lyskilde i r170: `getSpotLightInfo( spotLight, geometryPosition, directLight );` og `getDirectionalLightInfo( directionalLight, directLight );` i `lights_fragment_begin`. Der kan skyskygger eller annen demping legges inn for alle materialer.
+- Hele gjennomgangen med tall og plan står i docs/grafikk-weatherglass.md. Skyggefilteret i Weatherglass bruker r186-API og kan ikke kopieres rett inn.
+
+## Gjenbruk fra de andre repoene (Claude, 2026-10-09)
+
+- docs/gjenbruk.md er en vurdering av prosjektbiblioteket og elleve andre repoer til Tom, med filstier, lisenser og prioritet. Ingenting er flyttet inn ennå.
+- Vi bruker WebGL 2 (WebGLRenderer i r170). Ingen av Toms spill bruker WebGPU. Bytte krever r171 eller nyere og at alle onBeforeCompile-shaderne skrives om til TSL.
+- Alle Pages-spillene deler opphavet tombonator3000.github.io og dermed localStorage-kvoten. Miniatyrbildene i lagringene våre konkurrerer med de andre spillene.
+- Voidcraft er AGPL: bare ideer, ikke kode. Lydene i Morbidium er CC0 (assets/lyd/KILDER.md).
 
 ## Malte teksturer og grafikk (ChatGPT, D007)
 

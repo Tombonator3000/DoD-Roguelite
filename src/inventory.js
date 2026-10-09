@@ -12,6 +12,8 @@ export const POTION_KG = 0.5;
 // Mat, drikk og annet som kan brukes
 export const CONS = {
   brod: { name: 'Brød', icon: 'bread', value: 20, kg: 0.5, desc: 'Helbreder 2 KP. Mester Flansen regner det som et måltid.', heal: 2, bread: true },
+  // mat for et døgn på reise (verdenskartet). Spises av seg selv når du er sulten (uv).
+  proviant: { name: 'Proviant', icon: 'ration', value: 15, kg: 0.6, desc: 'Mat for et døgn på reise: tørket kjøtt, hardt brød og ost i en klut. Spises av seg selv når det er tid.', ration: true },
   polse: { name: 'Gåseleverpølse', icon: 'sausage', value: 30, kg: 0.3, desc: 'Helbreder 4 KP. Det adelen i Kardunien spiser når prestene ikke ser.', heal: 4 },
   fisk: { name: 'Stekt abbor', icon: 'fish', value: 20, kg: 0.4, desc: 'Helbreder 1T6 KP.', healDie: 'D6' },
   kanel: { name: 'Kanelbolle', icon: 'bun', value: 20, kg: 0.2, desc: 'Helbreder 2 KP og gir 1 PSY.', heal: 2, psy: 1 },
@@ -199,6 +201,14 @@ export function useEntry(P, e) {
   const c = CONS[e.cid];
   if (!c || c.junk) return 'Det er ikke noe å bruke den til.';
   let txt = '';
+  // et måltid: mat (ikke drikker) holder sulten borte et døgn (verdenskartet, uv)
+  const meal = !c.potion && !c.psyAll && (c.heal || c.healDie || c.ration);
+  if (c.ration) {
+    if (G.run?.world) { G.run.world.fed = G.run.clock; G.run.world.starveT = null; }
+    removeFromBag(P, e, 1);
+    G.ui.log('Du spiser en dagsranson. Nå holder det et døgn.');
+    return 'Proviant: et døgn uten sult.';
+  }
   if (c.psyAll) {
     if (P.psy >= P.maxPSY) return 'PSY er allerede full.';
     P.psy = P.maxPSY;
@@ -217,6 +227,7 @@ export function useEntry(P, e) {
     G.fx.burst('heal', P.pos, 14);
     txt = `${c.name}: +${got} KP${c.psy ? `, +${c.psy} PSY` : ''}.`;
   }
+  if (meal && G.run?.world) { G.run.world.fed = G.run.clock; G.run.world.starveT = null; }
   removeFromBag(P, e, 1);
   G.audio.heal?.();
   G.ui.log(txt);

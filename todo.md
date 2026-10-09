@@ -6,7 +6,7 @@ Sortert etter hva som gir mest spill for minst jobb.
 
 Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når pull requesten er inne. Se AGENTS.md.
 
-Ingen arbeider på noe nå. PR #4, #5 og #6 er flettet inn i main 2026-10-08.
+- Claude (`claude/verdenskart`, PR #7): verdenskart over Aidne og grafikkfiksene etter Weatherglass. Klar til gjennomgang. Nye filer worldmap.js, worldtravel.js, worldview.js, areatemplates.js, envlight.js, treegeo.js. Endrer main.js, travel.js, edelmap.js, arealife.js, inventory.js, invui.js, townfolk.js, townpeople.js, save.js, ui.js, area.js, town.js, page.html, player.js.
 
 ## Nå
 
@@ -15,6 +15,11 @@ Ingen arbeider på noe nå. PR #4, #5 og #6 er flettet inn i main 2026-10-08.
 - [x] DoD91-regler (4.0) med Expert og Gigant: sju grundegenskaper, FV per ferdighet, träffområden med egne KP og rustning, parering per SR, magi med PSY, yrker og raser fra Bok I, Skräcktabellen, stridsmoral, fummeltabeller, EP og hjältepoäng (0.5). Lagrede spill fra 2023-reglene kan ikke lastes.
 - [x] Ild i ett tegnekall, vann med refleksjoner og ringer, regn og lyn, våte flater og pytter, vind i gress og trær, løv, fugler, flaggermus, sporer, glør, damp, røkelse, tilt-shift og fargestemning (0.5)
 - [x] Edelfara utenfor Nordporten: reisekart med tid, sju områder (Ekeskogen, Sortmund, Ridderskors borg, Akershus, Akershus borg, Glimming, Lekhs leir) og hele eventyret Triangeldrama i Edelfara med tre mistenkte, ledetråder, villspor, frist på sju dager, allierte, Lekh på ulven og fire slutter i Pharynx (0.6)
+- [x] Verdenskart over Aidne og Drakdjupet i Fallout-stil (0.7): tåke, steder du kjenner eller finner, reise rute for rute, møter med Upptäcka fara og Smyga, Orientering, landsbyer, fire skjulte steder, proviant og sult, lagring på kartet. Se docs/verdenskart.md.
+- [ ] Spilltest verdenskartet: er møtene for mange eller for få? Er 23 timer fra Fristaden til Edelfara for langt? Blir sulten et mas eller en fin grunn til å handle?
+- [ ] Verdenskartet: flere landsbyer med egne folk og oppdrag (nå er alle landsbyer fra samme mal), Pendon og Ekeborg som egne byer, skip fra Fristaden og Ardesch.
+- [ ] Verdenskartet: Rida og hester som halverer tida, og at været på kartet gjør reisen tregere (Bok II s. 5: dårlig vær -25 %, elendig -50 %).
+- [ ] Packningen fra verdenskartet: å slippe en ting der legger den i området bak kartet, så den blir borte. Sperr slipp når kartet er oppe.
 - [ ] Spilltest Edelfara: holder sju dager, eller er det for romslig? Er leiren for hard alene og for lett med grevens soldater? Finner folk fram til Ulfmar og bevisene uten journalen?
 - [ ] Rida: hester i Sortmund og Akershus som korter ned reisetida på kartet, med et Rida-slag.
 - [ ] Pharynx som eget område med hertigens vaktkaptein, i stedet for bare en rapport.
@@ -24,6 +29,13 @@ Ingen arbeider på noe nå. PR #4, #5 og #6 er flettet inn i main 2026-10-08.
 - [ ] Spilltest menyene på ekte mobil: er knappene i pausemenyen store nok, og er tekststørrelsen Størst for mye i loggen?
 - [ ] Pilnavigering (opp og ned) i pausemenyen som i tittelen.
 - [ ] Spilltest grafikken på ekte maskin og mobil: er regnet for tett, tilt-shift for sterk, natta for mørk i uvær?
+- [x] Grafikk etter Weatherglass, raske ting (0.7): MSAA i komposeren, bloom etter sted og tid, miljøkart fra himmelen, eksponering etter døgnet, myke trekroner. Se docs/grafikk-weatherglass.md.
+- [ ] Trær nær kameraet skjuler spilleren i Ekeskogen. La kronene mellom kameraet og spilleren bli gjennomsiktige, som takene i byen. Mal: fadeFronts i Loincloth Legends (docs/gjenbruk.md).
+- [ ] Fra docs/gjenbruk.md, raske ting: CC0-lyder fra Morbidium og Loincloth (fotsteg etter underlag, dører, gulvknirk, regn, vind, natt, bål, sverdklang), skriftene bygget inn med FontFace i stedet for Google Fonts, alphaToCoverage på tuster og faner, handler for tapt WebGL-kontekst, test av artifact.html under sandkassens CSP.
+- [ ] Fra docs/gjenbruk.md, middels: skjermeffekter (sjokkbølge, zoom-punch, rød kant ved lav KP), angrepspoletter og tempostyrer (høyst 2 som angriper), automatisk kvalitet med pikselbudsjett, stemmer per släkt med formanter, musikk som skifter i takt, spilltestmodus bak ?testmodus.
+- [ ] log.md er over 50 KB. Flytt eldre økter til logg/ÅÅÅÅ-MM.md, som Morbidium gjør med tools/rydd_dokumenter.py.
+- [ ] Grafikk etter Weatherglass, middels: sol som retningslys ute med skyggekamera snappet til texler, lys gjennom bladene, bakkeshader som bryter opp flisene, enkel AO nederst på vegger og steiner, skyskygger på alle materialer.
+- [ ] Grafikk etter Weatherglass, stort: trær med greiner og bladkort, gresstrå med vind, lav dis med lyssøyler, adaptiv DPR med tre nivåer.
 - [ ] Mer grafikk: tåke som ligger lavt over elva om morgenen, snø om vinteren, lysstråler gjennom vinduene i flere hus, varmeflimmer over smia, skyggen av fuglene på bakken.
 
 - [ ] Sjekke det som er merket `uv` mot bøkene: rottene (finnes ikke i Bok II), Rødpels og demonen, prisene i byen, sanntidsoversettelsene i docs/regler/IMPLEMENTERING.md.
@@ -62,8 +74,10 @@ Ingen arbeider på noe nå. PR #4, #5 og #6 er flettet inn i main 2026-10-08.
 
 ## Senere
 
+- [ ] Verdenskart i Fallout-stil over Aidne (rutenett med tåke, reise i dager, tilfeldige møter, steder du finner eller får vite om), og senere hele Kopparhavet. Plan i docs/verdenskart.md, venter på Toms svar om målestokk, Ereno og proviant.
+
 - [ ] Flere regioner fra "Hjältar från Kopparhavet" (Arkipelagen, Mindre Akrogal, Tolan og Jorien, Norra Samkarna, Norra Soluna) i bakgrunnssteget.
-- [ ] Oververden i Ultima-stil: kart over Zorakin med Fristaden, Karad Batur og Ereno.
+- [ ] Oververden i Ultima-stil: kart over Zorakin med Fristaden, Karad Batur og Ereno. Se verdenskartet over.
 - [x] Samtaler med nøkkelord som i Ultima IV og V (0.4). Neste: ord som låses opp av ting du har sett i kloakken.
 - [ ] Samarbeidsspill for to (Rune som spilleder?).
 

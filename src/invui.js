@@ -46,7 +46,8 @@ export class InvUI {
   }
 
   open() {
-    if (G.state !== 'play' || G.player.downed) return;
+    if ((G.state !== 'play' && G.state !== 'world') || G.player.downed) return;
+    this.fromWorld = G.state === 'world';
     G.state = 'inventory';
     this.isOpen = true;
     document.activeElement?.blur?.();
@@ -70,6 +71,7 @@ export class InvUI {
     G.ui.lastTip = undefined;
     G.ui.buildBar();
     G.audio.menuTick?.(60);
+    if (this.fromWorld) { this.fromWorld = false; G.state = 'world'; G.ui.show('world'); G.worldview.refresh(); }
   }
 
   toggle() { if (this.isOpen) this.close(); else this.open(); }

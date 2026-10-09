@@ -63,13 +63,14 @@ export function buildSave() {
   const P = G.player, run = G.run;
   const town = !!G.dungeon.isTown;
   const area = G.dungeon.isArea ? G.dungeon.areaId : null;
+  const onWorld = !!G.game?.onWorldNow?.();
   return {
     v: SAVE_VERSION,
     rules: SAVE_RULES,
     at: Date.now(),
     meta: {
       name: P.name, kin: P.sheet.kin, prof: P.sheet.profession, nebb: P.isNebb,
-      depth: G.depth, place: area ? G.dungeon.L.name : town ? 'Fristaden' : FLOORS[G.depth]?.name || '', clock: run.clock,
+      depth: G.depth, place: onWorld ? 'Verdenskartet' : area ? G.dungeon.L.name : town ? 'Fristaden' : FLOORS[G.depth]?.name || '', clock: run.clock,
       kp: P.kp, maxKP: P.maxKP, silver: P.silver, time: Math.round((performance.now() - (run.t0 || 0)) / 1000) + (run.elapsedBefore || 0),
     },
     run: { ...run, known: [...(run.known || [])], t0: undefined, elapsedBefore: Math.round((performance.now() - (run.t0 || 0)) / 1000) + (run.elapsedBefore || 0) },
@@ -80,6 +81,7 @@ export function buildSave() {
     level: town ? null : G.world.serializeLevel(),
     pos: { x: +P.pos.x.toFixed(2), z: +P.pos.z.toFixed(2), yaw: +P.yaw.toFixed(3) },
     companion: !!G.companion,
+    onWorld,
   };
 }
 

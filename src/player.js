@@ -10,6 +10,7 @@ import {
 import { addRimFlash, makeOutline } from './assets.js';
 import { weaponItem, armorItem, isRanged, refinalize } from './loot.js';
 import { makeCons, removeFromBag, carriedKg } from './inventory.js';
+import { hungerLevel } from './worldtravel.js';
 import { buildCharacter, buildWeaponMesh, ghostGeometry, HOLD } from './kinmodels.js';
 import { makeBody, resizeBody, hurt, lostKP, usable, legHalf, kneeling, fallen, healBody, healFull, ARMS, LEGS } from './body.js';
 
@@ -240,7 +241,8 @@ export class Player {
       if (this.equip.rustning) this.equip.rustning.name = 'Slitt läderharnesk';
     }
     this.kit = new Set(S.gear?.g || []);
-    this.bag = [makeCons('brod', 2)];
+    // to brød og proviant for to døgn på reise (verdenskartet)
+    this.bag = [makeCons('brod', 2), makeCons('proviant', 2)];
     this.potions = 2 + (lv.niste || 0);
     this.silver = S.silver || 0;
     this.boons = [];
@@ -457,7 +459,7 @@ export class Player {
 
   /**
    * Slår et färdighetsslag, eller et grundegenskapsslag for STY, FYS osv. (normalt, eller o.sg).
-   * o: { mod, base, fv, sg, locs, label, combat, noExp, noHero, noBonus }
+   * o: { mod, base, fv, sg, locs, label, combat, noExp, noHero, noBonus, halve }
    */
   roll(id, o = {}) {
     const attr = !!ATTR_NAME[id];
@@ -476,6 +478,7 @@ export class Player {
       if (this.fx.tjuvBonus) { bonus += this.fx.tjuvBonus; this.fx.tjuvBonus = 0; }
     }
     cl += bonus;
+    if (o.halve) cl = Math.floor(cl / 2);
     const r = clRoll(cl, o.fv ?? (attr ? this.attrs[id] : Math.max(1, this.skillVal(id))));
     r.skill = id;
     r.label = o.label || id;
@@ -656,7 +659,8 @@ export class Player {
     // PSY kommer tilbake utenfor kamp: 1 per 20 sekunder (Bok III: 1 per time i hvile, uv)
     if (!this.flags.has('bloodthirst')) {
       const out = !this.inCombat();
-      this.psyT += dt * (out ? 1 : 0) * (this.flags.has('breath') ? 2 : 1) * (this.sheet.special?.fx?.psyRegen || 1);
+      // sulten: PSY kommer ikke tilbake av seg selv (verdenskartet, uv)
+      this.psyT += dt * (out && !hungerLevel() ? 1 : 0) * (this.flags.has('breath') ? 2 : 1) * (this.sheet.special?.fx?.psyRegen || 1);
       if (this.psyT >= 20) { this.psyT = 0; if (this.psy < this.maxPSY) this.psy++; }
     }
     if (this.flags.has('regen')) {

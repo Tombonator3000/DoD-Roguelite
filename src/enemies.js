@@ -8,7 +8,7 @@ import { weaponItem } from './loot.js';
 import { WEAPONS, ARMORS, SR, LOC_SHORT, hitLocation, skadebonus, FUMMEL_NARSTRID, fromRange } from './dod.js';
 import { makeBody, hurt, lostKP, usable, kneeling } from './body.js';
 import { buildRat, buildSkeleton, buildGoblin, buildOrc, buildFox } from './assets.js';
-import { buildDemon } from './kinmodels.js';
+import { buildDemon, buildCharacter, buildWeaponMesh, HOLD } from './kinmodels.js';
 import { buildOrcEd, buildSvartalf, buildWolf } from './edelmodels.js';
 
 const A = (STY, STO, FYS, SMI, INT, PSY) => ({ STY, STO, FYS, SMI, INT, PSY });
@@ -141,7 +141,35 @@ export const DEFS = {
     dieLine: 'Ulven stuper, og Lekh blir liggende under den.',
     lore: 'Lekh flykter på en dressert ulv. Ulven er rask. Lekh er raskere i hodet.',
   },
+
+  // --- Stråtrøvere på veiene i Zorakin (Hjältar från Kopparhavet s. 39: stråtrövare och stigmän) ---
+  // Menneskeverdier som en vanlig människa i Bok I, våpen og rustning etter skjønn (uv).
+  rovare: {
+    name: 'Stråtrøver', attrs: A(12, 12, 11, 12, 10, 10), kp: 12, nat: 0, detailed: true, humanoid: true, weapon: 'handyxa', fv: 8, uv: true,
+    armor: ['laderharnesk', 'laderhuva'], shield: 'targ', moral: 9, upptacka: 9, group: 'rovare', grunt: 1.0,
+    speed: 3.4, radius: 0.55, aggro: 13, range: 2.1, windup: 0.7, recover: 0.85, shape: 'cone', sr: 2.8, arc: 1.8, silver: [20, 80],
+    build: () => buildHuman('rovare', 'handyxa', 0x4a3a2a), hipsY: 0.86, interrupt: true, bounty: 3, ko: 'rob', h: 1.8, dieLine: 'Stråtrøveren faller i grøfta.',
+    lore: 'Stråtrøvere fra åsene. De later som de reparerer en kjerre. De flykter når det går dårlig.',
+  },
+  rovare_bue: {
+    name: 'Stråtrøver med bue', attrs: A(11, 11, 11, 13, 10, 10), kp: 11, nat: 0, detailed: true, humanoid: true, weapon: 'kortbage', melee: 'dolk', fv: 8, meleeFv: 7, uv: true,
+    armor: ['laderharnesk'], moral: 8, upptacka: 10, ranged: true, pref: 10, group: 'rovare', grunt: 1.05,
+    speed: 3.5, radius: 0.52, aggro: 15, windup: 1.0, recover: 1.0, silver: [20, 60],
+    build: () => buildHuman('rovare_bue', 'kortbage', 0x3a4a2a), hipsY: 0.86, interrupt: true, bounty: 3, ko: 'rob', h: 1.8, dieLine: 'Buen faller i gresset.',
+    lore: 'En stråtrøver med kortbue. Han holder avstand og skyter mens de andre slåss.',
+  },
 };
+
+// Mennesker som fiender: samme modell som rollpersonene, med våpenet i høyre hånd
+function buildHuman(id, wid, top) {
+  const sheet = { id: id + Math.floor(Math.random() * 1000), kin: 'manniska', profession: 'tjuv', age: 'medel', clothes: { top, pants: 0x2a2420, cape: 0x3a2a1e } };
+  const c = buildCharacter(sheet, { armor: { type: 'lader' }, helmet: { hid: 'laderhuva' } });
+  const wm = buildWeaponMesh(weaponItem(wid));
+  wm.rotation.x = HOLD[WEAPONS[wid]?.kind] ?? -0.35;
+  c.rig.handR.add(wm);
+  const R = c.rig;
+  return { root: c.root, parts: { hips: R.hips, torso: R.torso, head: R.head, legL: R.legL, legR: R.legR, armL: R.shL, armR: R.shR, weapon: wm }, fx: [c.fxU] };
+}
 
 // Rødpels' angrepstabell (T6). Samme angrep to ganger på rad gir det neste i tabellen.
 const BOSS_ATTACKS = [
@@ -1167,7 +1195,7 @@ export class Enemy {
     }
     const bodyNode = P.torso || P.body;
     const kneel = kneeling(this.body) ? 0.3 : 0;
-    if (P.hips) P.hips.position.y = 0.95 + Math.abs(sw) * 0.05 - kneel;
+    if (P.hips) P.hips.position.y = (this.def.hipsY ?? 0.95) + Math.abs(sw) * 0.05 - kneel;
     else if (P.body) P.body.position.y = (this.def.bodyY || (this.type === 'goblin' ? 0.62 : this.type === 'orc' ? 1.25 : this.type === 'demon' ? 1.3 : 1.55)) + Math.abs(sw) * 0.05 - kneel;
     let armR = -sw * 0.5, armL = sw * 0.5;
     if (st === 'windup') armR = -2.2 * wp;
