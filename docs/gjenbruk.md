@@ -176,7 +176,9 @@ Det som finnes:
 - **Loincloth `docs/GJENBRUK.md`** og denne fila er gjenbruksrevisjoner per prosjekt.
 - **Skills** i `.claude/skills/` (Loincloth, Guild Life) og `Automation/Skills/` (SIGNAL-47, gauntlet-loop) har `agents/openai.yaml`, så Claude og ChatGPT/Codex leser de samme.
 
-Forslag i tre steg:
+Steg 1 og 3 er gjort 9. oktober: løsningskortene ligger i prosjektbiblioteket (PR #1 der, `LOSNINGER.md`), med 15 kort fra Svart Nebb. Skillen `spill-gjenbruk` er steg 2.
+
+Forslaget var tre steg:
 
 1. **Løsningskort i prosjektbiblioteket**: `losninger/<domene>/<slug>.md` (grafikk, lyd, testing, ui, bygg, regler). `data/losninger.json` holder metadataene, og `find.py` søker i kortene. Hvert kort har:
    - symptomet slik man ville søkt etter det, også feilteksten;
