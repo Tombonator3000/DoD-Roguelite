@@ -97,6 +97,12 @@ try {
   await page.locator('#btn-resume').click();
   await page.waitForFunction(() => window.G.state === 'play' && document.querySelector('#pause').hidden);
   result.pauseAndResume = true;
+  result.lostOffhand=await page.evaluate(()=>{
+    const P=G.player,off=P.equip.vapen2;
+    P.equip.vapen2=null;
+    try{P.meleeHit({offStrike:true,kind:'knife',step:1});return true;}
+    finally{P.equip.vapen2=off;}
+  });
   result.stress = await page.evaluate(() => stress('tjuv', 20));
   assert.deepEqual(result.stress.errors, [], 'stresstesten feilet');
   assert.equal(result.stress.floors.length, 5);
