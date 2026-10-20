@@ -3,7 +3,9 @@
 // Upptäcka fara for å se møtet først, Smyga for å komme forbi, Orientering utenfor vei (Bok I s. 54),
 // Överlevnad for å finne mat. Tidene er sammenpresset etter Toms valg. Tall som ikke står i boka, er uv.
 import { G } from './state.js';
-import { WW, WH, TERRAIN, TERR, FREQ, FREQ_ORDER, ROADS, PLACES, REGIONS, ENCOUNTERS } from './worldmap.js';
+import { WW, WH, TERRAIN, TERR, FREQ, FREQ_ORDER, ENCOUNTERS } from './worldmap.js';
+import { PLACES, getRegionMap, defaultPlace } from './regionalmaps.js';
+import { ATLAS_REGIONS } from './atlasdata.js';
 import { makeCons, giveItem } from './inventory.js';
 import { d } from './rules.js';
 
@@ -12,26 +14,36 @@ export const inWorld = (x, y) => x >= 0 && y >= 0 && x < WW && y < WH;
 
 // --- veier som et lag: 1 = vei, 2 = sti -------------------------------------------------------
 export const ROAD = new Uint8Array(WW * WH);
-for (const r of ROADS) {
-  for (let i = 0; i < r.pts.length - 1; i++) {
-    const [ax, ay] = r.pts[i], [bx, by] = r.pts[i + 1];
-    const n = Math.max(Math.abs(bx - ax), Math.abs(by - ay));
-    for (let s = 0; s <= n; s++) {
-      const x = Math.round(ax + (bx - ax) * s / n), y = Math.round(ay + (by - ay) * s / n);
-      const k = idx(x, y);
-      ROAD[k] = ROAD[k] === 1 ? 1 : r.kind === 'vei' ? 1 : 2;
+const PLACE_AT = {};
+let indexedRegion = null;
+export const worldMap = () => getRegionMap(G.run?.world?.region || 'aidne');
+function ensureIndex() {
+  const map = worldMap();
+  if (indexedRegion === map.id) return;
+  indexedRegion = map.id;
+  ROAD.fill(0);
+  for (const k of Object.keys(PLACE_AT)) delete PLACE_AT[k];
+  for (const [id,p] of Object.entries(map.places)) PLACE_AT[idx(p.x,p.y)] = id;
+  for (const r of map.roads) {
+    for (let i = 0; i < r.pts.length - 1; i++) {
+      const [ax, ay] = r.pts[i], [bx, by] = r.pts[i + 1];
+      const n = Math.max(Math.abs(bx - ax), Math.abs(by - ay));
+      for (let s = 0; s <= n; s++) {
+        const x = Math.round(ax + (bx - ax) * s / Math.max(1,n)), y = Math.round(ay + (by - ay) * s / Math.max(1,n));
+        const k = idx(x, y);
+        ROAD[k] = ROAD[k] === 1 ? 1 : r.kind === 'vei' ? 1 : 2;
+      }
     }
   }
 }
-const PLACE_AT = {};
-for (const [id, p] of Object.entries(PLACES)) PLACE_AT[idx(p.x, p.y)] = id;
 
-export const terrainAt = (x, y) => (inWorld(x, y) ? TERRAIN[y][x] : '~');
-export const placeAt = (x, y) => PLACE_AT[idx(x, y)] || null;
-export const roadAt = (x, y) => (inWorld(x, y) ? ROAD[idx(x, y)] : 0);
+export const terrainAt = (x, y) => (inWorld(x, y) ? worldMap().terrain[y][x] : '~');
+export const placeAt = (x, y) => { ensureIndex(); return inWorld(x,y) ? PLACE_AT[idx(x, y)] || null : null; };
+export const roadAt = (x, y) => { ensureIndex(); return inWorld(x, y) ? ROAD[idx(x, y)] : 0; };
 export function regionAt(x, y) {
   const t = terrainAt(x, y);
-  return REGIONS.find(r => r.test(x, y, t)) || REGIONS[REGIONS.length - 1];
+  const regions = worldMap().regions;
+  return regions.find(r => r.test(x, y, t)) || regions[regions.length - 1];
 }
 export const passable = (x, y) => inWorld(x, y) && TERR[terrainAt(x, y)]?.hours != null;
 
@@ -47,15 +59,34 @@ export function W() {
   const r = G.run;
   if (!r.world) {
     const f = PLACES.fristaden;
-    r.world = { x: f.x, y: f.y, seen: new Array(WW * WH).fill(0), known: {}, fed: r.clock ?? 17, starveT: null, done: {}, cleared: {}, enc: null, route: null };
-    for (const [id, p] of Object.entries(PLACES)) if (p.known) r.world.known[id] = true;
+    r.world = { region: 'aidne', maps: {}, x: f.x, y: f.y, seen: new Array(WW * WH).fill(0), known: {}, fed: r.clock ?? 17, starveT: null, done: {}, cleared: {}, enc: null, route: null };
+    for (const [id, p] of Object.entries(getRegionMap('aidne').places)) if (p.known) r.world.known[id] = true;
     // landet rett rundt Fristaden kjenner du fra før
     for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) if (inWorld(f.x + dx, f.y + dy)) r.world.seen[idx(f.x + dx, f.y + dy)] = 1;
     look(f.x, f.y);
   }
   const w = r.world;
+  // Gamle 0.7-lagringer får Aidne uten å miste posisjon, tåke eller kjente steder.
+  if (!w.region || ATLAS_REGIONS[w.region]?.id !== w.region) w.region = 'aidne';
+  if (!w.maps || typeof w.maps !== 'object') w.maps = {};
+  w.known ||= {}; w.done ||= {}; w.cleared ||= {};
   if (!w.seen || w.seen.length !== WW * WH) w.seen = new Array(WW * WH).fill(0);
+  const snapshot = w.maps[w.region] ||= {};
+  snapshot.x = w.x; snapshot.y = w.y; snapshot.seen = w.seen;
   return w;
+}
+
+export function changeRegion(id, arrival = defaultPlace(id)) {
+  if (ATLAS_REGIONS[id]?.id !== id || !PLACES[arrival] || PLACES[arrival].map !== id) return false;
+  const w = W(), p = PLACES[arrival];
+  w.region = id;
+  w.x = p.x; w.y = p.y;
+  w.seen = w.maps[id]?.seen || new Array(WW * WH).fill(0);
+  w.route = null; w.enc = null;
+  indexedRegion = null;
+  look(w.x,w.y);
+  W();
+  return true;
 }
 
 export const seenAt = (x, y) => (inWorld(x, y) ? W().seen[idx(x, y)] : 0);
@@ -63,6 +94,7 @@ export const known = id => !!W().known[id] || (id === 'pharynx' && (G.run.ivan?.
 
 // Tåken letter rundt deg. Fra fjellet ser du lenger, som Scout i Fallout (uv).
 export function look(x, y) {
+  ensureIndex();
   const w = G.run.world;
   if (!w) return;
   const r = terrainAt(x, y) === '^' ? 2 : 1;
@@ -146,7 +178,7 @@ export function freqAt(x, y, hour) {
   let i = FREQ_ORDER.indexOf(t.freq);
   if (roadAt(x, y)) i -= 1;
   // nær byer er det tryggere
-  for (const p of Object.values(PLACES)) if (p.kind !== 'sted' && Math.max(Math.abs(p.x - x), Math.abs(p.y - y)) <= 1) { i = Math.min(i, 1); break; }
+  for (const p of Object.values(worldMap().places)) if (p.kind !== 'sted' && Math.max(Math.abs(p.x - x), Math.abs(p.y - y)) <= 1) { i = Math.min(i, 1); break; }
   const reg = regionAt(x, y);
   if (reg.danger >= 2 && !roadAt(x, y)) i += 1;
   const night = hour >= 21 || hour < 5;
@@ -250,7 +282,7 @@ export function campHours() {
 }
 
 export function placeList() {
-  return Object.entries(PLACES).filter(([id]) => known(id)).map(([id, p]) => ({ id, ...p }));
+  return Object.entries(worldMap().places).filter(([id]) => known(id)).map(([id, p]) => ({ id, ...p }));
 }
 
 export { PLACES, TERRAIN, TERR, WW, WH, d };
