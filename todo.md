@@ -6,7 +6,7 @@ Sortert etter hva som gir mest spill for minst jobb.
 
 Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når pull requesten er inne. Se AGENTS.md.
 
-- Claude (`claude/verdenskart`, PR #7): verdenskart over Aidne og grafikkfiksene etter Weatherglass. Klar til gjennomgang. Nye filer worldmap.js, worldtravel.js, worldview.js, areatemplates.js, envlight.js, treegeo.js. Endrer main.js, travel.js, edelmap.js, arealife.js, inventory.js, invui.js, townfolk.js, townpeople.js, save.js, ui.js, area.js, town.js, page.html, player.js.
+- ChatGPT (`chatgpt/ereb-altor`): kildebelagt atlas over Ereb og resten av Altor, flere regionale kart, havner og sjøreiser, lagring mellom regioner og en prioritert Ultima-plan. PR #7 er flettet inn.
 
 ## Nå
 

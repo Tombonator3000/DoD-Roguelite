@@ -278,3 +278,7 @@ Alt som gjøres i prosjektet loggføres her med tidsstempel (Europe/Oslo).
 - 04:40 Skrev docs/gjenbruk.md: svaret om WebGL og WebGPU, topp ti med kilder og kost, grafikk, anda, gameplay, lyd, musikk, brukerflate, testing, fallgruver, hva vi ikke skal ta (AGPL, CC BY-SA, ukjente rettigheter), og et forslag om løsningskort i prosjektbiblioteket og en felles skill. Nye punkter i todo.md og et avsnitt i memory.md.
 - 04:48 Tok navnene på de tre private repoene ut av docs/gjenbruk.md og log.md før push, fordi DoD-Roguelite er offentlig.
 - 04:52 Tom ba om løsningskortene. Satte dem opp i prosjektbiblioteket på grenen claude/losningskort, PR #1 der: format, mal, byggeskript, sjekk i verify.py og søk i find.py. 19 kort, 15 av dem fra Svart Nebb (MSAA i komposeren, bloom, miljøkart, trekroner, uniformlister, onBeforeCompile i kjede, regnstreker, vertexColors, lyskroker, én HTML-fil, testriggen, bilder før og etter, grid-skjermer, hidden, Karplus-Strong). Detaljer i prosjektbibliotekets log.md.
+
+## 2026-10-20: Ereb Altor og Ultima-retningen (ChatGPT)
+
+- 23:06 (ChatGPT) Leste oppdatert main, D010-D012, verdensarkitekturen og testene. PR #4-7 er flettet. Opprettet chatgpt/ereb-altor og reserverte oppgaven. Hentet kontrollerte HTML-kilder for Ereb Altor, Kopparhavets Kapare, Trakorien og Krilloan fra Toms bibliotek, samt verdenskartet til visuell kontroll.
