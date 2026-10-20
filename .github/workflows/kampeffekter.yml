@@ -28,7 +28,7 @@ jobs:
       - run: npm install --no-save --no-audit --no-fund playwright@1.62.1
       - run: npx playwright install --with-deps chromium
       - run: npm run build
-      - run: node --test tools/test/combatfx.test.mjs
+      - run: node --test tools/test/combatfx.test.mjs tools/test/atlas.test.mjs
       - run: node tools/test/combatfx-browser.mjs dist/combatfx-test
       - run: node tools/test/texture-fallback.mjs
       - run: node tools/test/texture-browser.mjs dist/index.html dist/teksturer/etter
@@ -42,3 +42,22 @@ jobs:
         with:
           name: teksturer-test
           path: dist/teksturer/etter
+
+  atlas:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install --no-audit --no-fund
+      - run: npm install --no-save --no-audit --no-fund playwright@1.62.1
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - run: node tools/test/atlas-browser.mjs dist/atlas-test
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: verdensatlas-test
+          path: dist/atlas-test

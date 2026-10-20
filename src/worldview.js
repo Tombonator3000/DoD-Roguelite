@@ -1,10 +1,11 @@
 // Verdenskartet på skjermen: tegningen, lista over steder, reisen rute for rute og møtene underveis.
 // Tegnes med canvas i blekk og pergament. Kartet er vårt eget, tegnet fra rutenettet i worldmap.js.
 import { G } from './state.js';
-import { WW, WH, TERRAIN, PLACES, ROADS, RIVERS } from './worldmap.js';
+import { WW, WH } from './worldmap.js';
+import { PLACES } from './regionalmaps.js';
 import {
   W, look, known, findPath, pathHours, stepHours, roadAt, terrainAt, regionAt, placeAt, passable, seenAt,
-  rollEncounter, tickHunger, hungerLevel, countFood, forage, campHours, ate, placeList,
+  rollEncounter, tickHunger, hungerLevel, countFood, forage, campHours, ate, placeList, worldMap,
 } from './worldtravel.js';
 
 const $ = s => document.querySelector(s);
@@ -68,6 +69,7 @@ export class WorldView {
 
   // Landskapet tegnes én gang per størrelse: farger, trær, fjell, kystlinje, elver og veier
   paintBackground(Wd, Hd, c) {
+    const { terrain:TERRAIN, roads:ROADS, rivers:RIVERS } = worldMap();
     const off = document.createElement('canvas');
     off.width = Wd; off.height = Hd;
     const g = off.getContext('2d');
@@ -131,11 +133,12 @@ export class WorldView {
     // landskapsnavn
     g.fillStyle = 'rgba(60,40,24,0.55)'; g.textAlign = 'center';
     g.font = `italic ${Math.max(10, Math.round(c * 0.75))}px Alegreya, Georgia, serif`;
-    for (const [t, x, y] of [['Drakdjupet', 35.5, 19], ['Sjunkna sjön', 22, 22.5], ['Aidnebergen', 15, 11.6], ['Vorgabergen', 33, 3.2], ['Nidabergen', 44, 6], ['Goiana', 19, 6.4], ['Torilskogen', 17.5, 17.8], ['Indar', 29.5, 19.6], ['Tolan', 44, 23], ['Kardunien', 6, 21], ['Valbukten', 2.5, 10.5]]) g.fillText(t, x * c, y * c);
+    if (W().region === 'aidne') for (const [t, x, y] of [['Drakdjupet', 35.5, 19], ['Sjunkna sjön', 22, 22.5], ['Aidnebergen', 15, 11.6], ['Vorgabergen', 33, 3.2], ['Nidabergen', 44, 6], ['Goiana', 19, 6.4], ['Torilskogen', 17.5, 17.8], ['Indar', 29.5, 19.6], ['Tolan', 44, 23], ['Kardunien', 6, 21], ['Valbukten', 2.5, 10.5]]) g.fillText(t, x * c, y * c);
     this.bg = off;
   }
 
   draw() {
+    const { places:PLACES } = worldMap();
     const { Wd, Hd, c } = this.size();
     if (!this.bg) this.paintBackground(Wd, Hd, c);
     const g = this.ctx, w = W();
@@ -209,6 +212,7 @@ export class WorldView {
   refresh() {
     const w = W(), P = G.player;
     const reg = regionAt(w.x, w.y);
+    $('#w-map-title').textContent = worldMap().name;
     const here = placeAt(w.x, w.y);
     $('#w-region').textContent = reg.name;
     const food = countFood(), hl = hungerLevel();
@@ -219,6 +223,7 @@ export class WorldView {
       ['Silver', `${P.silver} sm`],
     ].map(([k, v]) => `<div class="${k === 'Mat' && (hl || !food) ? 'bad' : ''}"><span>${k}</span><b>${v}</b></div>`).join('');
     const hp = here ? PLACES[here] : null;
+    $('#btn-w-atlas').disabled = !!this.moving || !$('#w-enc').hidden;
     $('#w-here').innerHTML = hp ? `<b>${hp.name}</b><span>${hp.sub[0].toUpperCase() + hp.sub.slice(1)}.</span>` : `<b>${TERR_NAME[terrainAt(w.x, w.y)][0].toUpperCase() + TERR_NAME[terrainAt(w.x, w.y)].slice(1)}${roadAt(w.x, w.y) ? ' ved veien' : ''}</b><span>${reg.name}.</span>`;
     $('#btn-w-enter').textContent = hp ? (hp.kind === 'port' ? 'Gå til porten' : `Gå inn i ${hp.name}`) : 'Se deg om';
     $('#btn-w-camp').disabled = false;

@@ -138,7 +138,7 @@ export class InvUI {
             <div class="capnote">Bärförmåga ${cap} kg, like mye som STY (Bok II s. 5). Det du har på deg og i hendene teller ikke. Høyst ${hard} kg.</div></div>
           ${over ? '<div class="overwarn">Överlastad: du går tregere og har -5 på Smyga, Akrobatik, Hoppa og Klättra.</div>' : ''}
           <div class="bag">${bag}</div>
-          <div class="drop" data-drop="ground">Slipp på bakken</div>
+          ${this.fromWorld ? '<div class="capnote">Gå inn i et område før du slipper noe på bakken.</div>' : '<div class="drop" data-drop="ground">Slipp på bakken</div>'}
           <div class="detail" id="inv-detail"></div>
         </div>
       </div>
@@ -236,11 +236,11 @@ export class InvUI {
           if (P.potions < 4) out.push({ label: 'Til beltet', fn: () => { removeFromBag(P, e, 1); P.potions++; P.recalc(); } });
         } else if (!e.junk && e.cid !== 'safran') out.push({ label: e.icon === 'potionvp' ? 'Drikk' : 'Spis', fn: () => this.say(useEntry(P, e)) });
       }
-      out.push({ label: 'Slipp', fn: () => { dropEntry(P, e); this.sel = null; } });
+      if (!this.fromWorld) out.push({ label: 'Slipp', fn: () => { dropEntry(P, e); this.sel = null; } });
     } else if (ref.kind === 'eq') {
       out.push({ label: 'Ta av', fn: () => { if (!unequip(P, ref.slot)) this.say('Sekken er full.'); } });
       if (ref.slot === 'vapen' || ref.slot === 'vapen2') out.push({ label: 'Bytt hånd', fn: () => this.swapHands() });
-      out.push({ label: 'Slipp', fn: () => { dropEntry(P, null, ref.slot); this.sel = null; } });
+      if (!this.fromWorld) out.push({ label: 'Slipp', fn: () => { dropEntry(P, null, ref.slot); this.sel = null; } });
     } else if (ref.kind === 'belt') {
       out.push({ label: 'Drikk', fn: () => { G.state = 'play'; P.cd.potion = 0; P.drinkPotion(); G.state = 'inventory'; } });
       out.push({ label: 'Til sekken', fn: () => { if (!canCarry(P, makeCons('legedrikk'))) return this.say('Sekken er full.'); P.potions--; addToBag(P, makeCons('legedrikk'), true); } });
@@ -353,7 +353,7 @@ export class InvUI {
   canDrop(ref, target) {
     const [k, v] = target.split(':');
     const e = ref.e;
-    if (k === 'ground') return true;
+    if (k === 'ground') return !this.fromWorld;
     if (k === 'eq') {
       if (ref.kind === 'eq') return (ref.slot === 'vapen' && v === 'vapen2' && !G.player.equip.vapen2?.shield) || (ref.slot === 'vapen2' && v === 'vapen' && !e.shield);
       return ref.kind === 'bag' && canEquip(e, v);
@@ -371,6 +371,7 @@ export class InvUI {
     const [k, v] = target.split(':');
     const e = ref.e;
     if (k === 'ground') {
+      if (this.fromWorld) return;
       if (ref.kind === 'bag') dropEntry(P, e);
       else if (ref.kind === 'eq') dropEntry(P, null, ref.slot);
       else if (ref.kind === 'belt') { P.potions--; const x = makeCons('legedrikk'); P.bag.push(x); dropEntry(P, x); }
