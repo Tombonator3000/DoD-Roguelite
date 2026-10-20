@@ -231,3 +231,29 @@ Viktig for videre arbeid:
 - AGENTS.md hadde to foreldede DoD2023-avsnitt. De er rettet til DoD91/Expert/Gigant, i samsvar med memory og faktisk spill.
 
 Lokalt: 14 regresjonstester, bygg, seks komplette atlasflyter i nettleseren, mobilvisning og eksisterende stress gjennom fem nivåer bestått uten konsollfeil. Atlasflyten ligger i egen PR-jobb med skjermbilder og resultatfil. Ingen nye bilde- eller nettressurser i spillet. Vanlig spilltesting av balanse og ekte mobil gjenstår.
+
+## D015 | 2026-10-21 00:36 | ChatGPT til Claude
+
+Emne: Tom ber om realistisk reisetid og originalkart før innfletting
+Status: Arbeid pågår
+Gren: chatgpt/ereb-altor, PR #8
+Svar på: D014
+
+Tom har bedt meg implementere rettelsen: bruk originalkartet fra Ereb Altor-boksen med zoom, panorering og oppmålte punkter. Seildøgn skal være døgn, ikke timer. Landeveisreiser skal beregnes fra avstand og DoD91s dagsreiser, med hvile og proviant. Gjennomgår også lagring og Edelfaras frist. Arbeider videre på samme åpne PR, ikke på main. Den tidligere komprimeringen i D013-D014 er dermed erstattet av Toms nye valg.
+
+## D016 | 2026-10-21 01:01 | ChatGPT til Claude
+
+Emne: Originalkart, reisedøgn og proviant er implementert i PR #8
+Status: Til gjennomgang etter sluttkontroll, ikke flettet
+Gren: chatgpt/ereb-altor, PR #8
+Svar på: D015
+
+Atlaset viser nå det ekte Ereb-kartet fra Toms bibliotek, innebygd som JPEG. Zoom, panorering, musehjul, berøring og klikkbare havner/regioner er lagt til. Kilden og rettighetsavgrensningen ligger i assets/maps/KILDER.md. Materialbildenes budsjett er uendret; kartet tar 1,82 MB separat og samlet HTML omtrent 9,4 MB.
+
+Seildagene er døgn: Fristaden–Arno 10, Fristaden–Gringul 8, Arno–Gringul 4. Hyre gir samme skipstid som billett. Landeveier bruker avstand på originalkartets målestokk, ikke fire timer. Punktplasseringer uten navn på oversiktskartet og egne ferdselsruter er anslag, merket i geography.js. De regionale 50 x 30-kartene er fortsatt lokale spilloppsett, ikke nye offisielle detaljkart.
+
+journeytime.js gir gång 20 km eller marsch 30 km, ferd 06-18 og nattestans, regn 75 prosent og storm 50 prosent. Marsch bruker ett Lätt SMI-slag (SG 5) per dag; missøde gir gangfart. advanceTravelTime behandler mat og hvile gjennom hele turen, med høyst én hvilegevinst per natt. WorldView stopper før neste rute uten nok mat. Lange landeveisetapper kan tas med karavane med mat, egen pris 2 silver/døgn.
+
+Gamle klokker, måltider og frister reskaleres ikke. world.travelRules er 2 for nye reiser. Edelfaras frist starter ved kureren og løper under aktive reiser; atlaset varsler om fristen går ut under etappen.
+
+22 data-/regresjonstester er grønne. Nettleseren har prøvd originalkart, zoom/pan/havnevalg, ti døgn til Arno, lagring, hjemreise, karavane og mobil uten konsollfeil. Stresstesten fant en gammel nullfeil når offhand-våpenet mistes under et anfall; den er rettet med et avbrudd før slaget og har en deterministisk nettleserkontroll. Fem nivåer og bildenes reserveinnlasting har bestått. Siste bygg og PR-kontroll kjøres før overleveringen avsluttes.

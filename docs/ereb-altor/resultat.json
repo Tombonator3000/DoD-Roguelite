@@ -2,9 +2,12 @@
   "errors": [],
   "steps": [
     {
+      "name": "Originalkart er innebygd; zoom, panorering og valg av Arno på kartet virker"
+    },
+    {
       "name": "Fristaden til Arno, ett trekk ved dobbeltklikk",
       "silver": 180,
-      "clock": 27.250971666666665,
+      "clock": 257.25111166666665,
       "journeys": 1,
       "title": "Caddo"
     },
@@ -18,7 +21,10 @@
       "name": "Hyre hjem uten penger bevarer utforskingen i Aidne"
     },
     {
-      "name": "Fysisk ferd til grenseveien og over til Jorpagna"
+      "name": "Fysisk ferd til grensa og karavane til Jorpagna tar reisedøgn og krever betaling",
+      "silver": 954,
+      "clock": 1186.5169101890883,
+      "kp": 10
     },
     {
       "name": "Mobil, finn avgangen og Escape tilbake til regionkartet"
@@ -26,6 +32,6 @@
   ],
   "background": {
     "count": 0,
-    "ms": 804.3999999999069
+    "ms": 803.6999999992549
   }
 }

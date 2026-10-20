@@ -6,7 +6,7 @@ Sortert etter hva som gir mest spill for minst jobb.
 
 Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når pull requesten er inne. Se AGENTS.md.
 
-- ChatGPT (`chatgpt/ereb-altor`): kildebelagt atlas over Ereb og resten av Altor, flere regionale kart, havner og sjøreiser, lagring mellom regioner og en prioritert Ultima-plan. PR #7 er flettet inn.
+- ChatGPT (`chatgpt/ereb-altor`, PR #8): retter atlaset etter Toms bestilling: originalkart med zoom og panorering, målte avstander, bokas seildøgn, dagsmarsj/hvile/proviant og kontroller av frister og lagring.
 
 ## Nå
 
@@ -17,14 +17,15 @@ Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når p
 - [x] Edelfara utenfor Nordporten: reisekart med tid, sju områder (Ekeskogen, Sortmund, Ridderskors borg, Akershus, Akershus borg, Glimming, Lekhs leir) og hele eventyret Triangeldrama i Edelfara med tre mistenkte, ledetråder, villspor, frist på sju dager, allierte, Lekh på ulven og fire slutter i Pharynx (0.6)
 - [x] Verdenskart over Aidne og Drakdjupet i Fallout-stil (0.7): tåke, steder du kjenner eller finner, reise rute for rute, møter med Upptäcka fara og Smyga, Orientering, landsbyer, fire skjulte steder, proviant og sult, lagring på kartet. Se docs/verdenskart.md.
 - [x] Ereb-atlas og videre reiser (0.8): 31 regionale kart, 30 sjøruter, 28 landeveier, passasje og hyre med Sjökunnighet, egen utforsking og gamle lagringer. Kilder og grenser i docs/ereb-altor.md. Nye byer er fortsatt malområder.
+- [x] Toms rettelse til PR #8: originalkart med zoom/panorering, oppmålte avstander, seildøgn som døgn, gång/marsch med vær, nattestans og dagsproviant, samt karavane og vern av gamle klokker/frister.
 - [ ] Ultima-kampanje: vedvarende verdens-/person-/fraksjonstilstand ved siden av kloakkløpet. Definer nederlag og nytt løp, og versjoner lagringen før nye scenarioer bindes til dette.
 - [ ] Arno og Gringul som egne små byer med havn, bydeler, navngitte folk og ulike interesser. Caddos magiforbud har nå samtaletekst, men trenger vitner og faktiske reaksjoner.
 - [ ] Felles oppdragsformat og Edsbrytarna i Erebos som neste hele bokeventyr. Kilden er funnet, scenarioet er ikke implementert. Deretter Enhörningen och Drakormen i Hynsolge. Se docs/ereb-altor.md.
 - [ ] Utvid regionkartene etter kildekartene, med flere særpregede steder og møter. Samkarna, Soluna og Akrogal trenger underregioner; Orghin, Irendor og Drakarnas arkipelag gjenstår.
 - [ ] Sjøhendelser med flere løsninger, skip og besetning fra Kopparhavets Kapare. Nåværende overfart behandler tid og mat, uten sjøkamp eller hendelser.
-- [ ] Spilltest verdenskartet: er møtene for mange eller for få? Er 23 timer fra Fristaden til Edelfara for langt? Blir sulten et mas eller en fin grunn til å handle?
+- [ ] Spilltest verdenskartet med realistiske reisedøgn: møtefrekvens, dagsproviant, karavanepriser og hvile. Detaljkalibrer Aidnes lokale veier; dagens 50 x 30-utsnitt gir avstandsanslag.
 - [ ] Verdenskartet: flere landsbyer med egne folk og oppdrag (nå er alle landsbyer fra samme mal), Pendon og Ekeborg som egne byer, skip også fra Ardesch. Fristaden har sjøruter fra 0.8.
-- [ ] Verdenskartet: Rida og hester som halverer tida, og at været på kartet gjør reisen tregere (Bok II s. 5: dårlig vær -25 %, elendig -50 %).
+- [ ] Verdenskartet: Rida og hester med 25/40 km per reisedag. Værets -25/-50 prosent og gange/marsj finnes i rettelsen til 0.8.
 - [x] Packningen fra verdenskartet: sperret Slipp og dra til bakken, også for beltet og direkte dropEntry-kall (0.8). Utstyr og forbruk virker fortsatt fra kartet.
 - [ ] Spilltest Edelfara: holder sju dager, eller er det for romslig? Er leiren for hard alene og for lett med grevens soldater? Finner folk fram til Ulfmar og bevisene uten journalen?
 - [ ] Rida: hester i Sortmund og Akershus som korter ned reisetida på kartet, med et Rida-slag.

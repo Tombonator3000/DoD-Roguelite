@@ -2,6 +2,8 @@
 
 Gjennomgang og første utvidelse 20. oktober 2026, ChatGPT. Tom ba om videre utvikling, hele verden i Ultima-stil og bruk av [Drakar-biblioteket](https://kingafw.no/Drakar/index.html) til regler, scenarioer og verden.
 
+Rettet 21. oktober etter Toms bestilling: originalkart med zoom og panorering, oppmålte avstander og reisedøgn. Den første sammenpressingen av bokdager til timer er fjernet fra PR #8.
+
 Spillet har allerede mye av grunnlaget: sanntidskamp med DoD91, en by med døgnrytme og nøkkelordsamtaler, et helt bokeventyr i Edelfara, lagring og et reisekart med møter. Det som manglet for en større verden, var forbindelse mellom regioner. Det som fortsatt mangler for en lang Ultima-kampanje, er mer særpreget innhold og varige følger av spillerens handlinger.
 
 ## Det som er lagt inn i 0.8
@@ -34,7 +36,9 @@ Utforsking og besøk huskes mellom reisene. Autolagringen etter ankomst gjenoppr
 
 Reglene er fortsatt DoD 4.0 fra 1991, med Expert og Gigant. Kontrakten står i [IMPLEMENTERING.md](regler/IMPLEMENTERING.md). De gamle 2023-instruksene i AGENTS.md er rettet så neste utvikler følger det som faktisk brukes.
 
-Verdensgeografien bygger på Ereb Altor-boksen fra 1989. Aidne bruker fortsatt den nyere geografien Tom valgte 8. oktober. Dette er et bevisst møte mellom utgaver; Kardunien og dagens Ereno flyttes ikke tilbake til eldre plasseringer. Atlasets kystlinjer er tegnet for spillet, og regionkartene er egne terrengoppsett. De er navigasjonshjelp, ikke nøyaktige avtegninger av bokkartene. Ingen kartbilder eller hele boktekster er bygget inn.
+Verdensatlaset viser originalkartet fra Ereb Altor-boksen fra 1989. Hele motivet er bygget inn som JPEG, med zoom, panorering, berøring og klikkbare markører. Det hentes ikke bilder fra nettet under spilling. Kartets 100 svenske mil tilsvarer 1000 km. Bildekilde og rettighetsavgrensning står i [assets/maps/KILDER.md](../assets/maps/KILDER.md); bokillustrasjonen er ikke merket som vår egen MIT-kunst.
+
+Aidnes lokale rutenett og steder beholder 2024-geografien Tom tidligere valgte, med Ereno sør for Fristaden. De andre regionkartene er fortsatt egne terrengoppsett. Rutenes avstander kalibreres mot regionutsnitt fra originalkartet, mens lokale veier og bygater fortsatt trenger detaljerte kildekart. Noen havner er omtalt i bøkene uten å være navngitt på oversiktskartet. Disse punktene er anslått ved den kildeførte kysten og merket `estimated` i `geography.js`. Det gjelder blant annet Tricilve, Mastika Agga og Krilloan/Kiorsham. Vi har ikke funnet på nøyaktige bokkoordinater.
 
 Sidelenkene under viser PDF-sider i biblioteket, som kan avvike fra sidetallet trykt på arket.
 
@@ -48,7 +52,15 @@ Sidelenkene under viser PDF-sider i biblioteket, som kan avvike fra sidetallet t
 | [Krilloan I](https://kingafw.no/Drakar/boker/35697e393a6b/les-hele-boka.html), «Geografi: Kiorsham» | Krilloan ved Ormsjön og omlasting via Kiorsham på Kopparhavssiden |
 | [Spelledarboken](https://kingafw.no/Drakar/boker/5d1c66369cd1/les-hele-boka.html), [Trakorien](https://kingafw.no/Drakar/boker/3605eb62c335/les-hele-boka.html) og [Kopparhavets Kapare](https://kingafw.no/Drakar/boker/f58270b411fc/les-hele-boka.html) | Videre kildestoff for regioner og fremtidig innhold |
 
-25 sjøruter har dager fra reisetabellen som `bookDays`. For å passe den sammenpressede målestokken brukes én bokdag som én spilltime. Fristaden til Arno tar derfor 10 spilltimer, mens Arno til Gringul tar 4. Dette er en spilltilpasning, ikke påstand om at bokas overfart tar ti timer. Billettprisen, muligheten til å ta hyre, tidsøkningen ved hyre, de fem ekstra sjørutene og alle landeveisetappene er egne tilpasninger, merket `uv: true`. Mat er inkludert på skip og behandles gjennom hele turen; én porsjon skal ikke mette en hel ukes reise. Til lands brukes vanlig proviant og sult.
+25 sjøruter har dager fra reisetabellen som `bookDays`. Fristaden–Arno tar **10 spilldøgn**, Fristaden–Gringul åtte og Arno–Gringul fire. Hyre betaler passasjen med arbeid; skipet bruker samme reisetid. Mat er inkludert på skip og behandles gjennom hele turen. De fem egne sjørutene er avstandsanslag ved 100 km per døgn, merket `uv: true`.
+
+Landeveisetapper har oppmålte ruter og kilometer i `geography.js`. De er anslåtte ferdselsveier på kartet, ikke påstått offisielle veilinjer. Etappen gjennom Demontungan er omtrent 1364 km og krever flere måneder til fots med fjellfaktoren. Ingen landeveisetapper har lenger standardtiden fire timer.
+
+DoD91 Bok II s. 5 gir gång 20 km og marsch 30 km på tolv timers ferd. Resten av døgnet er hvile; i spillet går dagsetappene fra seks til atten. Regn gir 75 prosent distanse, uvær 50 prosent. Marsch bruker ett Lätt SMI-slag (SG 5) per dag. Mislykket slag gir vanlig gangfart den dagen, som vår tilpasning av bokas lille missøde. Skog uten vei gir 65 prosent fart, fjell 50 prosent; dette er egne terrengfaktorer.
+
+Spilleren får tidsanslag, matbehov og eventuelle aktive frister før avreise. Egen proviant spises hver dag. Regionreisen stopper før neste rute hvis maten ikke rekker; den kan fortsettes etter handel eller Överlevnad. En hel landeveisetappe kan tas med karavane med mat underveis, til en egen spillpris på to silver per døgn. Dette gjør lange ekspedisjoner mulige uten å bære måneders mat i sekken. Nattestans gir hvilehelbredelse og PSY bare når spilleren har mat. Tid, terreng, mat og vær avvikles raskt i virkeligheten, selv om kalenderen flytter seg mange døgn.
+
+Edelfaras sjudagersfrist starter fortsatt ved funnet av kureren. Overfarten dit starter ikke scenarioet. Når scenarioet er i gang, løper fristen videre under reiser, og atlaset varsler om den utløper under etappen. Gamle lagringer beholder klokke, siste måltid og eksisterende frister; historisk tid blir ikke ganget opp. Nye reiser bruker `world.travelRules = 2`.
 
 Mastika Agga ligger i Barbia og tar imot varer fra Nargur. Stabul ligger nedenfor fossene som sperrer vanlig seilas inn til Golwyndas sötvattenshav. Krilloan har ikke fått en oppdiktet ordinær skipsrute gjennom Vägen bort. Disse skillene er viktige når mer innhold legges til.
 
@@ -85,7 +97,7 @@ Bokas gruppestørrelser og utfordringer må tilpasses én rollperson. Behold nav
 
 ### 4. La reisen gi valg
 
-Legg til et lite sett sjøhendelser med flere løsninger: storm med Sjökunnighet, syk sjømann med läkekonst, kontroll av last med sosial ferdighet, og havari med valg om å hjelpe. Deretter hester og Rida, vær som påvirker fart og proviant, og flere havner i Aidne. Nåværende hyre er bevisst enkel og sikrer at en blakk spiller kan komme hjem. Ikke fjern den uten en annen fungerende vei tilbake.
+Legg til et lite sett sjøhendelser med flere løsninger: storm med Sjökunnighet, syk sjømann med läkekonst, kontroll av last med sosial ferdighet, og havari med valg om å hjelpe. Deretter hester og Rida og flere havner i Aidne. Vær, dagsreiser og karavaner finnes nå som første grunnlag. Hyre sikrer at en blakk spiller kan komme hjem sjøveien.
 
 Det skal være mulig å velge en rask, dyr tur eller en billig tur med en annen risiko. Bruk regelnotatene i [regler/](regler/) når reise og sjøfart utvides. Vis tid, mat og pris før beslutningen.
 
@@ -99,7 +111,8 @@ Behold WebGL 2 og three r170 mens dette bygges. De viktige gevinstene nå kommer
 
 ## Teknisk overlevering
 
-- `atlasdata.js` er land, korte sammendrag, kildepekerne og scenariokatalogen. Katalogen lover ikke nye spillbare scenarioer.
+- `atlasdata.js` er land, korte sammendrag, kildepekerne og scenariokatalogen. Markørene kommer fra `geography.js`. Katalogen lover ikke nye spillbare scenarioer.
+- `geography.js` er bildekoordinater på en referanse 1856 x 1333 og skala 1000 km per 189 piksler. `journeytime.js` beregner dagsetapper, nattestans og værskifter. Ikke bytt kartbilde eller målestokk uten å oppdatere kalibreringen.
 - `regionalmaps.js` gir globale sted-ID-er, uendrede Aidne-data, nye terrengoppsett og toveis forbindelser. Regionenes navn og plassering er kildeført; lokale veier og pass er laget for navigasjon i spillet.
 - `worldtravel.js` bruker aktivt regionkart. `G.run.world.region` velger kart, og `maps[id]` lagrer utforsking. `known`, `done` og `cleared` bruker globale sted-ID-er. Oppslag for vei og sted må oppdateres ved regionbytte.
 - `atlastravel.js` sjekker avgangssted, pris og spilltilstand før avreise, behandler klokke og mat, og beholder de siste 80 reisene. Atlaset håndterer ikke sjøkamper.
@@ -112,6 +125,6 @@ Behold WebGL 2 og three r170 mens dette bygges. De viktige gevinstene nå kommer
 
 `tools/test/atlas-browser.mjs` kjører mot den ferdige HTML-fila fra Pages-undermappa med Playwright. Den prøver reise fra Fristaden til Arno, vern mot dobbeltkjøp, samtaler i Arno, Trakorien, last av en eldre Arno-lagring, gratis hjemreise, en fysisk grenseovergang, inventarvernet og mobilvisning. Konsollfeil gjør testen rød. Egen atlasjobb i PR-kontrollen lagrer skjermbilder og resultatfil som `verdensatlas-test`.
 
-Den eksisterende stresstesten `stress('tjuv', 20)` gjennom fem nivåer er også kjørt uten konsollfeil. Bygget beholder de 50 innebygde bildene på 3 856 040 byte og trenger ingen nye eksterne ressurser. Automatisk mobiltest er ikke en spilltest på fysisk telefon. Reisefrekvens, sult og nye regioners vanskelighetsgrad trenger fortsatt vanlig spilltesting.
+Bygget beholder de 50 material-/UI-bildene på 3 856 040 byte. Originalkartet bygges inn separat med 1 817 818 byte. HTML-fila er omtrent 9,4 MB og er under grensen på 16 MiB. Ingen nye eksterne ressurser hentes under spilling. Automatisk mobiltest er ikke en spilltest på fysisk telefon. Reisefrekvens, økonomi og nye regioners vanskelighetsgrad trenger fortsatt vanlig spilltesting.
 
-Lokalt 20. oktober: alle 14 regresjonstester, bygg og alle seks atlasflyter bestod. [Nettleserresultatet](ereb-altor/resultat.json) har ingen konsollfeil. Bilder og automatisk test bruker headless Chromium med programvaretegning; det er ingen måling av ytelse på en spillmaskin.
+22 regresjonstester dekker nå også målestokk, reisedøgn, nattestans, vær, proviant, karavane og frister uten å reskalere gammel tid. [Nettleserresultatet](ereb-altor/resultat.json) og bildene oppdateres fra det ferdige bygget. Testen prøver også kartets zoom, panorering og havnevalg. Headless Chromium bruker programvaretegning; dette er ingen måling av ytelse på en spillmaskin.

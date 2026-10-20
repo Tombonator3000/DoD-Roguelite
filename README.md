@@ -6,8 +6,9 @@ Laget med three.js r170. Musikk, lyd, fiendemodeller og effekter genereres i net
 
 ## Nytt i 0.8: ut i Ereb Altor
 
-- Åpne «Ereb Altor og sjøreiser» fra regionkartet. Atlaset forbinder 31 regioner med 30 sjøruter og 28 landeveier, fra Aidne og Kopparhavet til Samkarna, Soluna og Akrogal.
+- Åpne «Ereb Altor og sjøreiser» fra regionkartet. Atlaset bruker originalkartet fra Ereb-boksen med zoom, panorering og klikkbare reisemål. Det forbinder 31 regioner med 30 sjøruter og 28 landeveier.
 - Reis til avgangshavna eller grenseveien først. Kjøp passasje eller ta hyre om bord med Sjökunnighet. Mat er inkludert på skip, og hyre gir en vei hjem uten silver.
+- Bokas seildøgn er spilldøgn: Fristaden–Arno tar ti dager. Til lands brukes oppmålte avstander, gång 20 km eller marsch 30 km per reisedag, vær og nattestans. Egen proviant brukes dag for dag; du kan også betale for karavane med mat underveis.
 - Regionene har egne reisekart og husker utforskingen. Gamle 0.7-lagringer fortsetter i Aidne. Havner og leirer kan besøkes i 3D, med lokale rykter, handel og proviant.
 - Dette er grunnlaget for en større verden. De nye reisekartene er skjematiske, og byene bruker foreløpig områdemaler. Edelfara er fortsatt det ferdige bokeventyret; flere scenarioer er kildeført for videre arbeid.
 - Kilder fra Toms Drakar-bibliotek, bilder og konkret plan for en Ultima-kampanje: [Ereb Altor og veien videre](docs/ereb-altor.md).
@@ -148,7 +149,9 @@ src/
   ivan.js       oppdraget Triangeldrama i Edelfara: ledetråder, frist, journal
   travel.js     reisekartet over Edelfara
   worldmap.js   verdenskartet over Aidne: terreng, veier, steder, regioner, møter (ren data)
-  atlasdata.js  land, kilder, havner, scenariokatalog og egen atlasgeografi
+  atlasdata.js  land, kilder, havner, scenariokatalog og kartmarkører
+  geography.js  oppmålingspunkter, målestokk og ruter på originalkartet
+  journeytime.js dagsmarsj, vær, nattestans og visning av reisedøgn
   regionalmaps.js regionale reisekart, globale sted-ID-er og forbindelser
   atlastravel.js passasje, hyre, klokke og reisehistorikk
   atlasview.js  verdensatlaset, ruteplan og avganger
