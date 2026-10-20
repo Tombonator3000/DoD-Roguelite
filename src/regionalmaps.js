@@ -2,6 +2,8 @@
 // De øvrige kartene er egne skjematiske reisekart; byenes fulle gatenett kommer senere.
 import { WW, WH, TERRAIN, PLACES as AIDNE_PLACES, ROADS, RIVERS, REGIONS } from './worldmap.js';
 import { ATLAS_REGIONS, ATLAS_PORTS } from './atlasdata.js';
+import { geoForPlace, seaTrace, landTrace, distanceKm } from './geography.js';
+import { walkSchedule } from './journeytime.js';
 
 export const PLACES = Object.fromEntries(Object.entries(AIDNE_PLACES).map(([id, p]) => [id, { ...p, map: 'aidne' }]));
 const cache = {};
@@ -32,15 +34,18 @@ for (const r of Object.values(ATLAS_REGIONS)) if (r.id !== 'aidne' && !hubs[r.id
 }
 
 // Transport mellom kart. Alle priser, forbindelsestider til lands og ekspedisjonsruter er uv.
-// Bokas seildager forkortes til spilltimer, som Toms sammenpressede Aidne-målestokk.
+// Bokas seildager er kalenderdøgn. Anslåtte ruter bruker kartets avstand.
 export const CONNECTIONS = [];
 const firstHub = region => region === 'aidne' ? 'fristaden' : hubs[region]?.[0];
-function sea(a, b, hours, o = {}) {
+function sea(a, b, days, o = {}) {
+  const from=PLACES[a].map,to=PLACES[b].map,route=seaTrace(a,b,from,to),km=distanceKm(route);
+  const bookDays=o.original?null:days;
+  const hours=(bookDays??Math.ceil(km/100))*24; // 100 km/døgn på egne sjøruter er uv.
   CONNECTIONS.push({ id: a + '__' + b, a, b, from: PLACES[a].map, to: PLACES[b].map,
-    kind: 'skip', hours, fare: Math.max(8, Math.ceil(hours * 2)), uv: true,
-    source: 'kampanj', sourcePage: o.original ? 61 : 41, bookDays: o.original ? null : hours, ...o });
+    kind: 'skip', hours, fare: Math.max(8, Math.ceil(hours/24 * 2)), uv: true,route,km,
+    source: 'kampanj', sourcePage: o.original ? 61 : 41, bookDays, ...o });
 }
-// Kampanjboken, PDF s. 41, raden Fristaden. Hver time svarer her til én bokført dag.
+// Kampanjboken, PDF s. 41, raden Fristaden. Dager beholdes som dager.
 for (const [port, days] of [['arno',10],['gringul',8],['tricilve',55],['mercana',46],['staden_o',61],['kapahlt',60],['halle',62],['mastika_agga',87],['cerevallis',117],['jorgund',33],['fervidun',41],['tyros',35],['khaanikel',130],['stabul',42],['melukha',35]]) sea('fristaden', port, days);
 for (const [a,b,h] of [['arno','gringul',4],['arno','melukha',25],['arno','tricilve',45],['gringul','jorgund',25],['jorgund','tyros',13],['tyros','stabul',22],['halle','kapahlt',16],['kapahlt','tricilve',18],['mercana','staden_o',22],['cerevallis','mastika_agga',30]]) sea(a,b,h);
 sea('tricilve', firstHub('marjura'), 30, { original: true, expedition: true });
@@ -61,8 +66,13 @@ function gate(region, target) {
     x,y, map: region, kind: 'gateway', size: 'liten', target, original: true };
   return id;
 }
-function land(a,b,hours = 4) {
-  CONNECTIONS.push({ id: a + '__' + b, a: gate(a,b), b: gate(b,a), from: a, to: b, kind: 'landevei', hours, fare: 0, uv: true, source: 'kampanj', sourcePage: 61 });
+function land(a,b) {
+  const route=landTrace(a,b),km=distanceKm(route),terrain=a==='grynnerbergen'||b==='grynnerbergen'||b==='akrogal'?'^':'.';
+  const hours=walkSchedule(km,6,{terrain,road:terrain!== '^'}).hours;
+  const departure=gate(a,b),arrival=gate(b,a);
+  PLACES[departure].geo=route[0];PLACES[arrival].geo=route[route.length-1];
+  CONNECTIONS.push({ id: a + '__' + b, a:departure,b:arrival, from:a,to:b,kind:'landevei',hours,fare:0,uv:true,route,km,terrain,
+    source:'karta',estimated:true });
 }
 for (const [a,b] of [
   ['aidne','goiana'],['aidne','jorpagna'],['goiana','kasenu'],['kasenu','magilre'],['kasenu','klomellien'],
@@ -73,6 +83,8 @@ for (const [a,b] of [
   ['berendien','hynsolge'],['hynsolge','grynnerbergen'],['grynnerbergen','landori'],
   ['hynsolge','nidland'],['hynsolge','krun'],['nidland','krun'],['nidland','akrogal'],
 ]) land(a,b);
+
+for(const [id,p] of Object.entries(PLACES)) p.geo ||= geoForPlace(id,p.map);
 
 export function defaultPlace(region) { return firstHub(region); }
 
@@ -109,7 +121,7 @@ export function getRegionMap(id = 'aidne') {
 
 // En kant kan brukes i begge retninger; id og pris er de samme.
 export function connectionsFrom(region) {
-  return CONNECTIONS.filter(c => c.from === region || c.to === region).map(c => c.from === region ? c : { ...c, a:c.b, b:c.a, from:c.to, to:c.from });
+  return CONNECTIONS.filter(c => c.from === region || c.to === region).map(c => c.from === region ? c : { ...c, a:c.b, b:c.a, from:c.to, to:c.from,route:c.route.slice().reverse() });
 }
 
 // Finn første etappe. Gå til havna/grenseveien på regionkartet før du kan reise.

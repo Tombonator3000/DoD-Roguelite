@@ -1,7 +1,7 @@
 // Verdenskartet over Aidne og Drakdjupet: ren data uten three.js, så kartet kan sjekkes i node.
 // Kilde for hvor ting ligger: kartet i «Ereb Altor: Kopparhavet» (Helmgast 2024, Toms Drive) og
-// «Hjältar från Kopparhavet» (2025) s. 33-37. Tom valgte 2024-kartet og en sammenpresset målestokk
-// (2026-10-08): én rute er omtrent én time på vei, ikke en dagsmarsj. Pharynx og Edelfara står ikke
+// «Hjältar från Kopparhavet» (2025) s. 33-37. Tom valgte 2024-geografien (2026-10-08).
+// Fra 0.8 brukes realistiske avstander og dagsreiser, se geography.js/journeytime.js. Pharynx og Edelfara står ikke
 // på 2024-kartet. De er satt inn ved bukta sør for Valon, slik de gamle bøkene (Ivanhoe, 1988) har dem
 // midt i Zorakin ved kysten. Karad Batur ligger i Vorgabergen like ved Fristaden, Ereno sør for byen.
 // x mot øst, y mot sør. Terrenget er tegnet om fra kartet, ikke kopiert: ett tegn per rute.
@@ -42,7 +42,7 @@ export const TERRAIN = [
   '..~~~~~~~~~.~..~~~~~~~~~~~~~~~~~~~...~~^.~.~..FFF^',
 ];
 
-// Timer det tar å krysse en rute til fots. Vei gir alltid 1. Hemvist er koden i Bok II s. 24
+// Eldre terrengvekter i feltet hours, ikke lenger faktisk reisetid. Hemvist er koden i Bok II s. 24
 // (2 öppen skog, 3 tät skog, 4 slätter, 5 berg och högland, 7 vattendrag, 12 kuster, 13 öppet hav).
 // Timene er spillets egne, i samme forhold som dagsmarsjene i Bok II s. 5 (uv).
 export const TERR = {

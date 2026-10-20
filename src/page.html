@@ -887,7 +887,12 @@ body:not(.touch) #dlg-kw .kw:nth-child(-n+9)::before { content: counter(kw); mar
 .atlas-head h2 { margin: 2px 0; }
 .atlas-body { display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: 20px; margin-top: 14px; }
 .atlas-chart { min-width: 0; }
-#atlas-map { width: 100%; height: auto; display: block; border: 1px solid #8c805e; touch-action: manipulation; }
+#atlas-map { width: 100%; height: auto; display: block; border: 1px solid #8c805e; touch-action: none; cursor: grab; }
+#atlas-map:active { cursor: grabbing; }
+.atlas-tools { display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;align-items:center; }
+.atlas-tools output { margin-left:auto;font-size:13px; }
+.w-pace { display:block;font-size:13px; }
+.w-pace select { width:100%;padding:6px;color:#30271e;background:#eee1c3;margin:4px 0; }
 .atlas-chart p { font-style: italic; opacity: .8; font-size: 13px; }
 .atlas-side { min-width: 0; }
 .atlas-side label { display: block; font-family: var(--ui); font-size: 14px; }
@@ -1214,6 +1219,7 @@ body:not(.touch) #dlg-kw .kw:nth-child(-n+9)::before { content: counter(kw); mar
       <aside class="w-side">
         <div class="w-here" id="w-here"></div>
         <div class="w-info" id="w-info"></div>
+        <label class="w-pace" for="w-pace">Ferd til fots<select id="w-pace"><option value="walk">Gång, 20 km per reisedag</option><option value="march">Marsch, 30 km og Lätt SMI</option></select></label>
         <div class="w-btns">
           <button class="btn" id="btn-w-atlas">Ereb Altor og sjøreiser</button>
           <button class="btn primary" id="btn-w-go">Reis</button>
@@ -1233,12 +1239,17 @@ body:not(.touch) #dlg-kw .kw:nth-child(-n+9)::before { content: counter(kw); mar
     <div class="atlas-head"><div><div class="eyebrow">Verden utenfor bymuren</div><h2>Ereb Altor</h2></div><button class="btn small" id="btn-atlas-back">Til regionkartet</button></div>
     <p id="atlas-place"></p>
     <div class="atlas-body">
-      <div class="atlas-chart"><canvas id="atlas-map" width="900" height="702" aria-label="Atlas over Ereb og nabokontinentene"></canvas><p>Skjematisk reisekart. Velg et land på kartet eller i lista.</p></div>
+      <div class="atlas-chart">
+        <div class="atlas-tools"><button class="btn small" id="atlas-zoom-out">Zoom ut</button><button class="btn small" id="atlas-zoom-in">Zoom inn</button><button class="btn small" id="atlas-fit">Hele kartet</button><button class="btn small" id="atlas-focus">Vis målet</button><output id="atlas-zoom" aria-live="polite">100 %</output></div>
+        <canvas id="atlas-map" width="900" height="646" tabindex="0" aria-label="Originalkart over Ereb Altor. Dra for å panorere. Bruk zoomknappene eller musehjulet."></canvas>
+        <p>Dra kartet for å flytte utsnittet. Velg et reisemål på kartet eller i lista. <a href="https://kingafw.no/Drakar/boker/ae66767c8db9/les-hele-boka.html" target="_blank" rel="noopener">Originalkart: Ereb Altor, 1989</a>.</p>
+      </div>
       <aside class="atlas-side">
         <label for="atlas-country">Land og region</label><select id="atlas-country"></select>
         <h3 id="atlas-name"></h3><p id="atlas-lore"></p><p id="atlas-rumor"></p>
         <div class="atlas-plan"><p id="atlas-route"></p>
           <label id="atlas-mode-wrap" for="atlas-mode">Passasje<select id="atlas-mode"><option value="passenger">Kjøp billett</option><option value="crew">Arbeid om bord, uten billett</option></select></label>
+          <label id="atlas-land-wrap" for="atlas-land-mode">Landevei<select id="atlas-land-mode"><option value="walk">Gång med egen proviant</option><option value="march">Marsch med egen proviant</option><option value="caravan">Karavane med mat, 2 sm per døgn</option></select></label>
           <button class="btn" id="btn-atlas-find">Finn avgangen</button><button class="btn primary" id="btn-atlas-travel">Reis</button>
         </div>
         <h3>Forbindelser fra regionen</h3><div id="atlas-departures"></div>

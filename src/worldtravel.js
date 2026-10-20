@@ -8,6 +8,8 @@ import { PLACES, getRegionMap, defaultPlace } from './regionalmaps.js';
 import { ATLAS_REGIONS } from './atlasdata.js';
 import { makeCons, giveItem } from './inventory.js';
 import { d } from './rules.js';
+import { cellDistance } from './geography.js';
+import { walkSchedule, terrainFactor } from './journeytime.js';
 
 const idx = (x, y) => y * WW + x;
 export const inWorld = (x, y) => x >= 0 && y >= 0 && x < WW && y < WH;
@@ -50,8 +52,24 @@ export const passable = (x, y) => inWorld(x, y) && TERR[terrainAt(x, y)]?.hours 
 // timer for å gå inn i en rute
 export function stepHours(x, y) {
   if (!passable(x, y)) return Infinity;
-  if (roadAt(x, y)) return 1;
-  return TERR[terrainAt(x, y)].hours;
+  return cellDistance(W().region,1,0)/(20/12*terrainFactor(terrainAt(x,y),!!roadAt(x,y)));
+}
+
+export function marchDistance(day) {
+  const w=W();
+  if(w.marchDay!==day) {
+    const r=G.player.roll('SMI',{sg:5,label:'Marsch: Lätt SMI',noExp:true,noHero:true,noBonus:true});
+    w.marchDay=day;w.marchPassed=r.success;
+    G.ui?.logRoll?.(r,r.success?'Du holder marsjfarten.':'Et lite missøde gjør at du må holde vanlig gangfart resten av dagen.');
+  }
+  return w.marchPassed?30:20;
+}
+
+export function stepPlan(px,py,x,y,clock=G.run.clock,pace=W().pace||'walk',controls=false) {
+  const km=cellDistance(W().region,x-px,y-py),options={pace,terrain:terrainAt(x,y),road:!!roadAt(x,y),weather:t=>G.weather?.kindAt?.(t)||'klart'};
+  const plan=walkSchedule(km,clock,{...options,dayKm:controls&&pace==='march'?marchDistance:null});
+  plan.maxHours=pace==='march'?walkSchedule(km,clock,{...options,pace:'walk'}).hours:plan.hours;
+  return plan;
 }
 
 // --- tilstanden i G.run.world -----------------------------------------------------------------
@@ -70,6 +88,7 @@ export function W() {
   if (!w.region || ATLAS_REGIONS[w.region]?.id !== w.region) w.region = 'aidne';
   if (!w.maps || typeof w.maps !== 'object') w.maps = {};
   w.known ||= {}; w.done ||= {}; w.cleared ||= {};
+  w.travelRules=2;
   if (!w.seen || w.seen.length !== WW * WH) w.seen = new Array(WW * WH).fill(0);
   const snapshot = w.maps[w.region] ||= {};
   snapshot.x = w.x; snapshot.y = w.y; snapshot.seen = w.seen;
@@ -150,7 +169,7 @@ export function findPath(sx, sy, tx, ty) {
       if (!passable(nx, ny)) continue;
       // ikke skjær hjørner over vann
       if (dx && dy && (!passable(x + dx, y) || !passable(x, y + dy))) continue;
-      const c = stepHours(nx, ny) * (dx && dy ? 1.41 : 1) * (roadAt(nx, ny) && roadAt(x, y) ? 0.9 : 1);
+      const c = cellDistance(W().region,dx,dy)/(20/12*terrainFactor(terrainAt(nx,ny),!!roadAt(nx,ny))) * (roadAt(nx,ny)&&roadAt(x,y)?.9:1);
       const nk = idx(nx, ny);
       if (g[k] + c < g[nk]) { g[nk] = g[k] + c; prev[nk] = k; open.push([g[nk] + h(nx, ny), nx, ny]); }
     }
@@ -163,12 +182,12 @@ export function findPath(sx, sy, tx, ty) {
 }
 
 export function pathHours(path) {
-  let h = 0;
+  let at=G.run.clock;
   for (let i = 1; i < path.length; i++) {
     const [x, y] = path[i], [px, py] = path[i - 1];
-    h += stepHours(x, y) * (x !== px && y !== py ? 1.41 : 1);
+    at=stepPlan(px,py,x,y,at).end;
   }
-  return h;
+  return at-G.run.clock;
 }
 
 // --- møter ------------------------------------------------------------------------------------
@@ -243,12 +262,12 @@ export function countFood() {
   return P.bag.filter(it => it && it.type === 'cons' && (it.cid === 'proviant' || it.cid === 'brod')).reduce((a, it) => a + (it.qty || 1), 0);
 }
 
-export function tickHunger() {
+export function tickHunger(quiet=false) {
   if (!G.run?.world || !G.player) return;
   const w = W();
   if (hoursSinceMeal() >= 24) {
     const what = eatFromBag();
-    if (what) { ate(what === 'proviant' ? 'Du spiser en dagsranson. Tørket kjøtt, hardt brød og en bit ost.' : 'Du spiser brødet fra sekken. Det får holde.'); return; }
+    if (what) { ate(quiet?null:what === 'proviant' ? 'Du spiser en dagsranson. Tørket kjøtt, hardt brød og en bit ost.' : 'Du spiser brødet fra sekken. Det får holde.'); return; }
   }
   const h = hoursSinceMeal();
   if (h >= 24 && !w.hungryTold) { w.hungryTold = true; G.ui?.log('<b class="c-cond">Du er sulten.</b> Uten mat gror ikke sårene når du sover, og PSY kommer ikke tilbake av seg selv. Kjøp proviant, eller let etter mat (Överlevnad).'); }
@@ -261,6 +280,31 @@ export function tickHunger() {
       if (P.kp > 1) { P.kp -= 1; G.ui?.log('<b class="c-cond">Sulten.</b> Du mister 1 KP. Kroppen tærer på seg selv.'); G.ui?.flashDamage?.(); }
     }
   }
+}
+
+export function foodNeeded(hours) {
+  return Math.max(0,Math.floor((Math.min(24,G.run.clock-(W().fed??G.run.clock))+hours)/24));
+}
+
+// Behandle hvert døgn, også når en hel måned avvikles på ett klikk.
+// Nattestans helbreder bare når spilleren faktisk har hvilt minst seks timer og fått mat.
+export function advanceTravelTime(hours,{ meals=false,nights=[] }={}) {
+  const start=G.run.clock,w=W(),P=G.player;
+  if(meals&&start-w.fed>=24)ate();
+  tickHunger(true);
+  const ends=new Set(nights.filter(n=>n.end-n.start>=6).map(n=>n.end));
+  if(meals&&!nights.length) for(let t=Math.floor(start/24)*24+6;t<=start+hours;t+=24) if(t-start>=6)ends.add(t);
+  let recovered=0;
+  while(G.run.clock<start+hours-1e-7) {
+    const before=G.run.clock;
+    G.run.clock=Math.min(start+hours,before+1);
+    if(meals&&G.run.clock-w.fed>=24)ate();
+    tickHunger(true);
+    for(const end of ends) if(before<end&&G.run.clock>=end&&hungerLevel()===0) {
+      P.heal?.(d(3),true);P.gainPSY?.(P.maxPSY);recovered++;
+    }
+  }
+  return { hours,recovered };
 }
 
 // Överlevnad: let etter mat i en time. Lyckat gir én dagsranson, perfekt to. Ikke i byene.

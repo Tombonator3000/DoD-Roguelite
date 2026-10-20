@@ -50,6 +50,30 @@ try {
   assert.equal(await page.locator('#atlas-country option').count(),31);
   await page.locator('#atlas-country').selectOption('caddo');
   console.log('Atlaset er åpent');
+  assert.ok(await page.evaluate(()=>G.atlas.mapLoaded&&window.EREB_MAP.startsWith('data:image/jpeg;base64,')));
+  assert.ok((await page.locator('#atlas-route').innerText()).includes('10 døgn'));
+  const warning=await page.evaluate(()=>{
+    const old=G.run.ivan;
+    try{
+      G.run.ivan={stage:1,deadline:G.run.clock+24,flags:{}};G.atlas.refresh();
+      return document.querySelector('#atlas-route').textContent;
+    }finally{G.run.ivan=old;G.atlas.refresh();}
+  });
+  assert.ok(warning.includes('Fristen i Edelfara utløper'));
+  await page.locator('#atlas-zoom-in').click();
+  const beforePan=await page.evaluate(()=>({zoom:G.atlas.zoom,pan:G.atlas.pan.slice()}));
+  assert.ok(beforePan.zoom>1);
+  const box=await page.locator('#atlas-map').boundingBox();
+  await page.mouse.move(box.x+box.width*.5,box.y+box.height*.5);
+  await page.mouse.down();await page.mouse.move(box.x+box.width*.6,box.y+box.height*.6,{steps:4});await page.mouse.up();
+  assert.notDeepEqual(await page.evaluate(()=>G.atlas.pan),beforePan.pan);
+  await page.locator('#atlas-focus').click();
+  const arnoPoint=await page.evaluate(()=>G.atlas.mapToCanvas([434,1001]));
+  const focusedBox=await page.locator('#atlas-map').boundingBox();
+  await page.mouse.click(focusedBox.x+arnoPoint[0],focusedBox.y+arnoPoint[1]);
+  assert.equal(await page.evaluate(()=>G.atlas.preferredLeg),'fristaden__arno');
+  await page.locator('#atlas-fit').click();assert.equal(await page.evaluate(()=>G.atlas.zoom),1);
+  result.steps.push({name:'Originalkart er innebygd; zoom, panorering og valg av Arno på kartet virker'});
   await page.evaluate(()=> { G.atlasFrames=0; G.atlasFrameStart=performance.now(); G.savedRender=G.composer.render; G.composer.render=function(...args) { G.atlasFrames++; return G.savedRender.apply(this,args); }; });
   await page.waitForTimeout(800);
   const frames=await page.evaluate(()=> { G.composer.render=G.savedRender; return { count:G.atlasFrames,ms:performance.now()-G.atlasFrameStart }; });
@@ -61,7 +85,7 @@ try {
   await page.waitForFunction(()=>G.state==='world'&&G.run.world.region==='caddo'&&!G.game.wiping);
   const caddo=await page.evaluate(()=>({ silver:G.player.silver,clock:G.run.clock,journeys:G.run.world.journeys.length,title:document.querySelector('#w-map-title').textContent }));
   assert.equal(caddo.silver,start.silver-20); assert.equal(caddo.journeys,1);
-  assert.ok(Math.abs(caddo.clock-start.clock-10)<0.02); assert.equal(caddo.title,'Caddo');
+  assert.ok(Math.abs(caddo.clock-start.clock-240)<0.02); assert.equal(caddo.title,'Caddo');
   result.steps.push({ name:'Fristaden til Arno, ett trekk ved dobbeltklikk',...caddo });
   console.log('Ankom Caddo');
   await page.screenshot({ path:path.join(out,'caddo-kart.png'),timeout:90000 });
@@ -104,21 +128,32 @@ try {
   result.steps.push({ name:'Hyre hjem uten penger bevarer utforskingen i Aidne' });
   await page.locator('#btn-w-atlas').click();
   await page.locator('#atlas-country').selectOption('akrogal');
-  assert.equal(await page.locator('#btn-atlas-find').isVisible(),true);
+  assert.ok((await page.locator('#atlas-route').innerText()).includes('Etappene videre gir minst'));
   await page.setViewportSize({ width:390,height:844 });
   await page.screenshot({ path:path.join(out,'atlas-mobil.png'),fullPage:true,timeout:90000 });
   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth);
   assert.equal(overflow,false,'atlaset renner ut av mobilskjermen');
+  // Realistiske tider kan gjøre sjøveien til Hynsolge raskere mot Akrogal.
+  // Velg landeveien uttrykkelig for å prøve en fysisk grenseovergang.
+  await page.locator('[data-connection="aidne__jorpagna"]').click();
+  assert.equal(await page.locator('#btn-atlas-find').isVisible(),true);
   await page.locator('#btn-atlas-find').click();
   await page.waitForFunction(()=>G.state==='world');
   assert.ok(await page.evaluate(()=>G.worldview.sel?.length===2));
+  // Siste rute til grensa, med mat for flere reisedøgn. Hele regionruta er målt i datatestene.
+  await page.evaluate(()=>{G.run.world.x=47;G.run.world.y=17;G.player.bag.push({type:'cons',cid:'proviant',qty:15,kg:.6,name:'Proviant'});G.worldview.refresh();});
   await page.locator('#btn-w-go').click();
   await page.waitForFunction(()=>G.state==='atlas'&&!G.worldview.moving);
   assert.equal(await page.locator('#atlas-country').inputValue(),'jorpagna');
+  await page.locator('#atlas-land-mode').selectOption('caravan');
+  assert.equal(await page.locator('#btn-atlas-travel').isDisabled(),true,'blakk spiller kan ikke kjøpe karavane');
+  await page.evaluate(()=>{G.player.silver=1000;G.atlas.refresh();});
+  const landStart=await page.evaluate(()=>({silver:G.player.silver,clock:G.run.clock}));
   await page.locator('#btn-atlas-travel').click();
   await page.waitForFunction(()=>G.state==='world'&&G.run.world.region==='jorpagna'&&!G.game.wiping);
-  assert.equal(await page.evaluate(()=>G.player.silver),0);
-  result.steps.push({ name:'Fysisk ferd til grenseveien og over til Jorpagna' });
+  const land=await page.evaluate(()=>({silver:G.player.silver,clock:G.run.clock,kp:G.player.kp}));
+  assert.ok(land.silver<landStart.silver&&land.clock>landStart.clock+24&&land.kp>0);
+  result.steps.push({ name:'Fysisk ferd til grensa og karavane til Jorpagna tar reisedøgn og krever betaling',...land });
   await page.setViewportSize({ width:844,height:390 });
   await page.locator('#btn-w-atlas').click();
   await page.screenshot({ path:path.join(out,'atlas-mobil-liggende.png'),timeout:90000 });

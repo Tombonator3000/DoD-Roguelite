@@ -1,6 +1,7 @@
+import { EREB_MAP, REGION_GEO } from './geography.js';
 // Ereb og landene utenfor. Navn og relative plasseringer: Kampanjboken 1989,
 // PDF s. 10-14 og 59-64, samt det store Ereb-kartet i Toms kildebibliotek.
-// Dette er vår skjematiske atlasgeografi, ikke et kopiert kart eller presise grenser.
+// Markørene følger originalkartet. Regionkartene er fortsatt egne lokale oppsett.
 export const ATLAS_SOURCES = {
   kampanj: 'https://kingafw.no/Drakar/boker/3e37a844129d/les-hele-boka.html',
   spelare: 'https://kingafw.no/Drakar/boker/a3c541529260/les-hele-boka.html',
@@ -68,6 +69,11 @@ ATLAS_REGIONS.erebos = { id: 'erebos', name: 'Erebos', x: 41, y: 78, climate: 'v
   lore: 'Handelsøyene Dakkilo, Beyural, Targero og Tolokfe, med Gringul som en viktig møteplass.',
   rumor: 'Skip fra øst og vest bytter varer her. En avtale kan være verdt mer enn lasten, og et brutt løfte kan følge deg fra havn til havn.', source: 'spelare', sourcePage: 11 };
 
+for(const [id,r] of Object.entries(ATLAS_REGIONS)) {
+  r.geo=REGION_GEO[id].point;
+  r.x=r.geo[0]/EREB_MAP.width*100;r.y=r.geo[1]/EREB_MAP.height*100;
+}
+
 export const ATLAS_PORTS = Object.fromEntries(ports.map(([id, name, region]) => [id, { id, name, region, x: 9, y: 22, source: 'kampanj', sourcePage: 40 }]));
 export const ATLAS_SCENARIOS = [
   { id: 'edelfara', name: 'Triangeldrama i Edelfara', region: 'aidne', source: 'ivanhoe', state: 'spillbart', text: 'De tre adelsmennene, ledetrådene og fristen i Edelfara.' },
@@ -76,16 +82,4 @@ export const ATLAS_SCENARIOS = [
   { id: 'trakorien', name: 'Trakorien', region: 'trakorien', source: 'trakorien', state: 'verdensstoff', text: 'Øyene, trosretningene og handelshusene trenger egne folk og oppdrag.' },
   { id: 'kapare', name: 'Kopparhavets Kapare', region: 'samkarna', source: 'kapare', state: 'verdensstoff', text: 'Grunnlag for skip, pirater og egne sjøeventyr.' },
   { id: 'krilloan', name: 'Krilloan', region: 'samkarna', source: 'krilloan', state: 'verdensstoff', text: 'Kiorsham og Krilloan er grunnområder. Byens distrikter og eventyr krever videre arbeid.' },
-];
-
-// Egne kystlinjer i atlasets prosentkoordinater, for navigasjon mellom regioner.
-export const ATLAS_LAND = [
-  [[23,57],[25,48],[31,46],[29,39],[33,34],[31,27],[36,26],[34,19],[39,11],[43,16],[42,25],[47,23],[48,14],[52,17],[52,25],[60,24],[64,29],[64,36],[67,39],[64,47],[69,48],[74,53],[76,57],[71,63],[76,70],[75,79],[70,82],[66,77],[65,70],[59,68],[57,72],[52,69],[49,73],[44,68],[41,69],[39,65],[35,65],[33,75],[28,76],[25,72],[20,72],[19,66]],
-  [[10,26],[15,23],[17,28],[14,32],[10,30]], [[18,24],[20,28],[18,32],[16,30]], [[15,34],[19,33],[20,36],[17,37]],
-  [[14,17],[17,15],[20,18],[18,20]], [[7,49],[9,48],[10,53],[8,54]], [[14,46],[16,44],[17,48],[15,49]],
-  [[26,80],[29,78],[33,81],[32,84],[27,85]], [[36,76],[40,74],[44,77],[46,81],[42,83],[37,81]],
-  [[54,77],[59,73],[62,75],[59,80],[55,81]],
-  [[8,100],[9,94],[16,91],[22,95],[27,90],[31,95],[41,91],[45,94],[47,100]],
-  [[51,100],[53,93],[57,90],[62,92],[65,89],[71,90],[74,85],[78,94],[88,100]],
-  [[88,17],[100,13],[100,91],[94,88],[90,76],[84,73],[83,64],[78,60],[81,56],[89,55],[89,45],[85,39]],
 ];
