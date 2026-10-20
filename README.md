@@ -4,6 +4,14 @@ En spillbar prototype av et roguelite i stil med Diablo og Hades, med litt Ultim
 
 Laget med three.js r170. Musikk, lyd, fiendemodeller og effekter genereres i nettleseren. Materialene har egne AI-genererte bilder i malt stil, med prosedyriske teksturer som reserve. Anda og bildesettet bygges inn i HTML-fila. Se [teksturleveransen med før-/etterbilder](docs/teksturer.md) og [kilder og lisens](assets/tex/KILDER.md).
 
+## Nytt i 0.8: ut i Ereb Altor
+
+- Åpne «Ereb Altor og sjøreiser» fra regionkartet. Atlaset forbinder 31 regioner med 30 sjøruter og 28 landeveier, fra Aidne og Kopparhavet til Samkarna, Soluna og Akrogal.
+- Reis til avgangshavna eller grenseveien først. Kjøp passasje eller ta hyre om bord med Sjökunnighet. Mat er inkludert på skip, og hyre gir en vei hjem uten silver.
+- Regionene har egne reisekart og husker utforskingen. Gamle 0.7-lagringer fortsetter i Aidne. Havner og leirer kan besøkes i 3D, med lokale rykter, handel og proviant.
+- Dette er grunnlaget for en større verden. De nye reisekartene er skjematiske, og byene bruker foreløpig områdemaler. Edelfara er fortsatt det ferdige bokeventyret; flere scenarioer er kildeført for videre arbeid.
+- Kilder fra Toms Drakar-bibliotek, bilder og konkret plan for en Ultima-kampanje: [Ereb Altor og veien videre](docs/ereb-altor.md).
+
 ## Nytt i 0.7: verdenskart og bedre grafikk
 
 - Nordporten fører ut på et verdenskart over Aidne og Drakdjupet i stil med Fallout 1 og 2, tegnet etter 2024-kartet. Klikk på et sted og trykk Reis. Ruta går én time av gangen på veien, lengre i skog og fjell.
@@ -140,6 +148,10 @@ src/
   ivan.js       oppdraget Triangeldrama i Edelfara: ledetråder, frist, journal
   travel.js     reisekartet over Edelfara
   worldmap.js   verdenskartet over Aidne: terreng, veier, steder, regioner, møter (ren data)
+  atlasdata.js  land, kilder, havner, scenariokatalog og egen atlasgeografi
+  regionalmaps.js regionale reisekart, globale sted-ID-er og forbindelser
+  atlastravel.js passasje, hyre, klokke og reisehistorikk
+  atlasview.js  verdensatlaset, ruteplan og avganger
   worldtravel.js reisen på verdenskartet: tåke, veivalg, tid, møter, proviant og sult
   worldview.js  verdenskartet på skjermen
   areatemplates.js møter, landsbyer og steder fra mal

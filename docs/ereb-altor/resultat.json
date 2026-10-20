@@ -1,0 +1,31 @@
+{
+  "errors": [],
+  "steps": [
+    {
+      "name": "Fristaden til Arno, ett trekk ved dobbeltklikk",
+      "silver": 180,
+      "clock": 27.250971666666665,
+      "journeys": 1,
+      "title": "Caddo"
+    },
+    {
+      "name": "Arno har lokale folk og Caddos skikker i samtalen"
+    },
+    {
+      "name": "Lagring fra Arno gjenopprettes etter tur til Trakorien"
+    },
+    {
+      "name": "Hyre hjem uten penger bevarer utforskingen i Aidne"
+    },
+    {
+      "name": "Fysisk ferd til grenseveien og over til Jorpagna"
+    },
+    {
+      "name": "Mobil, finn avgangen og Escape tilbake til regionkartet"
+    }
+  ],
+  "background": {
+    "count": 0,
+    "ms": 804.3999999999069
+  }
+}
