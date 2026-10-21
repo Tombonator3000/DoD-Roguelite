@@ -299,3 +299,7 @@ Alt som gjøres i prosjektet loggføres her med tidsstempel (Europe/Oslo).
 - 00:55 (ChatGPT) 22 regresjonstester bestod. Rettet faktisk værnøkkel storm og sikret én marsjkontroll per dag og én hvilegevinst per natt. Oppdaterte README, memory, todo og verdensdokumentasjonen slik at gammel komprimering ikke fremstår som gjeldende.
 - 01:01 (ChatGPT) Nettlesertesten bestod originalkart, zoom/pan/havneklikk, reisedøgn, lagring og betalt karavane. Stresstesten fant en tidligere nullfeil i et offhand-anfall etter tap av våpen; rettet og lagt til deterministisk kontroll. Fem nivåer og teksturreservene er grønne uten konsollfeil. La oppdaterte bilder/resultat i docs og skrev D016 før siste PR-kontroll.
 - 01:05 (ChatGPT) Siste nettleserkjøring mot sluttbygget bestod alle sju atlasflyter, også fristvarsel og faktisk værnøkkel storm, uten konsollfeil. Oppdaterte bildene og resultatfila, og sender rettelsen til PR-kontroll.
+
+## 2026-10-21: Lyd og Arno etter The Ninth Vigil (ChatGPT)
+
+- 02:03 (ChatGPT) Tom ba meg starte med fotsteg, romklang, musikkoverganger og én havneby. Leste instruksene og D016, sjekket åpne PR-er og opprettet chatgpt/lyd-og-arno fra PR #8. Reserverte oppgaven og skrev D017. The Ninth Vigil er MIT, referansecommit 3355968b278d2e0544309344dfc7c54e0feaae32.

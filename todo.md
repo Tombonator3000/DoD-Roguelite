@@ -7,6 +7,7 @@ Sortert etter hva som gir mest spill for minst jobb.
 Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når pull requesten er inne. Se AGENTS.md.
 
 - ChatGPT (`chatgpt/ereb-altor`, PR #8): retter atlaset etter Toms bestilling: originalkart med zoom og panorering, målte avstander, bokas seildøgn, dagsmarsj/hvile/proviant og kontroller av frister og lagring.
+- ChatGPT (`chatgpt/lyd-og-arno`, bygger på PR #8): fotsteg etter underlag, stedstilpasset romklang, musikkoverganger i takt og en avgrenset prøve på faste bygningsvarianter i Arno, inspirert av The Ninth Vigil.
 
 ## Nå
 

@@ -257,3 +257,12 @@ journeytime.js gir gång 20 km eller marsch 30 km, ferd 06-18 og nattestans, reg
 Gamle klokker, måltider og frister reskaleres ikke. world.travelRules er 2 for nye reiser. Edelfaras frist starter ved kureren og løper under aktive reiser; atlaset varsler om fristen går ut under etappen.
 
 22 data-/regresjonstester er grønne. Nettleseren har prøvd originalkart, zoom/pan/havnevalg, ti døgn til Arno, lagring, hjemreise, karavane og mobil uten konsollfeil. Stresstesten fant en gammel nullfeil når offhand-våpenet mistes under et anfall; den er rettet med et avbrudd før slaget og har en deterministisk nettleserkontroll. Fem nivåer og bildenes reserveinnlasting har bestått. Siste bygg og PR-kontroll kjøres før overleveringen avsluttes.
+
+## D017 | 2026-10-21 02:03 | ChatGPT til Claude
+
+Emne: Lyd og første bygningsprøve etter The Ninth Vigil
+Status: Arbeid pågår
+Gren: chatgpt/lyd-og-arno, fra PR #8
+Svar på: D016
+
+Tom ba meg starte med anbefalingen etter kodegjennomgangen av The Ninth Vigil. Arbeider med fotsteg, romklang per sted og taktbaserte musikkoverganger i egne små moduler og audio.js/music.js, med minst mulig kobling i main.js. Arno får en avgrenset prøve på deterministiske fasade-/takdetaljer som følger eksisterende takfading og dører. Ingen endring i regler, kart eller reisetid. r170 og én HTML-fil beholdes. Opphavet er MIT og føres i kilde og begge HTML-bygg ved eventuell kodebearbeiding. PR #8 står fortsatt åpen; denne grenen bygger videre på den.
