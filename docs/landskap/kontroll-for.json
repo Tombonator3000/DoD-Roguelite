@@ -1,0 +1,125 @@
+{
+  "baseline": true,
+  "errors": [],
+  "views": [
+    {
+      "name": "fristaden-hus",
+      "calls": 184,
+      "triangles": 177822,
+      "geometries": 152,
+      "textures": 41,
+      "roofKinds": [
+        {
+          "id": "inn"
+        },
+        {
+          "id": "shop"
+        },
+        {
+          "id": "temple"
+        },
+        {
+          "id": "chapter"
+        },
+        {
+          "id": "tower"
+        },
+        {
+          "id": "dojo"
+        },
+        {
+          "id": "smithy"
+        },
+        {
+          "id": "home"
+        },
+        {
+          "id": "farm"
+        },
+        {
+          "id": "guard"
+        },
+        {
+          "id": "manor"
+        }
+      ]
+    },
+    {
+      "name": "arno-hus",
+      "calls": 194,
+      "triangles": 124386,
+      "geometries": 162,
+      "textures": 43,
+      "roofKinds": [
+        {
+          "id": "v_caddo_arno_inn",
+          "pitch": 0.46499999999999997
+        },
+        {
+          "id": "v_caddo_arno_shop",
+          "pitch": 0.46499999999999997
+        },
+        {
+          "id": "v_caddo_arno_h1",
+          "pitch": 0.51
+        },
+        {
+          "id": "v_caddo_arno_h2",
+          "pitch": 0.46499999999999997
+        },
+        {
+          "id": "v_caddo_arno_h3",
+          "pitch": 0.42
+        },
+        {
+          "id": "v_caddo_arno_h4",
+          "pitch": 0.6
+        },
+        {
+          "id": "v_caddo_arno_h5",
+          "pitch": 0.5549999999999999
+        }
+      ]
+    },
+    {
+      "name": "sortmund-sti",
+      "calls": 90,
+      "triangles": 115248,
+      "geometries": 155,
+      "textures": 47,
+      "roofKinds": [
+        {
+          "id": "sm_kapell"
+        },
+        {
+          "id": "sm_fisk"
+        },
+        {
+          "id": "sm_tupp"
+        },
+        {
+          "id": "sm_vakt"
+        },
+        {
+          "id": "sm_bagare"
+        },
+        {
+          "id": "sm_vagn"
+        },
+        {
+          "id": "sm_bonde"
+        },
+        {
+          "id": "sm_bild"
+        },
+        {
+          "id": "sm_smed"
+        },
+        {
+          "id": "sm_mjol"
+        }
+      ]
+    }
+  ],
+  "checks": {}
+}

@@ -10,6 +10,10 @@ import { townTextures, signTexture } from './towntex.js';
 import { WALL, FLOOR, WATER, PILLAR, HOUSE, FENCE, GR, TW, TH, RING, RIVER, GATE, BUILDINGS, TREES, SPOTS, buildTownLayout } from './townmap.js';
 import { TownLife } from './townfolk.js';
 import { shaftMaterial } from './gfx.js';
+import { addSurfaceDetail } from './surfaces.js';
+import { houseStyle, houseRoof } from './housestyle.js';
+import { terrainMaterial, terrainGeometry } from './terrain.js';
+import { naturalGround } from './terrainfield.js';
 
 export { HOUSE, FENCE, GR, SPOTS };
 
@@ -152,6 +156,10 @@ function materials() {
   addWetness(MAT.stone, { puddles: false, k: 0.5 });
   addWetness(MAT.timber, { puddles: false, k: 0.4 });
   addWetness(MAT.city, { puddles: false, k: 0.5 });
+  for (const key of ['stone', 'stonePlain', 'pillar', 'city']) addSurfaceDetail(MAT[key], 'stone');
+  for (const key of ['timber', 'plank', 'wood']) addSurfaceDetail(MAT[key], 'wood');
+  for (const key of ['outside', 'field']) addSurfaceDetail(MAT[key], 'ground');
+  MAT.terrain = terrainMaterial(TX);
   // vind i gress, blomster og trekroner
   addSway(MAT.tuft, 'grass');
   addSway(MAT.flower, 'flower');
@@ -169,6 +177,12 @@ function roofMats(b) {
   const src = b.style === 'stone' ? TX.stone : TX.timber;
   const gable = stdMat({ map: src.map, normalMap: src.normalMap, roughness: 0.92, transparent: true, vertexColors: true });
   const chim = stdMat({ map: TX.city.map, normalMap: TX.city.normalMap, roughness: 0.92, transparent: true, vertexColors: true });
+  addWetness(roof, { puddles: false, k: b.roof === 'thatch' ? 0.4 : 0.75 });
+  addWetness(gable, { puddles: false, k: 0.4 });
+  addWetness(chim, { puddles: false, k: 0.5 });
+  addSurfaceDetail(roof, 'roof');
+  addSurfaceDetail(gable, b.style === 'stone' ? 'stone' : 'wood');
+  addSurfaceDetail(chim, 'stone');
   MAT.roofs[b.id] = { roof, gable, chim, all: [roof, gable, chim] };
   return MAT.roofs[b.id];
 }
@@ -449,6 +463,14 @@ export class Town extends Dungeon {
     return m;
   }
 
+  addTerrain(mesher, M) {
+    if (mesher.empty) return null;
+    const mesh = new THREE.Mesh(terrainGeometry(mesher.geometry(), this), M.terrain);
+    mesh.receiveShadow = true;
+    this.group.add(mesh);
+    return mesh;
+  }
+
   // avstand til nærmeste vegg (for bakt skygge på bakken)
   aoAt(wx, wz) {
     const tx = Math.floor(wx / T - 0.001), tz = Math.floor(wz / T - 0.001);
@@ -491,6 +513,7 @@ export class Town extends Dungeon {
 
   buildGround(M) {
     const ms = {};
+    const natural = new Mesher();
     const get = k => ms[k] || (ms[k] = new Mesher());
     const plank = new Mesher();
     const curb = new Mesher();
@@ -506,7 +529,10 @@ export class Town extends Dungeon {
       for (const [a0, b0, a1, b1] of [[x0, z0, xm, zm], [xm, z0, x1, zm], [x0, zm, xm, z1], [xm, zm, x1, z1]]) {
         const kind = this.groundKindAt(x, y, (a0 + a1) / 2 / T, (b0 + b1) / 2 / T);
         const s = kind === GR.GRASS ? 0.2 : kind === GR.WOOD ? 0.42 : 0.34;
-        get(kind).quadUp(a0, b0, a1, b1, 0, [ao(a0, b0), ao(a1, b0), ao(a1, b1), ao(a0, b1)], s, kind === GR.WOOD && this.woodRot(x, y));
+        const b = this.buildingOf(x, y), qx = (a0 + a1) / 2 / T, qy = (b0 + b1) / 2 / T;
+        const inside = b && qx > b.x0 + 0.5 && qx < b.x1 + 0.5 && qy > b.y0 + 0.5 && qy < b.y1 + 0.5;
+        const target = naturalGround(kind) && !inside ? natural : get(kind);
+        target.quadUp(a0, b0, a1, b1, 0, [ao(a0, b0), ao(a1, b0), ao(a1, b1), ao(a0, b1)], s, kind === GR.WOOD && this.woodRot(x, y));
       }
       // kantstein mellom brostein og gress/jord
       if (g === GR.COBBLE) {
@@ -523,6 +549,7 @@ export class Town extends Dungeon {
       }
     }
     for (const k in ms) this.addMesh(ms[k], M.ground[k], false, true);
+    this.addTerrain(natural, M);
     this.addMesh(curb, M.city, false, true);
     // bruer og brygge
     const rails = new Mesher();
@@ -670,6 +697,7 @@ export class Town extends Dungeon {
     const backWood = new Mesher(), backGlass = new Mesher();
     this.furn = { wood: new Mesher(), cloth: new Mesher(), stone: new Mesher(), iron: new Mesher(), paint: new Mesher(), gold: new Mesher() };
     for (const b of this.buildings) {
+      houseStyle(b);
       b.fF = { walls: new Mesher(), wood: new Mesher(), glass: new Mesher() };
       b.fL = new Mesher();
       b.tint = b.harbor ? hex(b.plaster).map(c => c * 1.08) :
@@ -986,7 +1014,10 @@ export class Town extends Dungeon {
       chim.box(cx - 0.42, ridgeY + 0.85, cz - 0.42, cx + 0.42, ridgeY + 1.0, cz + 0.42, { vs: 2, us: 2, col: [0.7, 0.66, 0.6] });
       this.smokers.push({ x: cx, y: ridgeY + 1.1, z: cz, b, t: Math.random() });
     }
-    if (roofBounds) this.roofDetails?.(b, { roof, gable, chim }, roofBounds);
+    if (roofBounds) {
+      houseRoof(b, { roof, gable, chim }, roofBounds);
+      this.roofDetails?.(b, { roof, gable, chim }, roofBounds);
+    }
     this.addMesh(roof, R.roof, true, false, g);
     this.addMesh(gable, R.gable, true, true, g);
     this.addMesh(chim, R.chim, true, false, g);
