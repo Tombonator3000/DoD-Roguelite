@@ -1,0 +1,54 @@
+{
+  "errors": [],
+  "steps": [
+    {
+      "name": "Ragnas døgnruter er framkommelige",
+      "paths": [
+        {
+          "hour": 7,
+          "id": "h1_in",
+          "reachable": true
+        },
+        {
+          "hour": 12,
+          "id": "inn_guest",
+          "reachable": true
+        },
+        {
+          "hour": 13,
+          "id": "h1_in",
+          "reachable": true
+        },
+        {
+          "hour": 18,
+          "id": "inn_guest",
+          "reachable": true
+        },
+        {
+          "hour": 22,
+          "id": "h1_bed",
+          "reachable": true
+        }
+      ]
+    },
+    {
+      "name": "Journalen på 390 piksler",
+      "width": 390,
+      "scroll": 390
+    },
+    {
+      "name": "Instanserte trekroner viker, med frosset bilde og negativ kontroll",
+      "changed": 25761,
+      "stable": 0,
+      "control": 0,
+      "position": {
+        "x": 34.7227787896288,
+        "z": 29.642625220455386
+      },
+      "treeMeshes": 108,
+      "radius": 122.4,
+      "width": 960,
+      "height": 720
+    }
+  ]
+}

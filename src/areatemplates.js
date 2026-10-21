@@ -7,6 +7,7 @@ import { PLACES } from './regionalmaps.js';
 import { ATLAS_REGIONS } from './atlasdata.js';
 import { reveal, known, regionAt, ate, worldMap } from './worldtravel.js';
 import { harborStyle } from './harborstyle.js';
+import { harborFolk } from './harborfolk.js';
 
 const PI = Math.PI;
 const TERR_NAME = { '.': 'slette', F: 'skog', '^': 'fjell' };
@@ -303,6 +304,7 @@ export function villageLayout(id) {
     if (b.wallH < 3.5) b.style = 'stone';
   }
   harborStyle(id, buildings);
+  if (id === 'arno' || id === 'gringul') buildings.find(b => b.id === pre + 'h1').name = 'Havnekontoret';
   const props = [
     { t: 'well', x: 22.5, y: 24.6 },
     { t: 'barrel', x: 11.4, y: 21.0 }, { t: 'barrel', x: 11.4, y: 21.8 }, { t: 'crate', x: 24.4, y: 21.2 },
@@ -312,7 +314,7 @@ export function villageLayout(id) {
   if (p.coast) props.push({ t: 'boat', x: 41.6, y: 38.6, rot: 1.2 }, { t: 'net', x: 38.4, y: 38.0 });
   return {
     id: 'by_' + id, name: p.name, region: regionAt(p.x, p.y).name, sub: p.sub, seed: 40 + id.length, peaceful: true, spruce: 0.3, music: 'town', open: true,
-    intro: `${p.name}, ${p.sub}. Vertshuset er det største huset ved veien, og handelsboden ligger rett over gata.`,
+    intro: `${p.name}, ${p.sub}. Vertshuset er det største huset ved veien, og handelsboden ligger rett over gata.${id === 'arno' ? ' Ragna på havnekontoret sør for vertshuset har arbeid til en budbringer.' : id === 'gringul' ? ' Tova på havnekontoret sør for vertshuset tar imot listene fra Arno.' : ''}`,
     peaceText: `Dette er ${p.name}. Folk her bærer ikke våpen på gata, og det gjør ikke du heller.`,
     defaultArrival: 'west', arrivals: ARR, exits: EXITS.slice(2),
     paint(k) {
@@ -326,7 +328,7 @@ export function villageLayout(id) {
       if (p.coast) { k.deep(0, 43, 45, 45); k.water(30, 41, 45, 42); }
     },
     buildings, fences: [[[32, 31], [43, 31]], [[32, 31], [32, 41]], [[43, 31], [43, 41]]], gaps: [[37, 31]],
-    signs: [[pre + 'inn', 'VÄRDSHUS', p.name], [pre + 'shop', 'HANDEL', '']],
+    signs: [[pre + 'inn', 'VÄRDSHUS', p.name], [pre + 'shop', 'HANDEL', ''], ...(['arno', 'gringul'].includes(id) ? [[pre + 'h1', 'HAVNEKONTOR', p.name]] : [])],
     lamps: [[11.6, 22.0], [20.0, 20.6], [25.0, 20.6], [32.4, 21.0], [22.5, 26.4]],
     props, trees: [[10, 24.6], [34.4, 26.4, 's'], [20.4, 31.6]],
     furnish({ W, table, bench, bed, shelf, hearth, F, U }, A) {
@@ -352,13 +354,14 @@ export function villageLayout(id) {
       inn_t1: { x: 16.0, y: 17.16, yaw: 0, sit: true }, inn_t2: { x: 16.0, y: 18.44, yaw: PI, sit: true },
       inn_t3: { x: 18.0, y: 15.63, yaw: 0, sit: true }, inn_t4: { x: 18.0, y: 16.77, yaw: PI, sit: true },
       inn_up: { x: 13.6, y: 19.6, yaw: 0, upstairs: true }, inn_door: { x: 15.5, y: 21.6, yaw: 0, wander: 1.5 },
+      inn_guest: { x: 14.5, y: 18.6, yaw: PI / 2 },
       shop_in: { x: 27.0, y: 16.8, yaw: 0 }, shop_bed: { x: 29.4, y: 19.2, yaw: 0, sleep: true, lie: 'z' },
       h1_in: { x: 15.2, y: 27.4, yaw: PI }, h1_bed: { x: 16.2, y: 29.3, yaw: 0, sleep: true, lie: 'z' },
       h2_in: { x: 29.2, y: 27.4, yaw: PI }, h2_bed: { x: 30.2, y: 29.3, yaw: 0, sleep: true, lie: 'z' },
       street_w: { x: 8.0, y: 22.8, wander: 2 }, street_c: { x: 22.5, y: 22.4, wander: 2 }, street_e: { x: 36.0, y: 22.8, wander: 2 },
       field: { x: 37.0, y: 35.5, yaw: 0, wander: 1.5, work: 'dig' },
     },
-    people: villageFolk(id, p), place: id,
+    people: harborFolk(id, villageFolk(id, p)), place: id,
   };
 }
 

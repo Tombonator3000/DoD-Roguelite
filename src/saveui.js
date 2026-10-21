@@ -21,7 +21,7 @@ export class SaveUI {
         <div class="sthumb ${data?.thumb ? 'has' : ''}" ${thumb}><span>${slot === 'auto' ? 'A' : slot}</span></div>
         <div class="stxt"><div class="sname">${esc(SLOT_NAME[slot])}${data ? ` <em>${esc(d.when)}</em>` : ''}</div>
           ${data ? `<div class="stitle">${esc(d.title)}${d.place ? ` <span>${esc(d.place)}</span>` : ''}</div><div class="ssub">${esc(d.sub)}</div>` : `<div class="ssub">${slot === 'auto' ? 'Lagres av seg selv når du går ned luka eller til et nytt nivå.' : 'Tom plass'}</div>`}
-          ${d.old ? '<div class="ssub bad">Lagret med en eldre versjon. Kan ikke lastes.</div>' : ''}</div>
+          ${d.old ? '<div class="ssub bad">Lagringen er fra en versjon som ikke støttes.</div>' : ''}</div>
         <div class="sacts">
           ${canWrite ? `<button class="btn small ${data ? '' : 'primary'}" data-do="save">${data ? 'Skriv over' : 'Lagre her'}</button>` : ''}
           ${canRead ? '<button class="btn small primary" data-do="load">Last</button>' : ''}

@@ -22,6 +22,7 @@ export const G = {
   state: 'title', // title | play | transition | dialog | deathroll | dead | victory | pause | sheet
   depth: 1,
   run: null, // statistikk for gjeldende løp
+  campaign: null, // verden, oppdrag og forhold for den valgte rollpersonen
   meta: null, // permanente oppgraderinger (fjær)
   touch: false,
 };

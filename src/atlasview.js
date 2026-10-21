@@ -8,6 +8,7 @@ import { journeyQuote, takeJourney } from './atlastravel.js';
 import { formatDuration } from './journeytime.js';
 import { saveGame } from './save.js';
 import { textureImage } from './textures.js';
+import { questEntries } from './quests.js';
 
 const $ = s => document.querySelector(s);
 
@@ -75,6 +76,7 @@ export class AtlasView {
       if(indirect)text+=`Etappene videre gir minst ${formatDuration(total)}, i tillegg til ferd mellom avgangsstedene. `;
       const quest=G.run.ivan;
       if(quest?.deadline!=null&&!quest.flags?.truce&&!quest.flags?.storm&&G.run.clock+q.hours>=quest.deadline)text+='Fristen i Edelfara utløper før denne reisen er ferdig. ';
+      for(const entry of G.campaign?questEntries(G.campaign,G.run.clock):[]) if(entry.hours!=null&&q.hours>=entry.hours)text+=`Fristen for «${entry.title}» utløper under denne reisen. `;
       if(!q.affordable)text+=this.leg.kind==='skip'?'Du mangler silver. Du kan arbeide deg over.':'Du mangler silver til karavanen.';
       if(!q.foodReady)text+='Provianten rekker ikke. Skaff mer, eller velg karavane med mat underveis.';
       el.textContent=text;

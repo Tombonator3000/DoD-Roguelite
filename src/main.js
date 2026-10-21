@@ -45,6 +45,8 @@ import { W as worldState, tickHunger, regionAt as worldRegionAt, terrainAt as wo
 import { ENCOUNTERS } from './worldmap.js';
 import { PLACES as WORLD_PLACES } from './regionalmaps.js';
 import { encounterLayout, villageLayout, siteLayout, wildLayout } from './areatemplates.js';
+import { readCampaign, normalizeCampaign, restoreCampaign, restoreExploration } from './campaign.js';
+import { checkpointCampaign, tickCampaign, campaignJournalHTML, bindCampaignJournal } from './campaign-runtime.js';
 
 const $ = s => document.querySelector(s);
 const CAM_OFF = new THREE.Vector3(10.4, 15.6, 10.4);
@@ -533,6 +535,8 @@ class Game {
   }
 
   titleScene() {
+    tickCampaign();
+    checkpointCampaign();
     this.wipe(() => {
       G.audio.playMusic('title');
       this.enterTitle(true);
@@ -626,9 +630,10 @@ class Game {
   }
 
   bindUI() {
-    this.menuItems().forEach((m, i) => {
-      m.addEventListener('mouseenter', () => this.selectMenu(i));
-      m.addEventListener('focus', () => this.selectMenu(i, false, false));
+    document.querySelectorAll('#menu .mi').forEach(m => {
+      // Fortsett er skjult før lagringene leses, men trenger også en klikkhandler.
+      m.addEventListener('mouseenter', () => this.selectMenu(this.menuItems().indexOf(m)));
+      m.addEventListener('focus', () => this.selectMenu(this.menuItems().indexOf(m), false, false));
       m.addEventListener('click', () => this.menuAction(m.dataset.act));
     });
     document.querySelectorAll('#title .back').forEach(b => (b.onclick = () => this.backToMenu()));
@@ -665,7 +670,7 @@ class Game {
       G.audio.menuTick?.(67);
     }));
     $('#btn-resume').onclick = () => this.resume();
-    // to trykk: det som ikke er lagret, går tapt (autolagringen blir liggende)
+    // To trykk: løpsendringer etter siste lagring går tapt; verdensminnet sjekkpunktes.
     $('#btn-quit').onclick = () => {
       const b = $('#btn-quit');
       if (!b.classList.contains('armed')) {
@@ -707,12 +712,22 @@ class Game {
 
   startRun() {
     document.activeElement?.blur?.();
+    const campaign = readCampaign(G.player.sheet.id || 'svartnebb');
+    if (campaign.unsupported) {
+      this.title.leaving = false;
+      this.enterTitle(true);
+      $('#title-stats').textContent = 'Verdensminnet er fra en annen versjon. Oppdater spillet før du fortsetter med denne rollpersonen.';
+      return;
+    }
     G.audio.init();
     G.audio.ui();
     G.meta.runs++;
     saveMeta(G.meta);
     G.run = this.freshRun();
+    G.campaign = campaign;
+    restoreCampaign(G.campaign, G.run);
     worldState();
+    restoreExploration(G.campaign, worldState());
     this.pauseFromWorld = false;
     this.endRunCleanup();
     G.player.newRun(G.meta);
@@ -730,12 +745,14 @@ class Game {
     $('#title').hidden = true;
     G.depth = 0;
     this.loadFloor(0, null, false, 'start');
+    checkpointCampaign();
     G.ui.buildBar();
     G.audio.playMusic('town');
     const P = G.player;
     G.ui.log(P.isNebb
       ? 'Noen har stjålet hele safranlageret fra Hvass handel, der far står bak disken, og sjefen gir ham skylden. Sporet går ned i kloakken.'
       : `Herr Nansen, butikkbetjent hos Hvass handel i Fristaden, har leid ${P.name} for å finne det stjålne safranlageret. Sporet går ned i kloakken.`);
+    if (Object.keys(G.campaign.quests).length) G.ui.log('Et nytt kloakkløp. Oppdragene og folkene i verden husker deg. Se journalen.');
     G.ui.log('Kloakkluken ligger på torget. Snakk med folk først: trykk <kbd>E</kbd>, og skriv eller klikk på ord. Ord i gull blir nye spørsmål.');
   }
 
@@ -823,6 +840,7 @@ class Game {
   loadArea(id, arrival, opts = {}) {
     const L0 = opts.layout || AREAS[id];
     if (!L0) return;
+    tickCampaign();
     if (!opts.layout) G.run.areaSpec = null;
     if (G.dungeon) G.dungeon.dispose();
     G.fx.clearLevel();
@@ -1064,6 +1082,7 @@ class Game {
       // lagret på verdenskartet: området bak kartet bygges stille
       this.quietLoad = !!d.onWorld;
       G.run = { ...this.freshRun(), ...d.run, known: new Set(d.run.known || []), t0: performance.now() };
+      G.campaign = normalizeCampaign(d.campaign, d.player.sheet?.id || 'svartnebb', G.run.clock);
       const P = G.player;
       if (d.player.sheet?.id) { try { this.selectedId = d.player.sheet.id; localStorage.setItem('svartnebb.lastchar', d.player.sheet.id); } catch (e) { /* valgfritt */ } }
       P.deserialize(d.player);
@@ -1096,6 +1115,8 @@ class Game {
       G.camera.position.copy(P.pos).add(CAM_OFF);
       this.loadingSave = false;
       this.quietLoad = false;
+      tickCampaign();
+      checkpointCampaign();
       G.ui.buildBar();
       G.audio.playMusic(G.dungeon.isArea ? (G.dungeon.L.music === 'town' ? 'town' : 'explore') : G.dungeon.isTown ? 'town' : 'explore');
       G.ui.log(`Fortsetter: ${describeSave(d).title}${d.onWorld ? ', på verdenskartet' : G.dungeon.isArea ? ', ' + G.dungeon.L.name : G.dungeon.isTown ? ', Fristaden' : ''}.`);
@@ -1547,6 +1568,8 @@ class Game {
     const P = G.player;
     if (P.dead) return;
     P.dead = true;
+    tickCampaign();
+    checkpointCampaign();
     P.ko = null;
     this.ko = null;
     if (this.koTimer) { clearTimeout(this.koTimer); this.koTimer = null; }
@@ -1566,6 +1589,8 @@ class Game {
     if (G.state === 'dead' || G.state === 'victory' || G.state === 'title') return;
     if (G.state !== 'play') { setTimeout(() => this.onVictory(), 500); return; }
     G.state = 'victory';
+    tickCampaign();
+    checkpointCampaign();
     G.audio.playMusic('victory', { fast: true });
     const f = this.feathersFor(true);
     G.meta.feathers += f;
@@ -1588,6 +1613,7 @@ class Game {
       : (P.isNebb
         ? `Svart Nebb ble liggende i mørket under Fristaden${instant ? ' etter ett eneste, altfor hardt slag' : ''}${cause}. Mester Flansen kommer til å si at han visste det. Han kommer til å si det med munnen full av brød.`
         : `${P.name} ble liggende i mørket under Fristaden${instant ? ' etter ett eneste, altfor hardt slag' : ''}${cause}. Herr Nansen leier en ny neste uke.`);
+    $('#end-text').textContent += ' Et nytt kloakkløp gir startutstyr og silver som før. Verden husker oppdrag, folk og tid.';
     $('#end-stats').innerHTML = [
       ['Nivå nådd', `${r.depthReached} av 5`],
       ['Fiender felt', r.kills],
@@ -1802,13 +1828,15 @@ class Game {
 
   pause() {
     if (G.state !== 'play' && G.state !== 'world') return;
+    tickCampaign();
     this.pauseFromWorld = G.state === 'world';
     if (this.pauseFromWorld && (G.worldview.moving || !$('#w-enc').hidden)) return;
     G.state = 'pause';
     const P = G.player;
     const qs = Object.entries(G.run.quests || {}).filter(([, q]) => q.state === 'active' || q.state === 'done');
-    const journal = (qs.length ? '<h3>Oppdrag</h3>' + qs.map(([id, q]) => `<div class="qrow ${q.state}">${q.state === 'done' ? 'Fullført: ' : ''}${QUEST_TITLES[id] || id}</div>`).join('') : '') + journalHTML();
+    const journal = (qs.length ? '<h3>Oppdrag</h3>' + qs.map(([id, q]) => `<div class="qrow ${q.state}">${q.state === 'done' ? 'Fullført: ' : ''}${QUEST_TITLES[id] || id}</div>`).join('') : '') + journalHTML() + campaignJournalHTML();
     $('#pause-quests').innerHTML = journal || `<div class="pz-empty">Ingen oppdrag ennå. ${G.dungeon.isTown && !G.dungeon.isArea ? 'Oppslagstavla på torget har arbeid, og folk i byen vet ting.' : 'Folk i Fristaden har arbeid, og oppslagstavla på torget henger fullt.'}</div>`;
+    bindCampaignJournal();
     // løpet i korte trekk
     const D = G.dungeon;
     const place = this.pauseFromWorld ? 'Verdenskartet' : D.isArea ? D.L.name : D.isTown ? 'Fristaden' : FLOORS[G.depth]?.name || '';
@@ -1907,6 +1935,7 @@ class Game {
       if (G.slowmo > 0) { G.slowmo -= dt; gdt *= 0.3; }
       G.time += gdt;
       G.run.clock += gdt / 120;
+      tickCampaign();
       this.hungerT = (this.hungerT || 0) - gdt;
       if (this.hungerT <= 0) { this.hungerT = 5; tickHunger(); }
       this.updateAim();

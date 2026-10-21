@@ -10,6 +10,7 @@ import { makeCons, giveItem } from './inventory.js';
 import { d } from './rules.js';
 import { cellDistance } from './geography.js';
 import { walkSchedule, terrainFactor } from './journeytime.js';
+import { tickCampaign } from './campaign-runtime.js';
 
 const idx = (x, y) => y * WW + x;
 export const inWorld = (x, y) => x >= 0 && y >= 0 && x < WW && y < WH;
@@ -298,6 +299,7 @@ export function advanceTravelTime(hours,{ meals=false,nights=[] }={}) {
   while(G.run.clock<start+hours-1e-7) {
     const before=G.run.clock;
     G.run.clock=Math.min(start+hours,before+1);
+    tickCampaign();
     if(meals&&G.run.clock-w.fed>=24)ate();
     tickHunger(true);
     for(const end of ends) if(before<end&&G.run.clock>=end&&hungerLevel()===0) {
