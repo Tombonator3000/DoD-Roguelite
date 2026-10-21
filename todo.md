@@ -20,6 +20,7 @@ Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når p
 - [x] Ereb-atlas og videre reiser (0.8): 31 regionale kart, 30 sjøruter, 28 landeveier, passasje og hyre med Sjökunnighet, egen utforsking og gamle lagringer. Kilder og grenser i docs/ereb-altor.md. Nye byer er fortsatt malområder.
 - [x] Toms rettelse til PR #8: originalkart med zoom/panorering, oppmålte avstander, seildøgn som døgn, gång/marsch med vær, nattestans og dagsproviant, samt karavane og vern av gamle klokker/frister.
 - [ ] Ultima-kampanje: vedvarende verdens-/person-/fraksjonstilstand ved siden av kloakkløpet. Definer nederlag og nytt løp, og versjoner lagringen før nye scenarioer bindes til dette.
+- [x] Første avgrensede bygningsprøve i Arno: faste tak-/fasadevarianter med gesimser, konsoller og bevarte dører/takfading. Hele byer gjenstår.
 - [ ] Arno og Gringul som egne små byer med havn, bydeler, navngitte folk og ulike interesser. Caddos magiforbud har nå samtaletekst, men trenger vitner og faktiske reaksjoner.
 - [ ] Felles oppdragsformat og Edsbrytarna i Erebos som neste hele bokeventyr. Kilden er funnet, scenarioet er ikke implementert. Deretter Enhörningen och Drakormen i Hynsolge. Se docs/ereb-altor.md.
 - [ ] Utvid regionkartene etter kildekartene, med flere særpregede steder og møter. Samkarna, Soluna og Akrogal trenger underregioner; Orghin, Irendor og Drakarnas arkipelag gjenstår.
@@ -40,7 +41,7 @@ Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når p
 - [x] Grafikk etter Weatherglass, raske ting (0.7): MSAA i komposeren, bloom etter sted og tid, miljøkart fra himmelen, eksponering etter døgnet, myke trekroner. Se docs/grafikk-weatherglass.md.
 - [ ] Trær nær kameraet skjuler spilleren i Ekeskogen. La kronene mellom kameraet og spilleren bli gjennomsiktige, som takene i byen. Mal: fadeFronts i Loincloth Legends (docs/gjenbruk.md).
 - [ ] Fra docs/gjenbruk.md, raske ting: CC0-lyder fra Morbidium og Loincloth (fotsteg etter underlag, dører, gulvknirk, regn, vind, natt, bål, sverdklang), skriftene bygget inn med FontFace i stedet for Google Fonts, alphaToCoverage på tuster og faner, handler for tapt WebGL-kontekst, test av artifact.html under sandkassens CSP.
-- [ ] Fra docs/gjenbruk.md, middels: skjermeffekter (sjokkbølge, zoom-punch, rød kant ved lav KP), angrepspoletter og tempostyrer (høyst 2 som angriper), automatisk kvalitet med pikselbudsjett, stemmer per släkt med formanter, musikk som skifter i takt, spilltestmodus bak ?testmodus.
+- [ ] Fra docs/gjenbruk.md, middels: skjermeffekter (sjokkbølge, zoom-punch, rød kant ved lav KP), angrepspoletter og tempostyrer (høyst 2 som angriper), automatisk kvalitet med pikselbudsjett, stemmer per släkt med formanter, spilltestmodus bak ?testmodus.
 - [ ] log.md er over 50 KB. Flytt eldre økter til logg/ÅÅÅÅ-MM.md, som Morbidium gjør med tools/rydd_dokumenter.py.
 - [ ] Grafikk etter Weatherglass, middels: sol som retningslys ute med skyggekamera snappet til texler, lys gjennom bladene, bakkeshader som bryter opp flisene, enkel AO nederst på vegger og steiner, skyskygger på alle materialer.
 - [ ] Grafikk etter Weatherglass, stort: trær med greiner og bladkort, gresstrå med vind, lav dis med lyssøyler, adaptiv DPR med tre nivåer.
@@ -55,7 +56,8 @@ Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når p
 - [x] Parera og undvika som slag, pressa slag, drakvalg, missöden, vila, dödsslag med Samla sig, skräck, magi (0.3)
 - [x] Fristaden over bakken med folk, døgnrytme, nøkkelordsamtaler, tjenester, oppdrag og tyveri (0.4)
 - [ ] Spilltest byen: er prisene riktige mot det du finner i kloakken? Er natta mørk nok, eller for mørk? Er det for lett å stjele?
-- [ ] Lyd for fotsteg (plask i vann, tasse på stein), og egne stemmer for hver släkt (nå er det grynt for alle unntatt anka).
+- [x] Prosedyriske fotsteg etter underlag, stedstilpasset romklang og musikkoverganger i takt (ChatGPT, chatgpt/lyd-og-arno).
+- [ ] Egne stemmer for hver släkt (nå er det grynt for alle unntatt anka).
 - [ ] Ytelsestest på svakere bærbar og mobil.
 
 ## DoD-regler som mangler
@@ -73,7 +75,7 @@ Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når p
 - [ ] Flere oppdrag i byen, gjerne med valg: Gaspard som smugler, Hvass som skylder penger, Pimpa som forsvinner i kloakken.
 - [ ] Låste dører om natta (Fingerfärdighet eller dyrkar), og at folk reagerer hvis du står inne hos dem mens de sover.
 - [x] Lagre byens tilstand (oppdrag, rykte, klokke) sammen med resten av løpet (0.5). Butikkenes lager i byen lagres ikke ennå.
-- [ ] Lyd for dører, steg på planker og stein i byen, og stemmer for byfolk (korte grynt og hmm som i Ultima VII).
+- [ ] Lyd for dører og stemmer for byfolk (korte grynt og hmm som i Ultima VII). Fotsteg på planker og stein er implementert på chatgpt/lyd-og-arno.
 - [ ] Flere romtyper: fellerom (Upptäcka fara, Hoppa & klättra), skattekammer, rom med fanger å befri (Övertala).
 - [ ] Følgesvenner du kan leie på Den feite gåsen, så evner som Livvakt og Tonkonst får noe å gjøre.
 - [x] Lagre løp midt i (etasje, utstyr, gaver) slik at man kan fortsette senere (0.5).

@@ -303,3 +303,10 @@ Alt som gjøres i prosjektet loggføres her med tidsstempel (Europe/Oslo).
 ## 2026-10-21: Lyd og Arno etter The Ninth Vigil (ChatGPT)
 
 - 02:03 (ChatGPT) Tom ba meg starte med fotsteg, romklang, musikkoverganger og én havneby. Leste instruksene og D016, sjekket åpne PR-er og opprettet chatgpt/lyd-og-arno fra PR #8. Reserverte oppgaven og skrev D017. The Ninth Vigil er MIT, referansecommit 3355968b278d2e0544309344dfc7c54e0feaae32.
+
+- 02:23 (ChatGPT) Implementerte audio-space.js med fem fotsteg, faselåst kontakt, stille smyging, bru før vann og maks tolv gjenbrukte stemmer. To faste konvolvere skifter mellom fem cached romimpulser. Eksisterende lydvolum, mute og regn beholdes.
+- 02:23 (ChatGPT) Beholdt melodiene og Karplus-Strong-instrumentene, men la inn kø for taktbaserte temaskifter og mål for kamp-/natt-/vertshusvariant ved taktstreken. Rettet gammel tidsdrift etter JS-stans, og at et fast-kall til et allerede ventende tema ble oversett. Tittel, seier, død og bossens fast-intro reagerer straks.
+- 02:23 (ChatGPT) La inn faste bygningsvarianter bare i Arno: takvinkel, møneretning, puss, skodder, takrader, gesims og konsoller. Deler samles i de eksisterende takhaugene og følger takfadingen. Kontrollerte dører og identiske tak ved nytt besøk. Ingen nye bilder eller runtime-avhengigheter.
+- 02:23 (ChatGPT) Bygg, 22 regresjonstester, Chrome/WebAudio med vanlig brukeraktivering, alle fem underlag og rom, pause/mute, ressursgrense/opprydding, ekte takttid og JS-stans bestod. stress('tjuv', 20) gjennom fem nivåer og sju atlasflyter bestod uten konsollfeil. Teksturreservene for fullt, tomt og ødelagt sett bestod med CHROME=/usr/bin/chromium. HTML økte 7740 byte fra PR #8. Lisensen fra Ninth Vigil er med i begge bygg.
+
+- 02:24 (ChatGPT) Tok to nye, sammenlignbare JPEG-utsnitt av Arno før/etter og gjennomgikk dem visuelt. Samme antall geometrier og teksturer; 1200/1426 flere tegnede trekanter i utsnittene. La bilder, tørr lydprøve og resultatfiler i docs/lyd-arno og forklarte prøvens avgrensning i README. Opprettet egen lydjobb i PR-kontrollen og Pages.

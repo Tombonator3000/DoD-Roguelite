@@ -1,0 +1,146 @@
+{
+  "start": {
+    "path": "/DoD-Roguelite/",
+    "state": "play",
+    "depth": 0,
+    "town": true,
+    "duckVertices": 19594,
+    "textureLoaded": true,
+    "hudVisible": true,
+    "titleHidden": true
+  },
+  "movement": {
+    "keyReceived": true,
+    "error": null,
+    "x": 23.62,
+    "z": 30.41133774901385
+  },
+  "pauseAndResume": true,
+  "lostOffhand": true,
+  "stress": {
+    "prof": "tjuv",
+    "floors": [
+      {
+        "depth": 1,
+        "kills": 4,
+        "rolls": 19,
+        "kp": 9,
+        "psy": 4,
+        "bleeding": [],
+        "exp": 3,
+        "enemiesLeft": 25
+      },
+      {
+        "depth": 2,
+        "kills": 4,
+        "rolls": 20,
+        "kp": 9,
+        "psy": 7,
+        "bleeding": [],
+        "exp": 3,
+        "enemiesLeft": 25
+      },
+      {
+        "depth": 3,
+        "kills": 4,
+        "rolls": 20,
+        "kp": 9,
+        "psy": 7,
+        "bleeding": [],
+        "exp": 3,
+        "enemiesLeft": 31
+      },
+      {
+        "depth": 4,
+        "kills": 4,
+        "rolls": 21,
+        "kp": 9,
+        "psy": 6,
+        "bleeding": [],
+        "exp": 3,
+        "enemiesLeft": 38
+      },
+      {
+        "depth": 5,
+        "kills": 4,
+        "rolls": 38,
+        "kp": 0,
+        "psy": 9,
+        "bleeding": [],
+        "exp": 4,
+        "enemiesLeft": 1
+      }
+    ],
+    "errors": [],
+    "kin": "anka",
+    "spells": {},
+    "weapons": [
+      "dolk",
+      "kastkniv"
+    ],
+    "armor": [
+      "laderharnesk"
+    ],
+    "final": {
+      "kills": 4,
+      "perfekt": 0,
+      "fummel": 1,
+      "parries": 0,
+      "dodges": 0,
+      "hjp": 0,
+      "ko": 1,
+      "boss": "lever"
+    }
+  },
+  "cleanup": [
+    {
+      "extra": 0,
+      "slashes": 0,
+      "rings": 0,
+      "particles": 0
+    },
+    {
+      "extra": 0,
+      "slashes": 0,
+      "rings": 0,
+      "particles": 0
+    },
+    {
+      "extra": 0,
+      "slashes": 0,
+      "rings": 0,
+      "particles": 0
+    },
+    {
+      "extra": 0,
+      "slashes": 0,
+      "rings": 0,
+      "particles": 0
+    },
+    {
+      "extra": 0,
+      "slashes": 0,
+      "rings": 0,
+      "particles": 0
+    },
+    {
+      "extra": 0,
+      "slashes": 0,
+      "rings": 0,
+      "particles": 0
+    },
+    {
+      "extra": 0,
+      "slashes": 0,
+      "rings": 0,
+      "particles": 0
+    },
+    {
+      "extra": 0,
+      "slashes": 0,
+      "rings": 0,
+      "particles": 0
+    }
+  ],
+  "errors": []
+}

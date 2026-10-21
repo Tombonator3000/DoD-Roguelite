@@ -1,0 +1,19 @@
+{
+  "errors": [],
+  "views": [
+    {
+      "name": "vertshus",
+      "calls": 328,
+      "triangles": 174841,
+      "geometries": 195,
+      "textures": 50
+    },
+    {
+      "name": "oversikt",
+      "calls": 304,
+      "triangles": 133093,
+      "geometries": 198,
+      "textures": 50
+    }
+  ]
+}
