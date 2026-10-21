@@ -55,7 +55,7 @@ float wetRing(vec2 p){
 export function addWetness(mat, o = {}) {
   const puddles = o.puddles === false ? 0 : 1;
   const k = o.k ?? 1;
-  chain(mat, `wet${puddles}${k}`, sh => {
+  chain(mat, `wet${puddles}${k}${o.terrain ? 'terrain' : ''}`, sh => {
     Object.assign(sh.uniforms, WET);
     sh.vertexShader = sh.vertexShader
       .replace('#include <common>', '#include <common>\nvarying vec3 vWetW;')
@@ -64,8 +64,8 @@ export function addWetness(mat, o = {}) {
       .replace('#include <common>', '#include <common>\n' + WET_PARS)
       .replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
         float wetN = wn(vWetW.xz * 0.45) * 0.6 + wn(vWetW.xz * 1.6 + 3.1) * 0.4;
-        float puddle = ${puddles.toFixed(1)} * smoothstep(0.68 - uWet * 0.2, 0.74 - uWet * 0.18, wetN) * uWet;
-        float damp = uWet * ${k.toFixed(2)};
+        float puddle = ${puddles.toFixed(1)} * smoothstep(0.68 - uWet * 0.2, 0.74 - uWet * 0.18, wetN) * uWet ${o.terrain ? '* (terrainW.y + terrainW.z)' : ''};
+        float damp = uWet * ${k.toFixed(2)} ${o.terrain ? '* dot(terrainW, vec4(0.45, 0.9, 1.0, 0.45))' : ''};
         roughnessFactor = mix(roughnessFactor, 0.36, damp * 0.75);
         roughnessFactor = mix(roughnessFactor, 0.04, puddle);
         diffuseColor.rgb *= 1.0 - 0.4 * damp - 0.3 * puddle;`)

@@ -35,7 +35,10 @@ try {
     await page.goto(`http://127.0.0.1:${server.address().port}/`);
     await page.waitForFunction(() => window.G?.game?.title, null, { timeout: 90000 });
     const r = await page.evaluate(() => {
+      G.game.loop = () => {};
       area('akershus', 'castle', 12); G.state = 'pause';
+      G.game.renderPass.scene = G.scene; G.game.renderPass.camera = G.camera;
+      G.composer.render(); G.renderer.getContext().finish();
       const m = G.dungeon.M, grass = m.ground[3], forest = m.forestFloor;
       return { grassReserve: !!grass.map.isCanvasTexture, forestReserve: !!forest.map.isCanvasTexture,
         decoded: !!grass.map.image.complete, colorSpace: grass.map.colorSpace,

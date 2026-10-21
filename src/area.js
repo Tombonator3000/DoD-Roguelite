@@ -14,6 +14,7 @@ import { imageTexture } from './textures.js';
 import { AreaLife } from './arealife.js';
 import { buildAreaGrid, K_FOREST, K_DEEP, K_HILL, K_WALL } from './areagrid.js';
 import { harborRoof } from './harborstyle.js';
+import { addSurfaceDetail } from './surfaces.js';
 
 const E = 30; // så mange fliser bakken og vannet fortsetter utenfor kartet
 const idx = (x, y) => y * TW + x;
@@ -164,6 +165,9 @@ export class Area extends Town {
       addCutaway(M.spruce);
       addWetness(M.forestFloor, { puddles: false, k: 0.45 });
       addWetness(M.hill, { puddles: false, k: 0.45 });
+      addWetness(M.rock, { puddles: false, k: 0.5 });
+      addSurfaceDetail(M.hill, 'ground');
+      addSurfaceDetail(M.rock, 'stone');
       addSway(M.spruce, 'leaf');
     }
     this.buildGround(M);
@@ -229,7 +233,7 @@ export class Area extends Town {
       const flush = () => {
         if (!run) return;
         const target = run.out && plat ? low : floor;
-        target.quadUp(run.x0 * T, y * T, (run.x1 + 1) * T, (y + 1) * T, run.out && plat ? -plat.drop : -0.03, [1, 1, 1], 0.12);
+        for (let x = run.x0; x <= run.x1; x++) target.quadUp(x * T, y * T, (x + 1) * T, (y + 1) * T, run.out && plat ? -plat.drop : -0.03, [1, 1, 1], 0.2);
         run = null;
       };
       for (let x = -E; x < TW + E; x++) {
@@ -240,7 +244,7 @@ export class Area extends Town {
       }
       flush();
     }
-    this.addMesh(floor, L.open ? M.outside : M.forestFloor, false, true);
+    this.addTerrain(floor, M);
     if (plat) {
       this.addMesh(low, M.field, false, true);
       // klippekant rundt platået
@@ -272,7 +276,7 @@ export class Area extends Town {
         if (isRoad(0, y)) road.quadUp(-E * T, y * T, 0, (y + 1) * T, -0.015, [0.9, 0.86, 0.8], 0.34);
         if (isRoad(TW - 1, y)) road.quadUp(TW * T, y * T, (TW + E) * T, (y + 1) * T, -0.015, [0.9, 0.86, 0.8], 0.34);
       }
-      this.addMesh(road, M.ground[GR.DIRT], false, true);
+      this.addTerrain(road, M);
     }
     // åkrer med furer
     const fields = new Mesher();

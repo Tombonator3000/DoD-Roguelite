@@ -6,6 +6,19 @@ Laget med three.js r170. Musikk, lyd, fiendemodeller og effekter genereres i net
 
 [Gjennomgang av prosjektbibliotekets 172 spillprofiler](docs/gjenbruk.md): konkrete kandidater for verdensminne, oppdrag, NPC-er, grafikk og lyd, med kildefiler, lisenser og anbefalt rekkefølge.
 
+## Nytt i 0.10: materialer, middelalderhus og terreng
+
+- Stein, tre og tak har større variasjon i farge og ruhet. Mose og smuss samler seg nederst, og takene følger nå regnet og skyskyggene.
+- Husene har faste varianter med ulike takvinkler, gavlbjelker, takoppløft på større bindingsverkshus, tykkere halmtak og hjørnekvadre på murhus. Detaljene forsvinner sammen med taket når du går inn. Dører, rom og møbler beholder plasseringen.
+- Gress, jord, brostein og skogbunn glir sammen langs ujevne kanter. Normalkartene blandes også, så overgangen følger lyset og regnet. Tregulv, bruer, hus og vann beholder tydelige grenser.
+- De eksisterende 50 bildene gjenbrukes. Ingen nye bilder, nettressurser eller motoravhengigheter under spill. Lagrede spill virker som før.
+
+| Arno før | Arno etter |
+| --- | --- |
+| ![Arno før hus- og materialendringene](docs/landskap/arno-for.jpg) | ![Arno med takoppløft, gavlverk og murhjørner](docs/landskap/arno-etter.jpg) |
+
+[Før-/etterbilder av stien, regn og kontrollresultater](docs/landskap.md). 35 data-/regresjonstester, pluss nettleserprøver av terrengblanding, patina, våte flater og takfading. Den nye grafikkprøven kjører også før Pages-publisering.
+
 ## Nytt i 0.9: verdensminne og havneavtalen
 
 - Verden husker den valgte rollpersonen mellom kloakkløp: klokke, utforsking, oppdrag, relasjoner og faste objektendringer. Nederlag avslutter løpet; silver og utstyr starter som før. Et nytt løp begynner i Fristaden i samme verden. Andre rollpersoner har egne verdener. Lasting gjenoppretter verden slik den var i den lagringen.
