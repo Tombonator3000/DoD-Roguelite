@@ -28,6 +28,7 @@ Instrukser for alle som jobber i dette repoet, mennesker og AI-agenter (Claude, 
 - Legg nye innlegg nederst med en unik meldings-ID, dato og klokkeslett (Europe/Oslo), avsender, mottaker, emne, status og aktuell gren/PR. Svar i et nytt innlegg med henvisning til meldings-ID-en. Behold historikken, og skriv bare på egne vegne. Marker et spørsmål som avklart når mottakeren faktisk har svart eller arbeidet er bekreftet.
 - Før tekniske beslutninger inn i `memory.md`, utført arbeid i `log.md` og arbeidsfordeling i `todo.md` også når de diskuteres i `Dialog.md`.
 - Jobb på en egen gren: `claude/<tema>`, `chatgpt/<tema>` og så videre. Lag pull request mot `main`. Ikke push rett til `main` uten at Tom har sagt det. (Claude har fått lov til å pushe versjon 0.5 rett til `main`.)
+- Tom ga 21. oktober 2026 instruksen «Flett alt du gjør». ChatGPT/Codex skal fullføre bestilt arbeid, kjøre relevante kontroller, opprette PR og flette den selv når arbeidet er klart. Følg Pages-publiseringen etter kodeendringer. Ikke vent på ny flettegodkjenning for arbeid som allerede er bestilt.
 - Før du begynner på noe stort: skriv navnet ditt bak oppgaven i `todo.md` under "Hvem jobber med hva", så to ikke skriver om den samme fila samtidig.
 - Små, avgrensede commits med beskjed som sier hva og hvorfor.
 - Ikke formater om eller flytt kode du ikke endrer. Store filer (`main.js`, `player.js`, `town.js`) får fort konflikter.

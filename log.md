@@ -310,3 +310,9 @@ Alt som gjøres i prosjektet loggføres her med tidsstempel (Europe/Oslo).
 - 02:23 (ChatGPT) Bygg, 22 regresjonstester, Chrome/WebAudio med vanlig brukeraktivering, alle fem underlag og rom, pause/mute, ressursgrense/opprydding, ekte takttid og JS-stans bestod. stress('tjuv', 20) gjennom fem nivåer og sju atlasflyter bestod uten konsollfeil. Teksturreservene for fullt, tomt og ødelagt sett bestod med CHROME=/usr/bin/chromium. HTML økte 7740 byte fra PR #8. Lisensen fra Ninth Vigil er med i begge bygg.
 
 - 02:24 (ChatGPT) Tok to nye, sammenlignbare JPEG-utsnitt av Arno før/etter og gjennomgikk dem visuelt. Samme antall geometrier og teksturer; 1200/1426 flere tegnede trekanter i utsnittene. La bilder, tørr lydprøve og resultatfiler i docs/lyd-arno og forklarte prøvens avgrensning i README. Opprettet egen lydjobb i PR-kontrollen og Pages.
+
+
+## 2026-10-21: Flett ferdig arbeid (ChatGPT)
+
+- 03:06 (ChatGPT) Tom ga instruksen «Flett alt du gjør». Bekreftet grønne kontroller på 3a07067 og ea643b2, og flettet PR #8 som e862d30 og PR #9 som bba07bb med vanlige flettecommits. Ingen konflikter.
+- 03:06 (ChatGPT) Lagret stående fletteinstruks i AGENTS.md og memory.md, fjernet de to ferdige reservasjonene fra todo.md og skrev D019. Dokumentendringen går også gjennom egen PR og flettes. Følger siste Pages-bygg til publisering.
