@@ -1,4 +1,5 @@
 import { Music } from './music.js';
+import { SoundSpace } from './audio-space.js';
 
 // Prosedyrisk lyd med WebAudio. Ingen lydfiler, alt syntetiseres.
 // Kvakket er laget med sagtann gjennom to formantfiltre.
@@ -43,12 +44,8 @@ export class Sound {
     this.musicBus = c.createGain();
     this.musicBus.gain.value = this.musicVol * 0.7;
     this.musicBus.connect(this.out);
-    this.reverb = c.createConvolver();
-    this.reverb.buffer = this._impulse(2.8, 3.0);
-    const rvOut = c.createGain();
-    rvOut.gain.value = 0.85;
-    this.reverb.connect(rvOut);
-    rvOut.connect(this.out);
+    this.space = new SoundSpace(this);
+    this.reverb = this.space.input;
     this.sendS = c.createGain();
     this.sendS.gain.value = 0.16;
     this.master.connect(this.sendS);
@@ -64,21 +61,6 @@ export class Sound {
     for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
     this.music = new Music(this);
     if (this.biome) this.music.setBiome(this.biome);
-  }
-
-  _impulse(sec, decay) {
-    const c = this.ctx, sr = c.sampleRate, len = Math.floor(sr * sec);
-    const b = c.createBuffer(2, len, sr);
-    for (let ch = 0; ch < 2; ch++) {
-      const d = b.getChannelData(ch);
-      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
-      // tidlige refleksjoner fra steinvegger
-      for (const [ms, a] of [[11, 0.7], [23, 0.5], [37, 0.42], [53, 0.3], [71, 0.22]]) {
-        const k = Math.floor((ms + ch * 3) * sr / 1000);
-        if (k < len) d[k] += a * (Math.random() < 0.5 ? -1 : 1);
-      }
-    }
-    return b;
   }
 
   setVolumes(music, sfx) {
@@ -556,6 +538,7 @@ export class Sound {
   }
 
   update(dt) {
+    this.space?.update();
     if (!this.ok) return;
     if (this.biome === 'stad') {
       this.ambT = (this.ambT || 0) - dt;

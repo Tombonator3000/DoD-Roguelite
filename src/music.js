@@ -63,7 +63,7 @@ const BOSS_RIFF2 = [[53, 0, 4], [51, 4, 4], [50, 8, 6], [51, 14, 2]];
 
 const SONGS = {
   title: {
-    bpm: 84, sub: 2, drone: [38, 45], droneVol: 0.05,
+    bpm: 84, sub: 2, beats: 3, drone: [38, 45], droneVol: 0.05,
     step(m, s, n, t, sd) {
       const bar = Math.floor(n / 6), st = n % 6;
       const intro = bar < 2;
@@ -80,7 +80,7 @@ const SONGS = {
     },
   },
   explore: {
-    bpm: 70, sub: 2, drone: [38, 45], droneVol: 0.045,
+    bpm: 70, sub: 2, beats: 4, drone: [38, 45], droneVol: 0.045,
     step(m, s, n, t, sd) {
       const bar = Math.floor(n / 8), st = n % 8;
       const dw = s.biome === 'dverg';
@@ -102,7 +102,7 @@ const SONGS = {
     },
   },
   boss: {
-    bpm: 102, sub: 4, drone: [38, 26], droneVol: 0.04,
+    bpm: 102, sub: 4, beats: 4, drone: [38, 26], droneVol: 0.04,
     step(m, s, n, t, sd) {
       const bar = Math.floor(n / 16), st = n % 16;
       const v = CH[BOSS_CH[bar % 4]];
@@ -118,7 +118,7 @@ const SONGS = {
     },
   },
   town: {
-    bpm: 92, sub: 2, drone: [38, 45], droneVol: 0.022,
+    bpm: 92, sub: 2, beats: 3, drone: [38, 45], droneVol: 0.022,
     step(m, s, n, t, sd) {
       const bar = Math.floor(n / 6), st = n % 6;
       const lb = bar % 16;
@@ -180,6 +180,8 @@ export class Music {
     this.bus = sound.musicBus;
     this.intensity = 0;
     this.target = 0;
+    this.barTarget = 0;
+    this.pending = null;
     this.current = null;
     this.name = null;
     this.biome = 'kloakk';
@@ -192,18 +194,31 @@ export class Music {
   // --- styring ------------------------------------------------------------
 
   play(name, opts = {}) {
-    if (this.name === name && this.current && !opts.restart) return;
+    if (this.name === name && this.current && !opts.restart) { this.pending = null; return; }
+    if (this.pending?.name === name && !opts.restart && !opts.fast) return;
+    // Som i The Ninth Vigil: vanlig temaskifte venter på neste takt.
+    // Seier, død og tittelen må reagere med en gang, også fra en ventende overgang.
+    if (this.current && !opts.fast && !opts.restart && name !== 'title' &&
+        !SONGS[name]?.length && SONGS[name] && !this.current.song.length) {
+      this.pending = { name, opts };
+      return;
+    }
+    this.pending = null;
+    this._start(name, opts, this.ctx.currentTime + 0.02);
+  }
+
+  _start(name, opts, at) {
     const c = this.ctx;
-    const now = c.currentTime;
-    if (this.current) this._fadeOut(this.current, opts.fast ? 0.6 : 2.2);
+    if (this.current) this._fadeOut(this.current, opts.fast ? 0.6 : 1.2, at);
     const song = SONGS[name];
     this.name = name;
     if (!song) { this.current = null; return; }
     const out = c.createGain();
-    out.gain.setValueAtTime(0.0001, now);
-    out.gain.exponentialRampToValueAtTime(1, now + (opts.fast ? 0.4 : 1.6));
+    out.gain.setValueAtTime(0.0001, c.currentTime);
+    out.gain.setValueAtTime(0.0001, at);
+    out.gain.exponentialRampToValueAtTime(1, at + (opts.fast ? 0.4 : 1.2));
     out.connect(this.bus);
-    const s = { song, out, n: 0, next: now + 0.12, sd: 60 / song.bpm / song.sub, biome: this.biome, drone: null };
+    const s = { song, out, n: 0, next: at, start: at, sd: 60 / song.bpm / song.sub, biome: this.biome, drone: null };
     if (song.drone) s.drone = this._drone(song.drone, song.droneVol, out);
     this.current = s;
   }
@@ -218,30 +233,51 @@ export class Music {
   }
 
   stop() {
+    this.pending = null;
     if (this.current) this._fadeOut(this.current, 1.5);
     this.current = null;
     this.name = null;
   }
 
-  _fadeOut(s, dur) {
+  _fadeOut(s, dur, at = this.ctx.currentTime) {
     const now = this.ctx.currentTime;
-    s.out.gain.cancelScheduledValues(now);
-    s.out.gain.setValueAtTime(Math.max(0.0001, s.out.gain.value), now);
-    s.out.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+    if (s.out.gain.cancelAndHoldAtTime) s.out.gain.cancelAndHoldAtTime(at);
+    else {
+      s.out.gain.cancelScheduledValues(at);
+      s.out.gain.setValueAtTime(Math.max(0.0001, s.out.gain.value), at);
+    }
+    s.out.gain.exponentialRampToValueAtTime(0.0001, at + dur);
     s.dead = true;
     setTimeout(() => {
       if (s.drone) s.drone.forEach(o => { try { o.stop(); } catch (e) { /* allerede stoppet */ } });
       s.out.disconnect();
-    }, dur * 1000 + 200);
+    }, (Math.max(0, at - now) + dur) * 1000 + 200);
   }
 
   _tick() {
-    this.intensity += (this.target - this.intensity) * 0.04;
-    const s = this.current;
+    this.intensity += (this.barTarget - this.intensity) * 0.04;
+    let s = this.current;
     if (!s || s.dead) return;
     const c = this.ctx;
-    if (s.next < c.currentTime - 0.5) s.next = c.currentTime + 0.05; // fanen var i bakgrunnen
+    if (s.next < c.currentTime - 0.5) {
+      // Hopp over tapte noter uten å flytte taktgrunnlaget etter en treg frame
+      // eller en bakgrunnsfane. Ikke spill en kø av gamle anslag på én gang.
+      const skipped = Math.ceil((c.currentTime + 0.05 - s.next) / s.sd);
+      s.n += skipped;
+      s.next += skipped * s.sd;
+    }
     while (s.next < c.currentTime + 0.14) {
+      const bar = s.song.beats * s.song.sub;
+      if (s.n % bar === 0) {
+        this.barTarget = this.target;
+        // By- og vertshusvarianten endres også på taktstreken.
+        this.night = this.wantNight; this.inn = this.wantInn;
+        if (this.pending) {
+          const p = this.pending; this.pending = null;
+          this._start(p.name, p.opts, s.next);
+          s = this.current;
+        }
+      }
       try { s.song.step(this, s, s.n, s.next, s.sd); } catch (e) { console.warn(e); }
       s.next += s.sd;
       s.n++;
@@ -252,6 +288,11 @@ export class Music {
         return;
       }
     }
+  }
+
+  setTownMood(night, inn) {
+    this.wantNight = night;
+    this.wantInn = inn;
   }
 
   // --- instrumenter -------------------------------------------------------
