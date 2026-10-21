@@ -2,8 +2,10 @@
 // (gravhaugen, orchleiren, Svarta Tornet, vraket). Ren data, som edelmap.js. Rutenettet er 46 x 46
 // fliser à 2 m. Folkene er spillets egne. Faren følger kildene i docs/verdenskart.md.
 import { FLOOR, GR } from './townmap.js';
-import { PLACES, ENCOUNTERS } from './worldmap.js';
-import { reveal, known, regionAt, ate } from './worldtravel.js';
+import { ENCOUNTERS } from './worldmap.js';
+import { PLACES } from './regionalmaps.js';
+import { ATLAS_REGIONS } from './atlasdata.js';
+import { reveal, known, regionAt, ate, worldMap } from './worldtravel.js';
 
 const PI = Math.PI;
 const TERR_NAME = { '.': 'slette', F: 'skog', '^': 'fjell' };
@@ -23,7 +25,7 @@ const SURN = { dvarg: ['Kvartsskjegg', 'Jernhånd', 'Skiferfot', 'Gruvebror'], m
 
 // Hvilke steder du kan få høre om i nærheten (ikke de du alt vet om)
 function nearbyUnknown(x, y, n = 2, hidden = true) {
-  return Object.entries(PLACES)
+  return Object.entries(worldMap().places)
     .filter(([id, p]) => !known(id) && (hidden || !p.hidden) && p.kind !== 'port')
     .map(([id, p]) => [id, Math.max(Math.abs(p.x - x), Math.abs(p.y - y))])
     .filter(([, dd]) => dd <= 12)
@@ -144,13 +146,14 @@ export function encounterFolk(kind, seed, x, y) {
 
 // Folk i landsbyene: verten (rom, mat, proviant, rykter), handleren og en bonde eller vakt
 function villageFolk(id, p) {
-  const R = rng(id.length * 97 + p.x * 31 + p.y);
+  const seed = [...id].reduce((n,c) => Math.imul(n,31) + c.charCodeAt(0),17);
+  const R = rng((p.map === 'aidne' ? id.length * 97 : seed) + p.x * 31 + p.y);
   const kin = p.folk === 'dverg' ? 'dvarg' : p.folk === 'alv' ? 'alv' : 'manniska';
   const nm = () => pick(R, NAMES[kin]);
   const vert = nm(), hand = nm(), bonde = nm();
   const place = p.name;
   const rumor = () => tellAbout((p.tells || []).filter(t => !known(t)).concat(nearbyUnknown(p.x, p.y, 2, false)).slice(0, 2), `Det skjer ikke stort i ${place}. Det er derfor vi bor her.`);
-  return [
+  const people = [
     { id: `v_${id}_vert`, name: vert, short: kin === 'dvarg' ? 'en dverg bak disken' : 'en vertinne med forkle', title: `vert i ${place}`,
       look: kin === 'dvarg' ? 'En bred dverg med ølfat under armen og skjegget knyttet opp så det ikke havner i suppa.' : 'En kraftig kvinne med forkle og et blikk som veier deg og pungen din samtidig.',
       model: { kin, profession: 'nasare', age: 'medel', clothes: { top: 0x6a3a2a, pants: 0x3a2a1a } },
@@ -173,6 +176,19 @@ function villageFolk(id, p) {
       topics: { NAVN: `${bonde}.`, JOBB: p.big ? 'Jeg holder orden. Det er mest å se streng ut.' : 'Jeg pløyer, sår, høster og klager. I den rekkefølgen.', RYKTER: c => rumor() },
       barks: p.big ? ['Hold deg unna trøbbel.'] : ['Fint vær for kål.'] },
   ];
+  const reg = ATLAS_REGIONS[p.map];
+  if (reg && p.map !== 'aidne') {
+    for (const n of people) {
+      n.topics.LANDET = reg.lore;
+      n.topics.BYEN = p.lore || reg.lore;
+      n.topics.VEIEN = c => tellAbout(p.tells || [], 'Spør om forbindelsene på atlaset. Havna og grenseveiene er merket på regionkartet.');
+      n.topics.RYKTER = () => `${reg.rumor} ${tellAbout((p.tells||[]).slice(0,2),'')}`;
+    }
+    people[0].greet = c => c.night ? 'Kjøkkenet er stengt. Trenger du [rom]?' : `Velkommen til ${place}. [Rom], [mat] og [proviant]. Vil du høre om [landet] eller om [veien] videre?`;
+    people[1].topics.JOBB = p.coast ? 'Jeg handler med skipene og folkene som kommer gjennom havna. [Handel]?' : 'Jeg kjøper varer fra karavanene og selger det reisende trenger. [Handel]?';
+    people[2].greet = p.map === 'caddo' ? 'Fredelig handel er velkommen. Hold magien for deg selv. Spør om [landet] hvis du ikke kjenner skikkene.' : `Du er i ${reg.name} nå. Spør om [landet] før du går videre.`;
+  }
+  return people;
 }
 
 // --- terreng i møteområdene -------------------------------------------------------------------
@@ -265,7 +281,7 @@ export function encounterLayout(enc, o) {
 export function villageLayout(id) {
   const p = PLACES[id];
   const R = rng(id.length * 131 + p.x);
-  const pre = 'v' + id.slice(0, 4) + '_';
+  const pre = p.map === 'aidne' ? 'v' + id.slice(0,4) + '_' : 'v_' + p.map + '_' + id + '_';
   const plaster = [0xe6d6b2, 0xd8ccb0, 0xe0d0aa, 0xd4c8a8][Math.floor(R() * 4)];
   const buildings = [
     { id: pre + 'inn', name: 'Vertshuset', sub: 'värdshus', x0: 12, y0: 14, x1: 19, y1: 20, doors: [[15, 20]], floor: GR.WOOD, style: 'timber', wallH: 4.2, roof: 'tile', plaster, chimney: [13.0, 17.2], shutter: [0.56, 0.24, 0.14] },
@@ -279,6 +295,11 @@ export function villageLayout(id) {
       { id: pre + 'h4', name: 'Et hus', sub: 'hus', x0: 36, y0: 15, x1: 41, y1: 20, doors: [[38, 20]], floor: GR.WOOD, style: 'timber', wallH: 3.2, roof: 'tile', plaster, chimney: [40.4, 16.2], shutter: [0.62, 0.14, 0.12] },
       { id: pre + 'h5', name: 'Et hus', sub: 'hus', x0: 4, y0: 26, x1: 8, y1: 30, doors: [[6, 26]], floor: GR.WOOD, style: 'timber', wallH: 2.8, roof: 'thatch', plaster: 0xd2c6a6, chimney: [7.4, 29.4], shutter: [0.3, 0.42, 0.5] },
     );
+  }
+  const climate = ATLAS_REGIONS[p.map]?.climate;
+  if (['varmt','tropisk'].includes(climate)) for (const b of buildings) {
+    b.plaster = 0xead7b0; b.roof = 'tile';
+    if (b.wallH < 3.5) b.style = 'stone';
   }
   const props = [
     { t: 'well', x: 22.5, y: 24.6 },

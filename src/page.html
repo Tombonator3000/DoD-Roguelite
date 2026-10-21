@@ -880,6 +880,41 @@ body:not(.touch) #dlg-kw .kw:nth-child(-n+9)::before { content: counter(kw); mar
   .w-info { min-height: 0; }
   .w-places { max-height: none; }
 }
+/* Verdensatlaset bruker samme pergament som regionkartet. */
+#atlas { place-items: start center; }
+#atlas .atlas-panel { width: min(1280px,100%); margin-block: auto; max-height: calc(100vh - 32px); overflow-y: auto; padding: 20px; }
+.atlas-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.atlas-head h2 { margin: 2px 0; }
+.atlas-body { display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: 20px; margin-top: 14px; }
+.atlas-chart { min-width: 0; }
+#atlas-map { width: 100%; height: auto; display: block; border: 1px solid #8c805e; touch-action: none; cursor: grab; }
+#atlas-map:active { cursor: grabbing; }
+.atlas-tools { display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;align-items:center; }
+.atlas-tools output { margin-left:auto;font-size:13px; }
+.w-pace { display:block;font-size:13px; }
+.w-pace select { width:100%;padding:6px;color:#30271e;background:#eee1c3;margin:4px 0; }
+.atlas-chart p { font-style: italic; opacity: .8; font-size: 13px; }
+.atlas-side { min-width: 0; }
+.atlas-side label { display: block; font-family: var(--ui); font-size: 14px; }
+.atlas-side select { display: block; width: 100%; margin: 5px 0 10px; padding: 8px; color: #30271e; background: #eee1c3; border: 1px solid #ad9365; font-size: 15px; }
+#atlas .atlas-side h3 { margin-top: 15px; }
+#atlas .atlas-side p { font-size: calc(15px * var(--txt,1)); }
+.atlas-plan { border-block: 1px solid #b39b71; padding: 8px 0 12px; margin-top: 12px; }
+.atlas-plan .btn { width: 100%; margin-top: 8px; white-space: normal; }
+#atlas-departures { max-height: 180px; overflow-y: auto; }
+.atlas-link { display: block; width: 100%; text-align: left; padding: 8px; border: 0; border-bottom: 1px solid #c1ab82; color: #3d3022; background: rgba(255,248,222,.35); font-size: 14px; cursor: pointer; }
+.atlas-link:hover { background: #f3e6c8; }
+.atlas-link small { display: block; color: #6c5945; margin-top: 3px; }
+#atlas-journal { padding-left: 18px; font-size: 13px; }
+.malt-pergament #atlas .panel { --parch: #30271e; --dim: #665444; --gild: #773e22; --gild-dim: #ad9365; color: var(--parch); background: #e4d6b5 var(--pergament); background-size: 512px 512px; }
+.malt-pergament #atlas .btn { color: #30271e; background: linear-gradient(#f2e6c7,#d7c29b); }
+.malt-pergament #atlas .btn.primary { color: #f8ead0; background: linear-gradient(#7a1a14,#3e0b08); }
+@media(max-width:760px) {
+  #atlas { padding: 8px; }
+  #atlas .atlas-panel { padding: 14px; max-height: none; }
+  .atlas-body { grid-template-columns: minmax(0,1fr); gap: 10px; }
+  #atlas-departures { max-height: 140px; }
+}
 </style>
 
 <div id="stage"></div>
@@ -1176,7 +1211,7 @@ body:not(.touch) #dlg-kw .kw:nth-child(-n+9)::before { content: counter(kw); mar
 <section class="screen" id="world" hidden>
   <div class="panel worldp">
     <div class="w-head">
-      <div><div class="eyebrow" id="w-region">Zorakin</div><h2>Aidne og Drakdjupet</h2></div>
+      <div><div class="eyebrow" id="w-region">Zorakin</div><h2 id="w-map-title">Aidne og Drakdjupet</h2></div>
       <div class="w-stats" id="w-stats"></div>
     </div>
     <div class="w-body">
@@ -1184,7 +1219,9 @@ body:not(.touch) #dlg-kw .kw:nth-child(-n+9)::before { content: counter(kw); mar
       <aside class="w-side">
         <div class="w-here" id="w-here"></div>
         <div class="w-info" id="w-info"></div>
+        <label class="w-pace" for="w-pace">Ferd til fots<select id="w-pace"><option value="walk">Gång, 20 km per reisedag</option><option value="march">Marsch, 30 km og Lätt SMI</option></select></label>
         <div class="w-btns">
+          <button class="btn" id="btn-w-atlas">Ereb Altor og sjøreiser</button>
           <button class="btn primary" id="btn-w-go">Reis</button>
           <button class="btn" id="btn-w-enter">Se deg om</button>
           <button class="btn" id="btn-w-camp">Slå leir</button>
@@ -1192,6 +1229,31 @@ body:not(.touch) #dlg-kw .kw:nth-child(-n+9)::before { content: counter(kw); mar
         </div>
         <h3>Steder du kjenner</h3>
         <div class="w-places" id="w-places"></div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<section class="screen" id="atlas" hidden>
+  <div class="panel atlas-panel">
+    <div class="atlas-head"><div><div class="eyebrow">Verden utenfor bymuren</div><h2>Ereb Altor</h2></div><button class="btn small" id="btn-atlas-back">Til regionkartet</button></div>
+    <p id="atlas-place"></p>
+    <div class="atlas-body">
+      <div class="atlas-chart">
+        <div class="atlas-tools"><button class="btn small" id="atlas-zoom-out">Zoom ut</button><button class="btn small" id="atlas-zoom-in">Zoom inn</button><button class="btn small" id="atlas-fit">Hele kartet</button><button class="btn small" id="atlas-focus">Vis målet</button><output id="atlas-zoom" aria-live="polite">100 %</output></div>
+        <canvas id="atlas-map" width="900" height="646" tabindex="0" aria-label="Originalkart over Ereb Altor. Dra for å panorere. Bruk zoomknappene eller musehjulet."></canvas>
+        <p>Dra kartet for å flytte utsnittet. Velg et reisemål på kartet eller i lista. <a href="https://kingafw.no/Drakar/boker/ae66767c8db9/les-hele-boka.html" target="_blank" rel="noopener">Originalkart: Ereb Altor, 1989</a>.</p>
+      </div>
+      <aside class="atlas-side">
+        <label for="atlas-country">Land og region</label><select id="atlas-country"></select>
+        <h3 id="atlas-name"></h3><p id="atlas-lore"></p><p id="atlas-rumor"></p>
+        <div class="atlas-plan"><p id="atlas-route"></p>
+          <label id="atlas-mode-wrap" for="atlas-mode">Passasje<select id="atlas-mode"><option value="passenger">Kjøp billett</option><option value="crew">Arbeid om bord, uten billett</option></select></label>
+          <label id="atlas-land-wrap" for="atlas-land-mode">Landevei<select id="atlas-land-mode"><option value="walk">Gång med egen proviant</option><option value="march">Marsch med egen proviant</option><option value="caravan">Karavane med mat, 2 sm per døgn</option></select></label>
+          <button class="btn" id="btn-atlas-find">Finn avgangen</button><button class="btn primary" id="btn-atlas-travel">Reis</button>
+        </div>
+        <h3>Forbindelser fra regionen</h3><div id="atlas-departures"></div>
+        <h3>Siste reiser</h3><ul id="atlas-journal"></ul>
       </aside>
     </div>
   </div>

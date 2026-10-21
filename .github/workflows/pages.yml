@@ -29,7 +29,7 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: npm run build
       - name: Test kampeffektpoolen
-        run: node --test tools/test/combatfx.test.mjs
+        run: node --test tools/test/combatfx.test.mjs tools/test/atlas.test.mjs
       - name: Test det ferdige spillet fra Pages-undermappa
         run: node tools/test/combatfx-browser.mjs dist/pages-test
       - name: Test bildeinnlasting og prosedyriske reserver

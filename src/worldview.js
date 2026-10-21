@@ -1,11 +1,13 @@
 // Verdenskartet på skjermen: tegningen, lista over steder, reisen rute for rute og møtene underveis.
 // Tegnes med canvas i blekk og pergament. Kartet er vårt eget, tegnet fra rutenettet i worldmap.js.
 import { G } from './state.js';
-import { WW, WH, TERRAIN, PLACES, ROADS, RIVERS } from './worldmap.js';
+import { WW, WH } from './worldmap.js';
+import { PLACES } from './regionalmaps.js';
 import {
   W, look, known, findPath, pathHours, stepHours, roadAt, terrainAt, regionAt, placeAt, passable, seenAt,
-  rollEncounter, tickHunger, hungerLevel, countFood, forage, campHours, ate, placeList,
+  rollEncounter, tickHunger, hungerLevel, countFood, forage, campHours, ate, placeList, worldMap,stepPlan,advanceTravelTime,foodNeeded,
 } from './worldtravel.js';
+import { formatDuration } from './journeytime.js';
 
 const $ = s => document.querySelector(s);
 const TERR_NAME = { '.': 'slette', F: 'skog', '^': 'fjell', '~': 'hav', o: 'innsjø' };
@@ -29,6 +31,7 @@ export class WorldView {
     $('#btn-w-enter').onclick = () => this.enter();
     $('#btn-w-camp').onclick = () => this.camp();
     $('#btn-w-forage').onclick = () => this.forageHere();
+    $('#w-pace').onchange=e=>{ W().pace=e.target.value;this.refresh(); };
     addEventListener('resize', () => { if (!$('#world').hidden) { this.bg = null; this.draw(); } });
     // HUD-loggen ligger under kartet, så linjene vises her også
     G.ui.mirror = $('#w-log');
@@ -68,6 +71,7 @@ export class WorldView {
 
   // Landskapet tegnes én gang per størrelse: farger, trær, fjell, kystlinje, elver og veier
   paintBackground(Wd, Hd, c) {
+    const { terrain:TERRAIN, roads:ROADS, rivers:RIVERS } = worldMap();
     const off = document.createElement('canvas');
     off.width = Wd; off.height = Hd;
     const g = off.getContext('2d');
@@ -131,11 +135,12 @@ export class WorldView {
     // landskapsnavn
     g.fillStyle = 'rgba(60,40,24,0.55)'; g.textAlign = 'center';
     g.font = `italic ${Math.max(10, Math.round(c * 0.75))}px Alegreya, Georgia, serif`;
-    for (const [t, x, y] of [['Drakdjupet', 35.5, 19], ['Sjunkna sjön', 22, 22.5], ['Aidnebergen', 15, 11.6], ['Vorgabergen', 33, 3.2], ['Nidabergen', 44, 6], ['Goiana', 19, 6.4], ['Torilskogen', 17.5, 17.8], ['Indar', 29.5, 19.6], ['Tolan', 44, 23], ['Kardunien', 6, 21], ['Valbukten', 2.5, 10.5]]) g.fillText(t, x * c, y * c);
+    if (W().region === 'aidne') for (const [t, x, y] of [['Drakdjupet', 35.5, 19], ['Sjunkna sjön', 22, 22.5], ['Aidnebergen', 15, 11.6], ['Vorgabergen', 33, 3.2], ['Nidabergen', 44, 6], ['Goiana', 19, 6.4], ['Torilskogen', 17.5, 17.8], ['Indar', 29.5, 19.6], ['Tolan', 44, 23], ['Kardunien', 6, 21], ['Valbukten', 2.5, 10.5]]) g.fillText(t, x * c, y * c);
     this.bg = off;
   }
 
   draw() {
+    const { places:PLACES } = worldMap();
     const { Wd, Hd, c } = this.size();
     if (!this.bg) this.paintBackground(Wd, Hd, c);
     const g = this.ctx, w = W();
@@ -208,7 +213,9 @@ export class WorldView {
   // --- sidepanelet ----------------------------------------------------------------------------
   refresh() {
     const w = W(), P = G.player;
+    $('#w-pace').value=w.pace||'walk';$('#w-pace').disabled=!!this.moving;
     const reg = regionAt(w.x, w.y);
+    $('#w-map-title').textContent = worldMap().name;
     const here = placeAt(w.x, w.y);
     $('#w-region').textContent = reg.name;
     const food = countFood(), hl = hungerLevel();
@@ -219,6 +226,7 @@ export class WorldView {
       ['Silver', `${P.silver} sm`],
     ].map(([k, v]) => `<div class="${k === 'Mat' && (hl || !food) ? 'bad' : ''}"><span>${k}</span><b>${v}</b></div>`).join('');
     const hp = here ? PLACES[here] : null;
+    $('#btn-w-atlas').disabled = !!this.moving || !$('#w-enc').hidden;
     $('#w-here').innerHTML = hp ? `<b>${hp.name}</b><span>${hp.sub[0].toUpperCase() + hp.sub.slice(1)}.</span>` : `<b>${TERR_NAME[terrainAt(w.x, w.y)][0].toUpperCase() + TERR_NAME[terrainAt(w.x, w.y)].slice(1)}${roadAt(w.x, w.y) ? ' ved veien' : ''}</b><span>${reg.name}.</span>`;
     $('#btn-w-enter').textContent = hp ? (hp.kind === 'port' ? 'Gå til porten' : `Gå inn i ${hp.name}`) : 'Se deg om';
     $('#btn-w-camp').disabled = false;
@@ -253,8 +261,8 @@ export class WorldView {
     const arrive = G.run.clock + h;
     const roadShare = path.slice(1).filter(([x, y]) => roadAt(x, y)).length / Math.max(1, path.length - 1);
     const food = countFood();
-    const need = Math.max(0, Math.ceil((h - (24 - Math.min(24, G.run.clock - (W().fed ?? G.run.clock)))) / 24));
-    el.innerHTML = `<b>${name[0].toUpperCase() + name.slice(1)}</b><span>${fmtH(h)}, ${roadShare > 0.7 ? 'mest langs veien' : roadShare > 0.3 ? 'dels langs veien' : 'utenfor veien'}. Fremme dag ${dayOf(arrive)} klokka ${hhmm(arrive)}.</span>${need > food ? `<span class="bad">Du har mat for ${food} døgn. Reisen krever ${need}.</span>` : ''}`;
+    const need = foodNeeded(h);
+    el.innerHTML = `<b>${name[0].toUpperCase() + name.slice(1)}</b><span>${formatDuration(h)} med nattestans, ${roadShare > 0.7 ? 'mest langs veien' : roadShare > 0.3 ? 'dels langs veien' : 'utenfor veien'}. Anslag: dag ${dayOf(arrive)} klokka ${hhmm(arrive)}.</span>${need > food ? `<span class="bad">Du har mat for ${food} døgn. Omtrent ${need} trengs. Reisen stopper før neste etappe hvis provianten ikke rekker.</span>` : ''}${W().pace==='march'?'<span>Marsch: Lätt SMI hver dag. Et missøde gir vanlig gangfart den dagen.</span>':''}`;
     goBtn.disabled = false;
     goBtn.textContent = w.route?.length > 1 && w.route[w.route.length - 1][0] === tx && w.route[w.route.length - 1][1] === ty ? 'Fortsett reisen' : 'Reis';
   }
@@ -313,9 +321,14 @@ export class WorldView {
     const w = W(), P = G.player;
     const [x, y] = m.path[m.i + 1];
     const [px, py] = m.path[m.i];
-    let h = stepHours(x, y) * (x !== px && y !== py ? 1.41 : 1);
-    // Orientering når du forlater veien i skog og fjell (Bok I s. 54). Halv CL uten klar himmel.
+    const estimate=stepPlan(px,py,x,y);
     const lostTerr = !roadAt(x, y) && (terrainAt(x, y) === 'F' || terrainAt(x, y) === '^');
+    const worst=lostTerr&&!m.offRoad?3+stepPlan(px,py,x,y,G.run.clock+3).maxHours:estimate.maxHours;
+    if(foodNeeded(worst)>countFood()) {
+      this.stop();G.ui.log('Provianten rekker ikke til neste etappe. Let etter mat eller kjøp mer før du fortsetter.');return;
+    }
+    let h = 0;
+    // Orientering når du forlater veien i skog og fjell (Bok I s. 54). Halv CL uten klar himmel.
     if (lostTerr && !m.offRoad) {
       const sky = G.weather?.kindAt?.(G.run.clock) ?? G.weather?.kind;
       const clear = !sky || sky === 'klart';
@@ -325,7 +338,9 @@ export class WorldView {
       else G.ui.logRoll(r, 'Du finner veien uten sti.');
     }
     m.offRoad = !roadAt(x, y);
-    G.run.clock += h;
+    if(h)advanceTravelTime(h);
+    const plan=stepPlan(px,py,x,y,G.run.clock,w.pace||'walk',true);
+    advanceTravelTime(plan.hours,{nights:plan.nights});
     w.x = x; w.y = y;
     m.i++;
     m.at = [x, y];
@@ -410,19 +425,17 @@ export class WorldView {
     const night = 22;
     const enc = rollEncounter(w.x, w.y, night) || (Math.random() < 0.5 ? rollEncounter(w.x, w.y, 2) : null);
     if (enc && enc.kind === 'fiende') {
-      G.run.clock += hrs / 2;
-      tickHunger();
+      advanceTravelTime(hrs/2);
       G.ui.log('Du våkner av at noen er i nærheten av leiren.');
       this.refresh();
       this.encounter(enc, w.x, w.y, ((G.run.clock % 24) + 24) % 24);
       return;
     }
-    G.run.clock += hrs;
-    tickHunger();
+    advanceTravelTime(hrs);
     const hungry = hungerLevel() > 0;
     const got = hungry ? 0 : P.heal(Math.ceil(Math.random() * 3), true);
-    P.gainPSY(P.maxPSY);
-    G.ui.log(`Du sover under åpen himmel${got ? ` og får tilbake ${got} KP og all PSY` : ' og får tilbake all PSY'}.${hungry ? ' Du er for sulten til at sårene gror.' : ''} Klokka er sju.`);
+    if(!hungry)P.gainPSY(P.maxPSY);
+    G.ui.log(`Du sover under åpen himmel.${hungry?' Du er for sulten til å hente deg inn.':` Du får tilbake ${got} KP og all PSY.`} Klokka er sju.`);
     G.audio.heal?.();
     this.refresh();
   }

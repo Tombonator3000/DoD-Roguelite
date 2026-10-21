@@ -5,7 +5,9 @@ const images = new Map();
 const textures = new Map();
 
 export async function loadTextureImages(source = window.TEX || {}) {
-  await Promise.all(Object.entries(source).map(async ([name, uri]) => {
+  const all={ ...source };
+  if(window.EREB_MAP) all.ereb_altor=window.EREB_MAP;
+  await Promise.all(Object.entries(all).map(async ([name, uri]) => {
     if (!/^data:image\/(jpeg|png);base64,/.test(uri)) return;
     const img = new Image();
     img.src = uri;

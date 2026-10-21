@@ -1058,6 +1058,8 @@ export class Player {
     let o;
     if (a.offStrike) {
       const off = this.equip.vapen2;
+      // Våpenet kan være mistet eller knekt etter at dette anfallet ble startet.
+      if(!off)return;
       const tv = this.skills['Två vapen'] || 0;
       o = { ...this.attackSpec(off), offhand: true, locs: [this.offArm] };
       // Två vapen: FV er det laveste av de to (Bok I s. 59). Uten: -10 for sköldhanden.

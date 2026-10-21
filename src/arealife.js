@@ -903,10 +903,10 @@ export class AreaLife extends TownLife {
     this.passTime(1, () => {
       const hungry = hungerLevel() > 0;
       const got = hungry ? 0 : P.heal(d(3));
-      P.gainPSY(P.maxPSY);
+      if(!hungry)P.gainPSY(P.maxPSY);
       G.fx.burst('heal', P.pos, 24);
       G.audio.heal();
-      G.ui.log(`Du sover på vertshuset. ${got ? `+${got} KP og ` : ''}all PSY.${hungry ? ' Du er for sulten til at sårene gror.' : ''}`);
+      G.ui.log(`Du sover på vertshuset.${hungry?' Du er for sulten til å hente deg inn.':` +${got} KP og all PSY.`}`);
       G.ui.log(`Klokka er sju. ${this.L.name} våkner.`);
       this.checkStorm();
     });

@@ -1,5 +1,7 @@
 # Verdenskart i Fallout-stil for Ereb Altor
 
+Oppdatert 21. oktober 2026: Toms nye valg er originalkart i atlaset og realistiske reisedøgn. Den sammenpressede 0.7-skalaen nedenfor beskriver den tidligere implementeringen. Gjeldende reiser og kalibrering står i [ereb-altor.md](ereb-altor.md).
+
 Claude, 2026-10-08. Tom spurte om et verdenskart som i Fallout 1 og 2: du klikker på kartet og reiser, det kan dukke opp tilfeldige møter, du kan finne steder selv, og noen byer er markert fra starten. På sikt skal Ereb Altor-verdenen og kartet bli større. Dette er en plan, ingen kode ennå.
 
 ## Kort fortalt

@@ -30,7 +30,9 @@ if (fs.existsSync(texDir)) for (const file of fs.readdirSync(texDir).sort()) {
   images[file.replace(/\.(jpg|png)$/, '')] = `data:image/${file.endsWith('.png') ? 'png' : 'jpeg'};base64,${bytes.toString('base64')}`;
 }
 if (imageBytes >= 4_000_000) throw new Error('Teksturene overskrider budsjettet på 4 MB');
-const data = `window.DUCK_B64="${duck}";window.DUCK_TEX="data:image/jpeg;base64,${tex}";window.TEX=${JSON.stringify(images)};`;
+const atlasBytes = fs.readFileSync(root + 'assets/maps/ereb-altor.jpg');
+if (atlasBytes.length > 4_000_000) throw new Error('Atlaskartet overskrider budsjettet på 4 MB');
+const data = `window.DUCK_B64="${duck}";window.DUCK_TEX="data:image/jpeg;base64,${tex}";window.TEX=${JSON.stringify(images)};window.EREB_MAP="data:image/jpeg;base64,${atlasBytes.toString('base64')}";`;
 const body = page.replace('/*__DUCK_DATA__*/', () => data).replace('/*__GAME_JS__*/', () => js);
 fs.mkdirSync(root + 'dist', { recursive: true });
 fs.writeFileSync(root + 'dist/artifact.html', body);
@@ -39,3 +41,4 @@ fs.writeFileSync(root + 'dist/index.html', full);
 if (Buffer.byteLength(body) >= 16 * 1024 * 1024) throw new Error('Artifact overskrider 16 MiB');
 console.log('js', (js.length / 1024).toFixed(0) + 'KB', 'html', (full.length / 1024).toFixed(0) + 'KB');
 console.log('bilder', Object.keys(images).length, (imageBytes / 1024).toFixed(0) + 'KB');
+console.log('originalkart', (atlasBytes.length / 1024).toFixed(0) + 'KB');

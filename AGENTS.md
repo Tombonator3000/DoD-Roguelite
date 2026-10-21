@@ -4,7 +4,7 @@ Instrukser for alle som jobber i dette repoet, mennesker og AI-agenter (Claude, 
 
 ## Hva prosjektet er
 
-"Svart Nebb under Fristaden": en roguelite i nettleseren, laget med three.js. Kamera og kamp som Diablo og Hades, samtaler med nøkkelord som i Ultima IV/V. Regler fra Drakar och Demoner (Fria Ligan, 2023), verden fra Ereb Altor. Hovedpersonen er Svart Nebb, en and og tjuv fra Fristaden i Zorakin. Eier: Tom (Tombonator3000).
+"Svart Nebb under Fristaden": en roguelite i nettleseren, laget med three.js. Kamera og kamp som Diablo og Hades, samtaler med nøkkelord som i Ultima IV/V. Regler fra Drakar och Demoner 4.0 (1991), med Expert og Gigant, verden fra Ereb Altor. Hovedpersonen er Svart Nebb, en and og tjuv fra Fristaden i Zorakin. Eier: Tom (Tombonator3000).
 
 ## Les dette først
 
@@ -35,8 +35,8 @@ Instrukser for alle som jobber i dette repoet, mennesker og AI-agenter (Claude, 
 
 ## Kilder
 
-- Reglene er fra DoD 2023 (Dragonbane). Hvor hver verdi kommer fra, står i `memory.md` under "Kilder for reglene".
-- Tom har pekt på https://kingafw.no/Drakar/index.html: et bibliotek med de eldre utgavene (DoD 1.0 til 5.0, Expert, Chronopia) på svensk. Bruk det til verden, lore og monstre (Ereb Altor, Monsterboken 1 og 2, Svartfolk, Tjuvar och lönnmördare, Kopparhavets Kapare). Ikke bruk tallene derfra som 2023-regler: skadetabeller, egenskaper og förmågor er annerledes. Skriv kilden i en kommentar når du henter noe derfra.
+- Reglene er fra DoD 4.0 (1991), med Expert og Gigant der det trengs. Byttet fra DoD 2023 skjedde i 0.5. Hvor hver verdi kommer fra, står i `memory.md` under "Kilder for reglene" og i `docs/regler/IMPLEMENTERING.md`.
+- Tom har pekt på https://kingafw.no/Drakar/index.html: et bibliotek med de eldre utgavene på svensk. Bruk DoD91-bøkene til reglene, og Ereb Altor, Ivanhoe, Monsterboken, Svartfolk, Tjuvar och lönnmördare og Kopparhavets Kapare til verden og eventyr. Ulike utgaver har ulike verdier og geografi. Skriv konkret bok og side i koden når du henter noe derfra. Aidnes valgte 2024-geografi beholdes; verdensatlasets eldre kilder og spilltilpasninger står i `docs/ereb-altor.md`.
 
 ## Teknikk
 

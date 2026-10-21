@@ -183,6 +183,10 @@ export function unequip(P, slot) {
 }
 
 export function dropEntry(P, e, fromSlot = null) {
+  if (G.state === 'world' || G.state === 'atlas' || G.inv?.fromWorld) {
+    G.ui?.log('Gå inn i et område før du slipper noe på bakken.');
+    return false;
+  }
   let item = e;
   if (fromSlot) { item = P.equip[fromSlot]; P.equip[fromSlot] = null; refreshAfterEquip(P, fromSlot); }
   else item = removeFromBag(P, e);

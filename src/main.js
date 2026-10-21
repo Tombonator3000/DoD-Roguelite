@@ -39,9 +39,11 @@ import { ARRIVE } from './arealife.js';
 import { Travel } from './travel.js';
 import { Q, fl, journalHTML, hoursLeft } from './ivan.js';
 import { WorldView } from './worldview.js';
+import { AtlasView } from './atlasview.js';
 import { EnvLight } from './envlight.js';
 import { W as worldState, tickHunger, regionAt as worldRegionAt, terrainAt as worldTerrainAt, roadAt as worldRoadAt } from './worldtravel.js';
-import { PLACES as WORLD_PLACES, ENCOUNTERS } from './worldmap.js';
+import { ENCOUNTERS } from './worldmap.js';
+import { PLACES as WORLD_PLACES } from './regionalmaps.js';
 import { encounterLayout, villageLayout, siteLayout, wildLayout } from './areatemplates.js';
 
 const $ = s => document.querySelector(s);
@@ -265,6 +267,7 @@ class Game {
     G.saveui = new SaveUI();
     G.travel = new Travel();
     G.worldview = new WorldView();
+    G.atlas = new AtlasView();
     G.audio = new Sound();
     G.input = new Input(renderer.domElement);
     G.world = new World();
@@ -867,7 +870,7 @@ class Game {
 
   // står du på verdenskartet (også med pause, rollformulär eller inventar oppe over det)?
   onWorldNow() {
-    return G.state === 'world' || ((G.state === 'pause' || G.state === 'sheet') && !!this.pauseFromWorld) || (G.state === 'inventory' && !!G.inv.fromWorld) || (G.state === 'travel' && !!G.travel.fromWorld);
+    return G.state === 'world' || G.state === 'atlas' || ((G.state === 'pause' || G.state === 'sheet') && !!this.pauseFromWorld) || (G.state === 'inventory' && !!G.inv.fromWorld) || (G.state === 'travel' && !!G.travel.fromWorld);
   }
 
   openWorld(o = {}) {
@@ -911,6 +914,7 @@ class Game {
     const w = worldState();
     const p = pid ? WORLD_PLACES[pid] : null;
     const h = ((G.run.clock % 24) + 24) % 24;
+    if (p?.kind === 'gateway') { G.atlas.open(p.target); return; }
     if (p?.kind === 'port') { G.ui.log(p.text); return; }
     if (p?.kind === 'fristaden' && (h >= 22 || h < 5)) { G.ui.log('Nordporten er stengt om natta. Folkard åpner når det lysner, rundt klokka fem. Du kan slå leir utenfor muren.'); return; }
     if (p?.kind === 'pharynx' && (Q().stage || 0) < 1) { G.ui.log('Pharynx, hertigens by. Vaktene i porten spør hva du vil. Du har ikke noe ærend her ennå.'); return; }
@@ -1860,6 +1864,7 @@ class Game {
     if (G.state === 'title') this.titleKeys(inp);
     else if (inp.wasPressed('Escape')) {
       if (G.state === 'inventory') G.inv.close();
+      else if (G.state === 'atlas') G.atlas.close();
       else if (G.state === 'travel') G.travel.close();
       else if (G.state === 'world') { if (!$('#w-enc').hidden) { /* et møte må avgjøres */ } else if (G.worldview.moving) G.worldview.stop(); else this.pause(); }
       else if (!$('#saves').hidden) this.closeSaves();
@@ -1950,7 +1955,12 @@ class Game {
     this.updateCamera(dt);
     this.updateLights(dt);
     G.water.update(dt);
-    G.composer.render();
+    // Kartet tegnes av canvas. Den skjulte 3D-bakgrunnen trenger ikke full bildefrekvens.
+    const mapOpen = (G.state === 'world' || G.state === 'atlas') && !this.wiping;
+    if (!mapOpen || now - (this.mapFrameAt ?? -Infinity) >= 125) {
+      G.composer.render();
+      this.mapFrameAt = now;
+    }
     inp.endFrame();
   }
 
