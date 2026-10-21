@@ -13,6 +13,23 @@ Laget med three.js r170. Musikk, lyd, fiendemodeller og effekter genereres i net
 - Dette er grunnlaget for en større verden. De nye reisekartene er skjematiske, og byene bruker foreløpig områdemaler. Edelfara er fortsatt det ferdige bokeventyret; flere scenarioer er kildeført for videre arbeid.
 - Kilder fra Toms Drakar-bibliotek, bilder og konkret plan for en Ultima-kampanje: [Ereb Altor og veien videre](docs/ereb-altor.md).
 
+## Lyd og bygningsprøve i Arno
+
+- Fotsteg følger gangfasen og skiller mellom stein, tre, jord, gress og vann. Bruer bruker trelyd selv om det er vann under. Smyga er stillere. Pause, stillstand, teleportering og nye områder lager ikke ekstra steg.
+- Romklangen følger stedet: kort ute, dempet i trehus, tydeligere i steinrom og lang i kloakken og dvergehallene. To romklanger tones mellom hverandre når du går inn eller ut.
+- Temaskifter, kampintensitet og vertshus-/nattvarianten følger neste takt. Våre egne melodier og instrumenter beholdes. Død og seier reagerer straks. Ved en treg nettleser hoppes tapte noter over uten å flytte taktgrunnlaget.
+- Arno er første prøve på faste bygningsvarianter: ulike takretninger, takvinkler, skodder og puss, takrader, gesimser og konsoller. Detaljene samles i de eksisterende takmaterialene og forsvinner sammen med taket når du går inn. Bygg-ID-er, dører og gulv beholder plasseringen. Dette er spillets egen arkitektur; egne bydeler, folk og oppdrag gjenstår.
+
+Teknikkene er tilpasset fra [The Ninth Vigil](https://github.com/iamlukethedev/The-Ninth-Vigil/tree/3355968b278d2e0544309344dfc7c54e0feaae32), særlig audio/Noise.js, VoicePool.js, AudioEngine.js og Music.js, samt ideen om bygningsdeler samlet per materiale fra world/town/Building.js. [MIT-lisensen](licenses/the-ninth-vigil.txt) følger også begge HTML-filene. Ingen ny avhengighet, bilde- eller lydfil lastes under spill.
+
+[Bilder og målinger](docs/lyd-arno/) viser bygningsprøven. [Lydprøven](docs/lyd-arno/fotsteg.wav) spiller stein, tre, gress, jord og vann i den rekkefølgen. Nettlesertesten `node tools/test/audio-browser.mjs` kontrollerer WebAudio, maks tolv fotstegstemmer, opprydding, rom, faktisk takttid og Arnos dører/tak. `node tools/test/harbor-shot.mjs` tar sammenlignbare bilder, også fra en urørt worktree med `ROOT` satt.
+
+| Arno før | Arno etter |
+|---|---|
+| ![Arnos malhus før](docs/lyd-arno/for-oversikt.jpg) | ![Arno med faste bygningsvarianter](docs/lyd-arno/etter-oversikt.jpg) |
+
+Ved samme kamera i Chromium/SwiftShader: 195/198 geometrier og 50 teksturer både før og etter. Utsnittene har 1200/1426 flere tegnede trekanter. Observerte tegnekall er 328 til 329 ved vertshuset og 304 til 306 i oversikten; lys og synlige folk varierer litt mellom kjøringene. Dette er ressurskontroll, ikke en måling av bildefrekvens på vanlig maskin. Lydnivå og ytelse på fysisk mobil gjenstår.
+
 ## Nytt i 0.7: verdenskart og bedre grafikk
 
 - Nordporten fører ut på et verdenskart over Aidne og Drakdjupet i stil med Fallout 1 og 2, tegnet etter 2024-kartet. Klikk på et sted og trykk Reis. Ruta går én time av gangen på veien, lengre i skog og fjell.

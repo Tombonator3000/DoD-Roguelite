@@ -1137,7 +1137,7 @@ class Game {
       this.fill.intensity = 0.22;
       G.scene.fog.near = 30;
       G.scene.fog.far = 64;
-      if (G.audio.music) { G.audio.music.night = false; G.audio.music.inn = false; }
+      G.audio.music?.setTownMood(false, false);
     }
     k.shadow.camera.updateProjectionMatrix();
   }
@@ -1181,8 +1181,8 @@ class Game {
     const night = n > 0.6;
     G.audio.townNight = night;
     if (G.audio.music) {
-      G.audio.music.night = night;
-      G.audio.music.inn = G.dungeon.insideId === 'inn';
+      const b = G.dungeon.buildings.find(b => b.id === G.dungeon.insideId);
+      G.audio.music.setTownMood(night, b?.id === 'inn' || b?.id.endsWith('_inn'));
     }
     if (night !== this.townNight) {
       this.townNight = night;
@@ -1371,7 +1371,7 @@ class Game {
       G.state = 'play';
       this.loadFloor(G.depth + 1);
       G.ui.buildBar();
-      if (G.audio.music && G.audio.music.name !== 'explore') G.audio.playMusic('explore');
+      G.audio.playMusic('explore');
     });
   }
 

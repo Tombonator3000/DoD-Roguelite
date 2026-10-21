@@ -33,7 +33,9 @@ if (imageBytes >= 4_000_000) throw new Error('Teksturene overskrider budsjettet 
 const atlasBytes = fs.readFileSync(root + 'assets/maps/ereb-altor.jpg');
 if (atlasBytes.length > 4_000_000) throw new Error('Atlaskartet overskrider budsjettet på 4 MB');
 const data = `window.DUCK_B64="${duck}";window.DUCK_TEX="data:image/jpeg;base64,${tex}";window.TEX=${JSON.stringify(images)};window.EREB_MAP="data:image/jpeg;base64,${atlasBytes.toString('base64')}";`;
-const body = page.replace('/*__DUCK_DATA__*/', () => data).replace('/*__GAME_JS__*/', () => js);
+const license = fs.readFileSync(root + 'licenses/the-ninth-vigil.txt', 'utf8');
+const notice = `<!-- Deler av lyden er tilpasset fra The Ninth Vigil, https://github.com/iamlukethedev/The-Ninth-Vigil\n${license}-->\n`;
+const body = notice + page.replace('/*__DUCK_DATA__*/', () => data).replace('/*__GAME_JS__*/', () => js);
 fs.mkdirSync(root + 'dist', { recursive: true });
 fs.writeFileSync(root + 'dist/artifact.html', body);
 const full = `<!doctype html>\n<html lang="no">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n</head>\n<body>\n${body}\n</body>\n</html>\n`;
