@@ -271,7 +271,13 @@ export function addCutaway(mat) {
     Object.assign(sh.uniforms, cutawayUniforms);
     sh.vertexShader = sh.vertexShader
       .replace('#include <common>', '#include <common>\nvarying float vViewZ; varying float vWY;')
-      .replace('#include <project_vertex>', '#include <project_vertex>\nvViewZ = -mvPosition.z; vWY = (modelMatrix * vec4(transformed, 1.0)).y;');
+      .replace('#include <project_vertex>', `#include <project_vertex>
+        vViewZ = -mvPosition.z;
+        vec4 cutWorld = vec4(transformed, 1.0);
+        #ifdef USE_INSTANCING
+          cutWorld = instanceMatrix * cutWorld;
+        #endif
+        vWY = (modelMatrix * cutWorld).y;`);
     sh.fragmentShader = sh.fragmentShader
       .replace('#include <common>', '#include <common>\nvarying float vViewZ; varying float vWY; uniform vec2 uCutPos; uniform float uCutDepth; uniform float uCutR;')
       .replace(

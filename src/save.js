@@ -2,12 +2,27 @@
 // Nivået bygges på nytt fra frøet, så bare det som har endret seg lagres (World.serializeLevel).
 import { G } from './state.js';
 import { FLOORS } from './dungeon.js';
+import { CAMPAIGN_VERSION, captureCampaign, copy, newCampaign, normalizeCampaign, writeCampaign } from './campaign.js';
+import { expireQuests } from './quests.js';
 
 const KEY = 'svartnebb.saves.v1';
-export const SAVE_VERSION = 2;
+export const SAVE_VERSION = 3;
 export const SAVE_RULES = 'dod91';
 export const SLOTS = ['auto', '1', '2', '3'];
 export const SLOT_NAME = { auto: 'Autolagring', 1: 'Plass 1', 2: 'Plass 2', 3: 'Plass 3' };
+
+export function compatibleSave(d) {
+  return !!d && [2, SAVE_VERSION].includes(d.v) && d.rules === SAVE_RULES && !!d.run && !!d.player && !!d.pos
+    && (d.v === 2 || d.campaign?.v === CAMPAIGN_VERSION);
+}
+
+export function migrateSave(d) {
+  if (!compatibleSave(d)) return null;
+  const result = copy(d), id = d.player.sheet?.id || 'svartnebb';
+  result.campaign = d.v === 2 ? captureCampaign(newCampaign(id, d.run.clock), d.run) : normalizeCampaign(d.campaign, id, d.run.clock);
+  result.v = SAVE_VERSION;
+  return result;
+}
 
 function readAll() {
   try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { return {}; }
@@ -24,7 +39,7 @@ export function listSaves() {
   return SLOTS.map(slot => ({ slot, data: all[slot] || null }));
 }
 export function latestSave() {
-  const s = listSaves().filter(x => x.data && x.data.v === SAVE_VERSION && x.data.rules === SAVE_RULES);
+  const s = listSaves().filter(x => compatibleSave(x.data));
   s.sort((a, b) => b.data.at - a.data.at);
   return s[0] || null;
 }
@@ -64,9 +79,13 @@ export function buildSave() {
   const town = !!G.dungeon.isTown;
   const area = G.dungeon.isArea ? G.dungeon.areaId : null;
   const onWorld = !!G.game?.onWorldNow?.();
+  const campaign = G.campaign ||= newCampaign(P.sheet.id || 'svartnebb', run.clock);
+  expireQuests(campaign, run.clock);
+  captureCampaign(campaign, run);
   return {
     v: SAVE_VERSION,
     rules: SAVE_RULES,
+    campaign: copy(campaign),
     at: Date.now(),
     meta: {
       name: P.name, kin: P.sheet.kin, prof: P.sheet.profession, nebb: P.isNebb,
@@ -93,6 +112,7 @@ export function saveGame(slot, quiet = false) {
   const all = readAll();
   all[slot] = data;
   const ok = writeAll(all);
+  if (ok && !writeCampaign(data.campaign)) G.ui?.log('Spillet er lagret, men verdensminnet kunne ikke oppdateres. Bruk Fortsett for å hente lagringen.');
   if (!quiet) G.ui.log(ok ? `Spillet er lagret (${SLOT_NAME[slot]}).` : 'Klarte ikke å lagre. Nettleseren har ikke plass.');
   return { ok, why: ok ? '' : 'Nettleseren har ikke plass.' };
 }
@@ -100,8 +120,9 @@ export function saveGame(slot, quiet = false) {
 export function readSave(slot) {
   const d = readAll()[slot];
   if (!d) return { ok: false, why: 'Plassen er tom.' };
-  if (d.v !== SAVE_VERSION || d.rules !== SAVE_RULES) return { ok: false, why: 'Lagret med en eldre versjon av spillet, og kan ikke lastes.' };
-  return { ok: true, data: d };
+  const data = migrateSave(d);
+  if (!data) return { ok: false, why: 'Lagringen bruker regler eller et format denne versjonen ikke støtter.' };
+  return { ok: true, data };
 }
 
 // Tekst for lista
@@ -112,7 +133,7 @@ export function describe(d) {
   const time = `dag ${day}, kl. ${String(Math.floor(h)).padStart(2, '0')}.${String(Math.floor((h % 1) * 60)).padStart(2, '0')}`;
   const play = m.time ? `${Math.floor(m.time / 3600) ? Math.floor(m.time / 3600) + ' t ' : ''}${Math.floor((m.time % 3600) / 60)} min spilt` : '';
   const when = new Date(d.at).toLocaleString('nb-NO', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-  const old = d.v !== SAVE_VERSION || d.rules !== SAVE_RULES;
+  const old = !compatibleSave(d);
   return {
     title: `${m.name || 'Ukjent'}${m.depth ? `, nivå ${m.depth}` : ''}`,
     place: m.place || '',

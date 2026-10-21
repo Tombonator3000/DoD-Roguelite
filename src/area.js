@@ -6,7 +6,7 @@ import { G, T } from './state.js';
 import { FLOORS, makeWaterMaterial } from './dungeon.js';
 import { Town, Mesher, materials, HT, WATER_BOTTOM, WATER_Y, tileToWorld as U } from './town.js';
 import { WALL, FLOOR, WATER, HOUSE, FENCE, GR, TW, TH } from './townmap.js';
-import { hash2, buildChest, buildBarrel, buildCrate } from './assets.js';
+import { hash2, buildChest, buildBarrel, buildCrate, addCutaway } from './assets.js';
 import { townTextures, signTexture } from './towntex.js';
 import { addWetness, addSway } from './wet.js';
 import { leafBlob, leafDetail, spruceCone } from './treegeo.js';
@@ -161,6 +161,7 @@ export class Area extends Town {
       M.rock = new THREE.MeshStandardMaterial({ map: TX.rock.map, normalMap: TX.rock.normalMap, roughness: 0.95, color: TX.rock.map.isCanvasTexture ? 0x8a867c : 0xeae6dd, flatShading: true });
       M.tent = new THREE.MeshStandardMaterial({ ...TX.canvas, roughness: 0.95, vertexColors: true, side: THREE.DoubleSide });
       M.spruce = new THREE.MeshStandardMaterial({ roughness: 0.9, vertexColors: true });
+      addCutaway(M.spruce);
       addWetness(M.forestFloor, { puddles: false, k: 0.45 });
       addWetness(M.hill, { puddles: false, k: 0.45 });
       addSway(M.spruce, 'leaf');

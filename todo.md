@@ -8,6 +8,7 @@ Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når p
 
 
 
+
 ## Nå
 
 - [x] Ny gjennomgang av alle 172 spillprofiler i prosjektbiblioteket, 15 kode-/lisensundersøkelser og to ekstra lisenskontroller. Prioritert plan og full dekning i docs/gjenbruk.md og docs/gjenbruk-spill.json (21. oktober).
@@ -19,10 +20,12 @@ Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når p
 - [x] Verdenskart over Aidne og Drakdjupet i Fallout-stil (0.7): tåke, steder du kjenner eller finner, reise rute for rute, møter med Upptäcka fara og Smyga, Orientering, landsbyer, fire skjulte steder, proviant og sult, lagring på kartet. Se docs/verdenskart.md.
 - [x] Ereb-atlas og videre reiser (0.8): 31 regionale kart, 30 sjøruter, 28 landeveier, passasje og hyre med Sjökunnighet, egen utforsking og gamle lagringer. Kilder og grenser i docs/ereb-altor.md. Nye byer er fortsatt malområder.
 - [x] Toms rettelse til PR #8: originalkart med zoom/panorering, oppmålte avstander, seildøgn som døgn, gång/marsch med vær, nattestans og dagsproviant, samt karavane og vern av gamle klokker/frister.
-- [ ] Ultima-kampanje: vedvarende verdens-/person-/fraksjonstilstand ved siden av kloakkløpet. Definer nederlag og nytt løp, og versjoner lagringen før nye scenarioer bindes til dette.
+- [x] Grunnlag for Ultima-kampanje (0.9): verdensminne per rollperson ved siden av kloakkløpet, person-/havnereaksjoner, klokke og utforsking mellom løp. Nederlag/nullstilling er definert og DoD91-lagringer migreres fra v2 til v3.
+- [ ] Utvid kampanjens objektminne til vanlige kister, butikkvarelager og endringer i flere områder. Havnelistens kiste er første faste objekt-ID, ikke en generell migrering av alle gamle verdensobjekter.
 - [x] Første avgrensede bygningsprøve i Arno: faste tak-/fasadevarianter med gesimser, konsoller og bevarte dører/takfading. Hele byer gjenstår.
-- [ ] Arno og Gringul som egne små byer med havn, bydeler, navngitte folk og ulike interesser. Caddos magiforbud har nå samtaletekst, men trenger vitner og faktiske reaksjoner.
-- [ ] Felles oppdragsformat og Edsbrytarna i Erebos som neste hele bokeventyr. Kilden er funnet, scenarioet er ikke implementert. Deretter Enhörningen och Drakormen i Hynsolge. Se docs/ereb-altor.md.
+- [ ] Arno og Gringul som egne små byer med havn og bydeler. Ragna, Tova, egne verter/vakter, døgnrytme og havneavtalen med ulike interesser er nå på plass (0.9). Caddos magiforbud trenger fortsatt vitner og faktiske reaksjoner.
+- [x] Felles oppdragsformat med navngitte trinn, frister, person-/sted-/objektvilkår, journalvalg, engangsbelønning og reaksjoner. Havnelisten mellom Arno og Gringul er første spillbare prøve (0.9).
+- [ ] Edsbrytarna i Erebos som neste hele bokeventyr på det nye oppdragsformatet. Kilden er funnet, scenarioet er ikke implementert. Deretter Enhörningen och Drakormen i Hynsolge. Se docs/ereb-altor.md.
 - [ ] Utvid regionkartene etter kildekartene, med flere særpregede steder og møter. Samkarna, Soluna og Akrogal trenger underregioner; Orghin, Irendor og Drakarnas arkipelag gjenstår.
 - [ ] Sjøhendelser med flere løsninger, skip og besetning fra Kopparhavets Kapare. Nåværende overfart behandler tid og mat, uten sjøkamp eller hendelser.
 - [ ] Spilltest verdenskartet med realistiske reisedøgn: møtefrekvens, dagsproviant, karavanepriser og hvile. Detaljkalibrer Aidnes lokale veier; dagens 50 x 30-utsnitt gir avstandsanslag.
@@ -39,7 +42,7 @@ Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når p
 - [ ] Pilnavigering (opp og ned) i pausemenyen som i tittelen.
 - [ ] Spilltest grafikken på ekte maskin og mobil: er regnet for tett, tilt-shift for sterk, natta for mørk i uvær?
 - [x] Grafikk etter Weatherglass, raske ting (0.7): MSAA i komposeren, bloom etter sted og tid, miljøkart fra himmelen, eksponering etter døgnet, myke trekroner. Se docs/grafikk-weatherglass.md.
-- [ ] Trær nær kameraet skjuler spilleren i Ekeskogen. La kronene mellom kameraet og spilleren bli gjennomsiktige, som takene i byen. Mal: fadeFronts i Loincloth Legends (docs/gjenbruk.md).
+- [x] Rettet utskjæring av instanserte trekroner: verdenshøyden inkluderer nå instanceMatrix, og granene bruker også utskjæringen. Gjenbruker dagens dithring og tegnelag uten nye tegnekall (0.9).
 - [ ] Fra docs/gjenbruk.md, raske ting: dør/knirk og havnemiljø med egne synteselyder eller kontrollert CC0-foley fra Morbidium/Loincloth, skriftene bygget inn med FontFace i stedet for Google Fonts, alphaToCoverage på tuster og faner, handler for tapt WebGL-kontekst, test av artifact.html under sandkassens CSP. Fotsteg etter underlag og romklang er allerede løst i PR #9.
 - [ ] Fra docs/gjenbruk.md, middels: skjermeffekter (sjokkbølge, zoom-punch, rød kant ved lav KP), angrepspoletter og tempostyrer (høyst 2 som angriper), automatisk kvalitet med pikselbudsjett, stemmer per släkt med formanter, spilltestmodus bak ?testmodus.
 - [ ] log.md er over 50 KB. Flytt eldre økter til logg/ÅÅÅÅ-MM.md, som Morbidium gjør med tools/rydd_dokumenter.py.

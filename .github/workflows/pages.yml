@@ -29,13 +29,20 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: npm run build
       - name: Test kampeffektpoolen
-        run: node --test tools/test/combatfx.test.mjs tools/test/atlas.test.mjs
+        run: node --test tools/test/combatfx.test.mjs tools/test/atlas.test.mjs tools/test/campaign.test.mjs
       - name: Test det ferdige spillet fra Pages-undermappa
         run: node tools/test/combatfx-browser.mjs dist/pages-test
       - name: Test bildeinnlasting og prosedyriske reserver
         run: node tools/test/texture-fallback.mjs
       - name: Test fotsteg, romklang, musikk og Arnos hus
         run: node tools/test/audio-browser.mjs dist/lydtest
+      - name: Test verdensminne, havneoppdrag og gamle lagringer
+        run: node tools/test/campaign-browser.mjs dist/kampanje-test
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pages-kampanje-test
+          path: dist/kampanje-test
       - uses: actions/upload-artifact@v4
         if: always()
         with:

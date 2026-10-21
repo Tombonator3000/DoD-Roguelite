@@ -6,6 +6,24 @@ Laget med three.js r170. Musikk, lyd, fiendemodeller og effekter genereres i net
 
 [Gjennomgang av prosjektbibliotekets 172 spillprofiler](docs/gjenbruk.md): konkrete kandidater for verdensminne, oppdrag, NPC-er, grafikk og lyd, med kildefiler, lisenser og anbefalt rekkefølge.
 
+## Nytt i 0.9: verdensminne og havneavtalen
+
+- Verden husker den valgte rollpersonen mellom kloakkløp: klokke, utforsking, oppdrag, relasjoner og faste objektendringer. Nederlag avslutter løpet; silver og utstyr starter som før. Et nytt løp begynner i Fristaden i samme verden. Andre rollpersoner har egne verdener. Lasting gjenoppretter verden slik den var i den lagringen.
+- Reise til Arno i Caddo, og finn Ragna Blekkfinger på havnekontoret rett sør for vertshuset. Hun arbeider klokka 7–12 og 13–18, spiser på vertshuset og sover om natta. Spør om OPPDRAG og si JA. Hent listen med E fra kisten ved handelsboden.
+- Lever listen til Tova Ankarsdotter på havnekontoret i Gringul i Erebos, og ta kvitteringen tilbake til Ragna. Skipet bruker fire døgn hver vei. Fristen er tolv døgn fra avtalen inngås; atlaset varsler hvis en etappe passerer fristen.
+- Helt segl gir 80 sm og bedre tillit. Journalen viser hva du bærer, hvor du skal og tiden som er igjen. Der kan du også bryte seglet og lese listen; da blir betalingen 20 sm. Folk husker utfallet, og havnas tillit gir 5 prosent avslag, mistillit 10 prosent påslag på lokale tjenester. Belønningen kan bare hentes én gang.
+- Kisten husker at den er tømt også etter gjenbesøk og nye løp. Oppdragsbrev står i journalen og følger verden. Havnefolkene, avtalen og prisutslagene er spillets egne, ikke et nytt bokeventyr eller nye DoD-regler.
+- DoD91-lagringer fra 0.5–0.8 kan fortsatt lastes. Format 2 får verdensminne ved lasting, uten å flytte gamle klokker eller Edelfaras frist. Nye lagringer bruker format 3.
+- Trekronenes utskjæring tar nå hensyn til hvor hvert instansert tre faktisk står. Granene bruker samme utskjæring, så anda blir lettere å se i skogen. Ingen nye teksturer eller tegnekall er lagt til for dette.
+
+Kampanjelaget bruker egne JavaScript-moduler: `campaign.js` for verdensminnet, `questdata.js`/`quests.js` for oppdragsdata og tillatte virkninger, og `campaign-runtime.js` for lagring og journal. Dataskillet er inspirert av gjennomgangen av Daggerfall Unity og OpenNefia. Ingen kode eller spillinnhold fra disse motorene er portert. Tester: `node --test tools/test/campaign.test.mjs` og `node tools/test/campaign-browser.mjs`. Egne bydeler og flere bokeventyr står fortsatt i todo.md.
+
+| Havna husker avtalen | Kontrollstillbilde av trekroner |
+| --- | --- |
+| ![Havnevakta i Arno husker at havnelisten kom fram](docs/kampanje/arno-husker.jpg) | ![Utskjæring av trekroner gjør rollpersonen synlig](docs/kampanje/trekroner.jpg) |
+
+[Journalen på 390 piksler](docs/kampanje/journal-mobil.jpg) viser oppdraget og den åpnede listen. [Lokal kontroll av ruter, mobil og trekroner](docs/kampanje/kontroll-layout.json) og [femnivå-stress](docs/kampanje/kontroll-stress.json) ligger ved. Den frosne renderprøven gir 25 761 endrede piksler når utskjæring slås på; gjentatt bilde og negativ kontroll med skjulte trær gir begge null. Dette er en kontroll av shaderen, ikke en prøve av stifinning eller FPS. Oppdragstesten i PR/Pages kjører i tillegg hele kjeden med begge oppgjør, lasting og frist under sjøreise. 32 data-/regresjonstester er grønne lokalt. HTML økte 16 068 byte til 9 395 281; de 50 innebygde bildene og materialbudsjettet er uendret. Fysisk mobil, lytting og spillbalanse gjenstår.
+
 ## Nytt i 0.8: ut i Ereb Altor
 
 - Åpne «Ereb Altor og sjøreiser» fra regionkartet. Atlaset bruker originalkartet fra Ereb-boksen med zoom, panorering og klikkbare reisemål. Det forbinder 31 regioner med 30 sjøruter og 28 landeveier.

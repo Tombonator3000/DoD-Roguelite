@@ -10,6 +10,8 @@ Fordelingen er 10 profiler som er aktuelle nå, 34 for senere og 128 med lav rel
 
 **Anbefaling:** bygg først verdensminne, oppdragsdata og lokale reaksjoner i Arno/Gringul. Behold three.js r170, WebGL 2 og én HTML-fil. Det nyttige her er avgrensede systemer, ikke et motorbytte. For rask grafisk gevinst er Toms eksisterende `fadeFronts` og kvalitetstilpasning fortsatt nærmere vår teknologi enn de store motorene nedenfor.
 
+Oppfølging i 0.9: verdensminne per rollperson, migrering av DoD91-lagringer, et felles oppdragsformat og havneavtalen med Ragna/Tova er implementert som egen kode. Trekronenes instanserte utskjæring er også rettet. Se [spillflyt og avgrensning](../README.md#nytt-i-09-verdensminne-og-havneavtalen). De øvrige kandidatene nedenfor er fortsatt en plan, ikke porter av motorene.
+
 ### Det som er mest nyttig hos oss
 
 | Prioritet | Opphav og undersøkt kode | Konkret bruk i Svart Nebb | Vilkår og arbeid |

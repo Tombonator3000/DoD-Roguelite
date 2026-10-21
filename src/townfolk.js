@@ -476,7 +476,7 @@ export class TownLife {
     const P = G.player;
     if (n.mode === 'sleep') {
       G.fx.float('Zzz', n.pos, 'miss', 1.2);
-      if (!this.sleepHint) { this.sleepHint = true; G.ui.log(`${G.meta.met?.[n.id] ? n.def.name : cap(n.def.short)} sover. Folk i Fristaden følger døgnet. Kom tilbake når det er lyst.`); }
+      if (!this.sleepHint) { this.sleepHint = true; G.ui.log(`${G.meta.met?.[n.id] ? n.def.name : cap(n.def.short)} sover. Folk her følger døgnet. Kom tilbake når det er lyst.`); }
       return;
     }
     const h = this.hour;
@@ -493,6 +493,9 @@ export class TownLife {
   // base står i de gamle tallene og ganges med PRIS. raw: base er allerede i sm (våpen, rustning, lärare).
   price(npcId, base, raw = false) {
     let m = 1;
+    const harbor = G.campaign?.factions[(this.town.L?.place || '') + '_havn'] || 0;
+    if (harbor > 0) m *= 0.95;
+    else if (harbor < 0) m *= 1.1;
     const ry = G.run.rykte || 0;
     if (ry <= -2) m *= 1.25;
     else if (ry >= 3) m *= 0.9;
@@ -508,6 +511,9 @@ export class TownLife {
 
   priceNote(npcId) {
     const n = [];
+    const harbor = G.campaign?.factions[(this.town.L?.place || '') + '_havn'] || 0;
+    if (harbor > 0) n.push('havnas tillit: 5% avslag');
+    else if (harbor < 0) n.push('havnas mistillit: dyrere');
     const ry = G.run.rykte || 0;
     if (ry <= -2) n.push('dårlig rykte: dyrere');
     else if (ry >= 3) n.push('godt rykte: billigere');

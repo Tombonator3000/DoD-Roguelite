@@ -13,6 +13,7 @@ import { buildCharacter, buildWeaponMesh, HOLD } from './kinmodels.js';
 import { buildChest } from './assets.js';
 import { Enemy } from './enemies.js';
 import { hungerLevel, ate, W as worldState } from './worldtravel.js';
+import { setupHarbor } from './harborlife.js';
 
 const U = v => v * T;
 const tmp = new THREE.Vector3();
@@ -199,6 +200,7 @@ export class AreaLife extends TownLife {
     this.exits = [];
     this.visit.rumorList = area.L.rumors || RUMORS[this.id] || RUMORS.sortmund;
     this.setup();
+    setupHarbor(this);
   }
 
   // Fristadens faste ting finnes ikke her
