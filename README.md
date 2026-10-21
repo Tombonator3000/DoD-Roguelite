@@ -6,6 +6,12 @@ Laget med three.js r170. Musikk, lyd, fiendemodeller og effekter genereres i net
 
 [Gjennomgang av prosjektbibliotekets 172 spillprofiler](docs/gjenbruk.md): konkrete kandidater for verdensminne, oppdrag, NPC-er, grafikk og lyd, med kildefiler, lisenser og anbefalt rekkefølge.
 
+## Rettet i 0.10.1: veier som møter terrenget naturlig
+
+Veibanen følger nå de faktiske veipunktene gjennom svinger. Brostein har en fast kjerne med slitt jordkant mot vegetasjonen, og jordveier går åpent inn på belegningen. Små adkomststier river ikke lenger opp ferdig brostein eller heller. De generiske kantsteinene over veimøtene er fjernet. Veijorden har småstein uten faste parallelle striper, og gresstuster holdes utenfor veibane og skulder.
+
+[Før-/etterbilder og kontroll av veimøtet](docs/veikanter.md). 40 data-/regresjonstester. Nettleseren kontrollerer også de faktiske overflatevektene på begge sider av brosteinsplassen og vegetasjonens plassering.
+
 ## Nytt i 0.10: materialer, middelalderhus og terreng
 
 - Stein, tre og tak har større variasjon i farge og ruhet. Mose og smuss samler seg nederst, og takene følger nå regnet og skyskyggene.

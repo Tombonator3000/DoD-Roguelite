@@ -341,6 +341,8 @@ export function townTextures() {
   cache.cobble = paintedTexture('brostein') || cobble();
   cache.flag = paintedTexture('heller') || flag();
   cache.dirt = paintedTexture('jord') || dirt();
+  // Veijord uten de malte kartets parallelle furer. Retning kommer fra veiløpet.
+  cache.roadSoil = cache.dirt.map.isCanvasTexture ? cache.dirt : dirt();
   cache.grass = paintedTexture('gress') || grass();
   cache.planks = paintedTexture('planker') || planks();
   cache.forest = paintedTexture('skogbunn') || cache.grass;

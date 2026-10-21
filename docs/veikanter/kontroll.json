@@ -1,0 +1,460 @@
+{
+  "baseline": false,
+  "errors": [],
+  "views": [
+    {
+      "name": "fristaden-hus",
+      "calls": 182,
+      "triangles": 174867,
+      "geometries": 150,
+      "textures": 44,
+      "roofKinds": [
+        {
+          "id": "inn",
+          "kind": "bygard",
+          "pitch": 0.6150000000000001,
+          "dormers": 1
+        },
+        {
+          "id": "shop",
+          "kind": "verksted",
+          "pitch": 0.67,
+          "dormers": 0
+        },
+        {
+          "id": "temple",
+          "kind": "murhus",
+          "pitch": 0.785,
+          "dormers": 0
+        },
+        {
+          "id": "chapter",
+          "kind": "murhus",
+          "pitch": 0.675,
+          "dormers": 0
+        },
+        {
+          "id": "tower",
+          "kind": "murhus",
+          "dormers": 0
+        },
+        {
+          "id": "dojo",
+          "kind": "stue",
+          "pitch": 0.89,
+          "dormers": 0
+        },
+        {
+          "id": "smithy",
+          "kind": "murhus",
+          "pitch": 0.62,
+          "dormers": 0
+        },
+        {
+          "id": "home",
+          "kind": "stue",
+          "pitch": 0.78,
+          "dormers": 0
+        },
+        {
+          "id": "farm",
+          "kind": "stue",
+          "pitch": 0.9450000000000001,
+          "dormers": 0
+        },
+        {
+          "id": "guard",
+          "kind": "verksted",
+          "pitch": 0.67,
+          "dormers": 0
+        },
+        {
+          "id": "manor",
+          "kind": "bygard",
+          "pitch": 0.7250000000000001,
+          "dormers": 1
+        }
+      ]
+    },
+    {
+      "name": "arno-hus",
+      "calls": 191,
+      "triangles": 135563,
+      "geometries": 159,
+      "textures": 46,
+      "roofKinds": [
+        {
+          "id": "v_caddo_arno_inn",
+          "kind": "bygard",
+          "pitch": 0.46499999999999997,
+          "dormers": 1
+        },
+        {
+          "id": "v_caddo_arno_shop",
+          "kind": "murhus",
+          "pitch": 0.46499999999999997,
+          "dormers": 0
+        },
+        {
+          "id": "v_caddo_arno_h1",
+          "kind": "murhus",
+          "pitch": 0.51,
+          "dormers": 0
+        },
+        {
+          "id": "v_caddo_arno_h2",
+          "kind": "murhus",
+          "pitch": 0.46499999999999997,
+          "dormers": 0
+        },
+        {
+          "id": "v_caddo_arno_h3",
+          "kind": "murhus",
+          "pitch": 0.42,
+          "dormers": 0
+        },
+        {
+          "id": "v_caddo_arno_h4",
+          "kind": "murhus",
+          "pitch": 0.6,
+          "dormers": 0
+        },
+        {
+          "id": "v_caddo_arno_h5",
+          "kind": "murhus",
+          "pitch": 0.5549999999999999,
+          "dormers": 0
+        }
+      ]
+    },
+    {
+      "name": "sortmund-sti",
+      "calls": 88,
+      "triangles": 125180,
+      "geometries": 153,
+      "textures": 50,
+      "roofKinds": [
+        {
+          "id": "sm_kapell",
+          "kind": "murhus",
+          "pitch": 0.62,
+          "dormers": 0
+        },
+        {
+          "id": "sm_fisk",
+          "kind": "stue",
+          "pitch": 0.8350000000000001,
+          "dormers": 0
+        },
+        {
+          "id": "sm_tupp",
+          "kind": "bygard",
+          "pitch": 0.56,
+          "dormers": 2
+        },
+        {
+          "id": "sm_vakt",
+          "kind": "verksted",
+          "pitch": 0.56,
+          "dormers": 0
+        },
+        {
+          "id": "sm_bagare",
+          "kind": "verksted",
+          "pitch": 0.7250000000000001,
+          "dormers": 0
+        },
+        {
+          "id": "sm_vagn",
+          "kind": "verksted",
+          "pitch": 0.56,
+          "dormers": 0
+        },
+        {
+          "id": "sm_bonde",
+          "kind": "stue",
+          "pitch": 0.8350000000000001,
+          "dormers": 0
+        },
+        {
+          "id": "sm_bild",
+          "kind": "stue",
+          "pitch": 0.8350000000000001,
+          "dormers": 0
+        },
+        {
+          "id": "sm_smed",
+          "kind": "murhus",
+          "pitch": 0.73,
+          "dormers": 0
+        },
+        {
+          "id": "sm_mjol",
+          "kind": "stue",
+          "pitch": 0.9450000000000001,
+          "dormers": 0
+        }
+      ]
+    },
+    {
+      "name": "arno-regn",
+      "calls": 386,
+      "triangles": 199145,
+      "geometries": 189,
+      "textures": 62,
+      "roofKinds": [
+        {
+          "id": "v_caddo_arno_inn",
+          "kind": "bygard",
+          "pitch": 0.46499999999999997,
+          "dormers": 1
+        },
+        {
+          "id": "v_caddo_arno_shop",
+          "kind": "murhus",
+          "pitch": 0.46499999999999997,
+          "dormers": 0
+        },
+        {
+          "id": "v_caddo_arno_h1",
+          "kind": "murhus",
+          "pitch": 0.51,
+          "dormers": 0
+        },
+        {
+          "id": "v_caddo_arno_h2",
+          "kind": "murhus",
+          "pitch": 0.46499999999999997,
+          "dormers": 0
+        },
+        {
+          "id": "v_caddo_arno_h3",
+          "kind": "murhus",
+          "pitch": 0.42,
+          "dormers": 0
+        },
+        {
+          "id": "v_caddo_arno_h4",
+          "kind": "murhus",
+          "pitch": 0.6,
+          "dormers": 0
+        },
+        {
+          "id": "v_caddo_arno_h5",
+          "kind": "murhus",
+          "pitch": 0.5549999999999999,
+          "dormers": 0
+        }
+      ]
+    },
+    {
+      "name": "arno-lav",
+      "calls": 191,
+      "triangles": 142403,
+      "geometries": 160,
+      "textures": 62,
+      "roofKinds": [
+        {
+          "id": "v_caddo_arno_inn",
+          "kind": "bygard",
+          "pitch": 0.46499999999999997,
+          "dormers": 1
+        },
+        {
+          "id": "v_caddo_arno_shop",
+          "kind": "murhus",
+          "pitch": 0.46499999999999997,
+          "dormers": 0
+        },
+        {
+          "id": "v_caddo_arno_h1",
+          "kind": "murhus",
+          "pitch": 0.51,
+          "dormers": 0
+        },
+        {
+          "id": "v_caddo_arno_h2",
+          "kind": "murhus",
+          "pitch": 0.46499999999999997,
+          "dormers": 0
+        },
+        {
+          "id": "v_caddo_arno_h3",
+          "kind": "murhus",
+          "pitch": 0.42,
+          "dormers": 0
+        },
+        {
+          "id": "v_caddo_arno_h4",
+          "kind": "murhus",
+          "pitch": 0.6,
+          "dormers": 0
+        },
+        {
+          "id": "v_caddo_arno_h5",
+          "kind": "murhus",
+          "pitch": 0.5549999999999999,
+          "dormers": 0
+        }
+      ]
+    }
+  ],
+  "checks": {
+    "weights": {
+      "vertices": 45700,
+      "mixed": 2277,
+      "invalid": 0
+    },
+    "blend": {
+      "changed": 64823,
+      "stable": 0,
+      "negative": 0,
+      "on": 1
+    },
+    "roadJunction": {
+      "crossing": [
+        {
+          "x": 32,
+          "z": 45,
+          "stone": 0,
+          "vegetation": 0,
+          "earth": 255
+        },
+        {
+          "x": 34,
+          "z": 45,
+          "stone": 0,
+          "vegetation": 0,
+          "earth": 255
+        },
+        {
+          "x": 35.8,
+          "z": 45,
+          "stone": 13,
+          "vegetation": 0,
+          "earth": 242
+        },
+        {
+          "x": 36,
+          "z": 45,
+          "stone": 152,
+          "vegetation": 0,
+          "earth": 103
+        },
+        {
+          "x": 36.2,
+          "z": 45,
+          "stone": 255,
+          "vegetation": 0,
+          "earth": 0
+        },
+        {
+          "x": 40,
+          "z": 45,
+          "stone": 255,
+          "vegetation": 0,
+          "earth": 0
+        },
+        {
+          "x": 52,
+          "z": 45,
+          "stone": 255,
+          "vegetation": 0,
+          "earth": 0
+        },
+        {
+          "x": 55.8,
+          "z": 45,
+          "stone": 255,
+          "vegetation": 0,
+          "earth": 0
+        },
+        {
+          "x": 56,
+          "z": 45,
+          "stone": 147,
+          "vegetation": 0,
+          "earth": 108
+        },
+        {
+          "x": 56.2,
+          "z": 45,
+          "stone": 8,
+          "vegetation": 0,
+          "earth": 247
+        },
+        {
+          "x": 58,
+          "z": 45,
+          "stone": 0,
+          "vegetation": 0,
+          "earth": 255
+        },
+        {
+          "x": 60,
+          "z": 45,
+          "stone": 0,
+          "vegetation": 0,
+          "earth": 255
+        }
+      ],
+      "pavedCore": {
+        "x": 44,
+        "z": 45,
+        "stone": 255,
+        "vegetation": 0,
+        "earth": 0
+      },
+      "pavedFarSide": {
+        "x": 54,
+        "z": 45,
+        "stone": 255,
+        "vegetation": 0,
+        "earth": 0
+      },
+      "earthCore": {
+        "x": 32,
+        "z": 45,
+        "stone": 0,
+        "vegetation": 0,
+        "earth": 255
+      },
+      "grass": {
+        "x": 62,
+        "z": 49,
+        "stone": 0,
+        "vegetation": 255,
+        "earth": 0
+      },
+      "tufts": 1667,
+      "inRoad": 0
+    },
+    "surface": {
+      "changed": 119392,
+      "stable": 0,
+      "negative": 0,
+      "on": 1
+    },
+    "wetness": {
+      "changed": 593733,
+      "stable": 0,
+      "negative": 0,
+      "on": 0.8
+    },
+    "roofs": {
+      "before": [
+        268,
+        307,
+        280
+      ],
+      "after": [
+        268,
+        307,
+        280
+      ],
+      "alpha": 0,
+      "visible": false,
+      "allMats": true
+    }
+  }
+}

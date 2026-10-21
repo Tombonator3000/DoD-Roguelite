@@ -2,6 +2,8 @@
 
 Tom ba om mer levende materialer, varierte middelalderhus og bedre overganger i terrenget. Dette er egen JavaScript-/shaderkode over de eksisterende malte teksturene. three.js er fortsatt r170. Ingen nye runtime-bilder eller avhengigheter er lagt til, og ingen spillregler eller reisetider er endret.
 
+Veilogikken fra denne versjonen er senere rettet i [0.10.1](veikanter.md). Den bruker faktiske veiløp og egne jordskuldre, og retter kantstein og stikkveier som brøt sammenhengen i 0.10. Tallene nedenfor beskriver den opprinnelige 0.10-leveransen.
+
 ## Overflater og hus
 
 `surfaces.js` legger farge- og ruhetsvariasjon i verdensrom, med mose på lave steinflater, mørkere treverk ved bakken og ujevn patina på tak. Større flekker bryter opp de gjentatte teksturene. Været mørkner og blanker takene, og eksisterende skyskygger beveger seg nå over dem også. De malte kartene og normalkartene beholdes.

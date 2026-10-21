@@ -120,6 +120,7 @@ export class Area extends Town {
     this.fields = A.fields;
     this.grid.set(A.grid);
     this.ground = A.ground;
+    this.roads = A.roads;
     this.bmap = A.bmap;
     this.doorMap = A.doorMap;
     this.bridgeMap = A.bridge;
