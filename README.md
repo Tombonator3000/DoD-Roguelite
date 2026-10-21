@@ -4,6 +4,8 @@ En spillbar prototype av et roguelite i stil med Diablo og Hades, med litt Ultim
 
 Laget med three.js r170. Musikk, lyd, fiendemodeller og effekter genereres i nettleseren. Materialene har egne AI-genererte bilder i malt stil, med prosedyriske teksturer som reserve. Anda og bildesettet bygges inn i HTML-fila. Se [teksturleveransen med før-/etterbilder](docs/teksturer.md) og [kilder og lisens](assets/tex/KILDER.md).
 
+[Gjennomgang av prosjektbibliotekets 172 spillprofiler](docs/gjenbruk.md): konkrete kandidater for verdensminne, oppdrag, NPC-er, grafikk og lyd, med kildefiler, lisenser og anbefalt rekkefølge.
+
 ## Nytt i 0.8: ut i Ereb Altor
 
 - Åpne «Ereb Altor og sjøreiser» fra regionkartet. Atlaset bruker originalkartet fra Ereb-boksen med zoom, panorering og klikkbare reisemål. Det forbinder 31 regioner med 30 sjøruter og 28 landeveier.

@@ -238,7 +238,8 @@ Detaljene står i docs/regler/IMPLEMENTERING.md. Det viktigste:
 
 ## Gjenbruk fra de andre repoene (Claude, 2026-10-09)
 
-- docs/gjenbruk.md er en vurdering av prosjektbiblioteket og elleve andre repoer til Tom, med filstier, lisenser og prioritet. Ingenting er flyttet inn ennå.
+- docs/gjenbruk.md har en ny vurdering 21. oktober av alle 172 spillprofiler i prosjektbiblioteket, med kodeutdrag/lisenser lest fra 15 prosjekter og to ekstra lisenskontroller. docs/gjenbruk-spill.json har dekning, kildecommits, undersøkte filer og begrunnelse per profil. Ingen av disse 172 spillene er bygget/kjørt eller portert i vurderingen. Tidligere gjennomgang av Toms egne repoer står som datert historikk; fotsteg/romklang/takt er senere løst via Ninth Vigil i PR #9.
+- Prioriter verdensminne og et lite oppdragsformat (DF Unity/OpenNefia MIT-mønstre), deretter lokale NPC-reaksjoner. GPL/AGPL/CC BY-SA-kilder brukes som designreferanser med egen implementasjon. DevilutionX ved 0706e014 har Sustainable Use License 1.0, ikke en generell åpen lisens. Athena Crisis har MIT-kode, men separate innholdsvilkår. Rotlisens på en motor frigir aldri originalspillets grafikk, lyd eller data.
 - Vi bruker WebGL 2 (WebGLRenderer i r170). Ingen av Toms spill bruker WebGPU. Bytte krever r171 eller nyere og at alle onBeforeCompile-shaderne skrives om til TSL.
 - Alle Pages-spillene deler opphavet tombonator3000.github.io og dermed localStorage-kvoten. Miniatyrbildene i lagringene våre konkurrerer med de andre spillene.
 - Voidcraft er AGPL: bare ideer, ikke kode. Lydene i Morbidium er CC0 (assets/lyd/KILDER.md).

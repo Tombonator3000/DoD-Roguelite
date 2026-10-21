@@ -316,3 +316,10 @@ Alt som gjøres i prosjektet loggføres her med tidsstempel (Europe/Oslo).
 
 - 03:06 (ChatGPT) Tom ga instruksen «Flett alt du gjør». Bekreftet grønne kontroller på 3a07067 og ea643b2, og flettet PR #8 som e862d30 og PR #9 som bba07bb med vanlige flettecommits. Ingen konflikter.
 - 03:06 (ChatGPT) Lagret stående fletteinstruks i AGENTS.md og memory.md, fjernet de to ferdige reservasjonene fra todo.md og skrev D019. Dokumentendringen går også gjennom egen PR og flettes. Følger siste Pages-bygg til publisering.
+
+## 2026-10-21: Hele spillregisteret i prosjektbiblioteket (ChatGPT)
+
+- 03:28 (ChatGPT) Tom ba om gjennomgang av prosjektbiblioteket og alle open source-spillene der. Leste biblioteket på 292a21f, alle 172 katalogoppføringer i 17 sjangre og relevante søketreff, samt bakgrunnen i bibliotekets åpne PR #4. Ingen natteskift eller andre agenter startet.
+- 03:28 (ChatGPT) Leste kodeutdrag og lisenser fra 15 utvalgte prosjekter, pluss lisensene fra DevilutionX og The Dark Mod. Alle 17 lisensfiler matcher bibliotekets SHA-256. Registrerte 10 aktuelle profiler nå, 34 senere og 128 med lav relevans. Ingen av upstream-spillene ble bygget eller kjørt.
+- 03:28 (ChatGPT) Oppdaterte docs/gjenbruk.md med konkrete kildefiler, arbeid, lisensgrenser og rekkefølge for verdensminne, oppdrag og NPC-er. docs/gjenbruk-spill.json dokumenterer hver profil og faktisk undersøkelsesnivå. Beholdt vurderingen fra 9. oktober som datert historikk og rettet foreldet lydstatus i todo/minne.
+- 03:28 (ChatGPT) Kontrollerte unik og full dekning, fordelinger, relative lenker og git diff --check. npm run build bestod; HTML er byteidentisk med sist publiserte spill (SHA-256 fe6f0739fc20bebc8178ba88be49eaf1b7e7fec144758469a8f9f7ced01e5369). Nettlesertesten med stress(tjuv, 20), fem nivåer, pause og opprydding bestod uten feil. Ingen spillkode eller runtime-ressurser er endret. Dokumentasjonen går gjennom egen PR og flettes etter Toms stående instruks.
