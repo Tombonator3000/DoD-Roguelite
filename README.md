@@ -10,7 +10,9 @@ Laget med three.js r170. Musikk, lyd, fiendemodeller og effekter genereres i net
 
 Veibanen følger nå de faktiske veipunktene gjennom svinger. Brostein har en fast kjerne med slitt jordkant mot vegetasjonen, og jordveier går åpent inn på belegningen. Små adkomststier river ikke lenger opp ferdig brostein eller heller. De generiske kantsteinene over veimøtene er fjernet. Veijorden har småstein uten faste parallelle striper, og gresstuster holdes utenfor veibane og skulder.
 
-[Før-/etterbilder og kontroll av veimøtet](docs/veikanter.md). 40 data-/regresjonstester. Nettleseren kontrollerer også de faktiske overflatevektene på begge sider av brosteinsplassen og vegetasjonens plassering.
+Alle husdørene i bymalen har sammenhengende adkomst til hovedveien, helt fram til terskelen.
+
+[Før-/etterbilder og kontroll av veimøtet](docs/veikanter.md). 41 data-/regresjonstester. Nettleseren kontrollerer også de faktiske overflatevektene på begge sider av brosteinsplassen, ved dørtersklene og vegetasjonens plassering.
 
 ## Nytt i 0.10: materialer, middelalderhus og terreng
 

@@ -322,8 +322,10 @@ export function villageLayout(id) {
       k.grove(4, 6, 4, 3.5, 21); k.grove(40, 6, 4.5, 3.5, 22); k.grove(4, 41, 4, 3.5, 23);
       k.road([[-1, 22.5], [47, 22.5]], 2.4);
       k.rect(18, 21, 27, 24, FLOOR, GR.COBBLE);
-      k.road([[15, 21], [15, 22]], 1.4); k.road([[27, 21], [27, 22]], 1.4);
-      k.road([[15, 24], [15, 25]], 1.4); k.road([[29, 24], [29, 25]], 1.4);
+      // Adkomst fra selve dørterskelen til hovedveien, også for de ytre husene.
+      for (const b of buildings) for (const [x, y] of b.doors) {
+        k.road([[x + 0.5, y + 0.5], [x + 0.5, 22.5]], 1.2);
+      }
       k.field(33, 32, 42, 40, 'korn'); k.field(18, 34, 27, 41, 'kal');
       if (p.coast) { k.deep(0, 43, 45, 45); k.water(30, 41, 45, 42); }
     },

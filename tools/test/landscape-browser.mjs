@@ -152,12 +152,14 @@ try {
           }
         }
       });
-      return { crossing, pavedCore: sample(44, 45), pavedFarSide: sample(54, 45), earthCore: sample(32, 45), grass: sample(62, 49), tufts, inRoad };
+      const doorThresholds = [[31, 41.55], [55, 41.55], [31, 52.45], [59, 52.45]].map(([x, z]) => sample(x, z));
+      return { crossing, doorThresholds, pavedCore: sample(44, 45), pavedFarSide: sample(54, 45), earthCore: sample(32, 45), grass: sample(62, 49), tufts, inRoad };
     });
     const junction = result.checks.roadJunction;
     assert.ok(junction.crossing.every(p => p.vegetation < 8 && p.stone + p.earth > 240), JSON.stringify(junction));
     assert.ok(junction.pavedCore.stone > 245 && junction.earthCore.earth > 245);
     assert.ok(junction.pavedFarSide.stone > 245, 'Adkomsten har revet opp brosteinen på motsatt side av torget');
+    assert.ok(junction.doorThresholds.every(p => p.vegetation < 8 && p.stone + p.earth > 240), JSON.stringify(junction.doorThresholds));
     assert.ok(junction.grass.vegetation > 245); assert.ok(junction.tufts > 100); assert.equal(junction.inRoad, 0);
     for (const kind of ['surface', 'wetness']) {
       const r = result.checks[kind] = await probe(kind);

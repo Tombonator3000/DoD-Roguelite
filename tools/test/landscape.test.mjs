@@ -4,6 +4,7 @@ import { terrainField, terrainWeights, roadAt, vegetationAt } from '../../src/te
 import { houseStyle } from '../../src/housestyle.js';
 import { TW, TH, FLOOR, WALL, WATER, GR, BUILDINGS } from '../../src/townmap.js';
 import { K_FOREST, K_DEEP, buildAreaGrid } from '../../src/areagrid.js';
+import { villageLayout } from '../../src/areatemplates.js';
 
 test('Terrengvekter er normaliserte, kontinuerlige og endelige også utenfor kartet', () => {
   const field = new Int8Array(TW * TH);
@@ -78,6 +79,20 @@ test('Tuster holdes unna veibane, jordskulder og brostein', () => {
   const field = roadFixture();
   for (const [x, z] of [[12, 20], [12, 22.2], [31, 31]]) assert.equal(vegetationAt(field, x, z), false);
   assert.equal(vegetationAt(field, 12, 24), true);
+});
+
+test('Alle dører i bymalen har sammenhengende adkomst til hovedveien', () => {
+  for (const id of ['arno', 'gringul']) {
+    const L = villageLayout(id), A = buildAreaGrid(L);
+    const field = terrainField({ ...A, L, roads: A.roads, bridgeMap: A.bridge, cityMask: new Uint8Array(TW * TH) });
+    for (const b of L.buildings) for (const [x, y] of b.doors) {
+      const start = (y + 0.5) * 2 + (y === b.y0 ? -0.55 : 0.55);
+      for (let i = 0; i <= 20; i++) {
+        const z = start + (45 - start) * i / 20, w = terrainWeights(field, x * 2 + 1, z);
+        assert.ok(w[1] + w[2] > 0.999, `${id}/${b.id}: ${z}, ${JSON.stringify(w)}`);
+      }
+    }
+  }
 });
 
 test('Husgulv, bruer og dypt vann deltar ikke i terrengblandingen', () => {

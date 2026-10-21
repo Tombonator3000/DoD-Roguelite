@@ -79,7 +79,7 @@
     {
       "name": "arno-hus",
       "calls": 191,
-      "triangles": 135563,
+      "triangles": 135535,
       "geometries": 159,
       "textures": 46,
       "roofKinds": [
@@ -199,7 +199,7 @@
     {
       "name": "arno-regn",
       "calls": 386,
-      "triangles": 199145,
+      "triangles": 199117,
       "geometries": 189,
       "textures": 62,
       "roofKinds": [
@@ -250,7 +250,7 @@
     {
       "name": "arno-lav",
       "calls": 191,
-      "triangles": 142403,
+      "triangles": 142375,
       "geometries": 160,
       "textures": 62,
       "roofKinds": [
@@ -306,7 +306,7 @@
       "invalid": 0
     },
     "blend": {
-      "changed": 64823,
+      "changed": 64855,
       "stable": 0,
       "negative": 0,
       "on": 1
@@ -398,6 +398,36 @@
           "earth": 255
         }
       ],
+      "doorThresholds": [
+        {
+          "x": 31,
+          "z": 41.55,
+          "stone": 0,
+          "vegetation": 0,
+          "earth": 255
+        },
+        {
+          "x": 55,
+          "z": 41.55,
+          "stone": 244,
+          "vegetation": 0,
+          "earth": 11
+        },
+        {
+          "x": 31,
+          "z": 52.45,
+          "stone": 0,
+          "vegetation": 0,
+          "earth": 255
+        },
+        {
+          "x": 59,
+          "z": 52.45,
+          "stone": 0,
+          "vegetation": 0,
+          "earth": 255
+        }
+      ],
       "pavedCore": {
         "x": 44,
         "z": 45,
@@ -426,17 +456,17 @@
         "vegetation": 255,
         "earth": 0
       },
-      "tufts": 1667,
+      "tufts": 1660,
       "inRoad": 0
     },
     "surface": {
-      "changed": 119392,
+      "changed": 119473,
       "stable": 0,
       "negative": 0,
       "on": 1
     },
     "wetness": {
-      "changed": 593733,
+      "changed": 596296,
       "stable": 0,
       "negative": 0,
       "on": 0.8
