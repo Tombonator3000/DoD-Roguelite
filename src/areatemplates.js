@@ -6,6 +6,7 @@ import { ENCOUNTERS } from './worldmap.js';
 import { PLACES } from './regionalmaps.js';
 import { ATLAS_REGIONS } from './atlasdata.js';
 import { reveal, known, regionAt, ate, worldMap } from './worldtravel.js';
+import { harborStyle } from './harborstyle.js';
 
 const PI = Math.PI;
 const TERR_NAME = { '.': 'slette', F: 'skog', '^': 'fjell' };
@@ -301,6 +302,7 @@ export function villageLayout(id) {
     b.plaster = 0xead7b0; b.roof = 'tile';
     if (b.wallH < 3.5) b.style = 'stone';
   }
+  harborStyle(id, buildings);
   const props = [
     { t: 'well', x: 22.5, y: 24.6 },
     { t: 'barrel', x: 11.4, y: 21.0 }, { t: 'barrel', x: 11.4, y: 21.8 }, { t: 'crate', x: 24.4, y: 21.2 },

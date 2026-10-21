@@ -13,6 +13,7 @@ import { leafBlob, leafDetail, spruceCone } from './treegeo.js';
 import { imageTexture } from './textures.js';
 import { AreaLife } from './arealife.js';
 import { buildAreaGrid, K_FOREST, K_DEEP, K_HILL, K_WALL } from './areagrid.js';
+import { harborRoof } from './harborstyle.js';
 
 const E = 30; // så mange fliser bakken og vannet fortsetter utenfor kartet
 const idx = (x, y) => y * TW + x;
@@ -204,6 +205,10 @@ export class Area extends Town {
 
   buildCityWall(M) {
     super.buildCityWall(M);
+  }
+
+  roofDetails(b, parts, bounds) {
+    harborRoof(b, parts, bounds);
   }
 
   // bakke utenfor kartet og under skogen, veier som fortsetter, åkrer, trær

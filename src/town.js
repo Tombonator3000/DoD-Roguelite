@@ -672,7 +672,8 @@ export class Town extends Dungeon {
     for (const b of this.buildings) {
       b.fF = { walls: new Mesher(), wood: new Mesher(), glass: new Mesher() };
       b.fL = new Mesher();
-      b.tint = b.style === 'stone' ? (b.id === 'temple' ? [1.08, 1.0, 0.86] : b.id === 'smithy' ? [0.78, 0.74, 0.7] : [0.9, 0.9, 0.92]) : hex(b.plaster || 0xe0d4b8).map(c => c * 1.08);
+      b.tint = b.harbor ? hex(b.plaster).map(c => c * 1.08) :
+        b.style === 'stone' ? (b.id === 'temple' ? [1.08, 1.0, 0.86] : b.id === 'smithy' ? [0.78, 0.74, 0.7] : [0.9, 0.9, 0.92]) : hex(b.plaster || 0xe0d4b8).map(c => c * 1.08);
     }
     for (const pc of this.pieces) {
       if (pc.v === FENCE) { this.fencePiece(pc, fence); continue; }
@@ -898,6 +899,7 @@ export class Town extends Dungeon {
     const col = [1, 1, 1];
     const th = 0.16;
     let ridgeY;
+    let roofBounds;
     if (b.roof === 'cone') {
       const xc = (X0 + X1) / 2, zc = (Z0 + Z1) / 2;
       const s = (X1 - X0) / 2;
@@ -925,8 +927,8 @@ export class Town extends Dungeon {
       sp.position.set(apex[0], apex[1] + 0.5, apex[2]);
       g.add(sp);
     } else {
-      const alongX = (b.x1 - b.x0) >= (b.y1 - b.y0);
-      const p = b.roof === 'thatch' ? 0.85 : b.roof === 'copper' ? 0.62 : 0.68;
+      const alongX = b.roofAxis ? b.roofAxis === 'x' : (b.x1 - b.x0) >= (b.y1 - b.y0);
+      const p = b.roofPitch ?? (b.roof === 'thatch' ? 0.85 : b.roof === 'copper' ? 0.62 : 0.68);
       // arbeid i lokale akser: a = langs mønet, c = på tvers
       const A0 = alongX ? X0 : Z0, A1 = alongX ? X1 : Z1, C0 = alongX ? Z0 : X0, C1 = alongX ? Z1 : X1;
       const wc0 = C0 + OV, wc1 = C1 - OV, cc = (C0 + C1) / 2, s = (wc1 - wc0) / 2;
@@ -934,6 +936,7 @@ export class Town extends Dungeon {
       const pp = rise / s;
       const ey = H - OV * pp;
       ridgeY = H + rise;
+      roofBounds = { X0, X1, Z0, Z1, ridgeY, ey, alongX };
       const P = (a, y, c) => (alongX ? [a, y, c] : [c, y, a]);
       const nrm = sgn => { const v = new THREE.Vector3(0, 1, sgn * pp).normalize(); return alongX ? [0, v.y, v.z] : [v.z, v.y, 0]; };
       const slope = Math.hypot(cc - C0, ridgeY - ey);
@@ -983,6 +986,7 @@ export class Town extends Dungeon {
       chim.box(cx - 0.42, ridgeY + 0.85, cz - 0.42, cx + 0.42, ridgeY + 1.0, cz + 0.42, { vs: 2, us: 2, col: [0.7, 0.66, 0.6] });
       this.smokers.push({ x: cx, y: ridgeY + 1.1, z: cz, b, t: Math.random() });
     }
+    if (roofBounds) this.roofDetails?.(b, { roof, gable, chim }, roofBounds);
     this.addMesh(roof, R.roof, true, false, g);
     this.addMesh(gable, R.gable, true, true, g);
     this.addMesh(chim, R.chim, true, false, g);
