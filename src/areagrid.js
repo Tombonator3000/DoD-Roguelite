@@ -22,7 +22,7 @@ export function buildAreaGrid(L) {
   const ground = new Uint8Array(N).fill(GR.OUT);
   const bmap = new Uint8Array(N), doorMap = new Uint8Array(N), bridge = new Uint8Array(N);
   const kind = new Uint8Array(N); // K_FOREST
-  const out = { grid, ground, bmap, doorMap, bridge, kind, hills: [], fields: [], buildings: L.buildings || [] };
+  const out = { grid, ground, bmap, doorMap, bridge, kind, roads: [], hills: [], fields: [], buildings: L.buildings || [] };
   const set = (x, y, v, g, k) => {
     if (!inMap(x, y)) return;
     const i = idx(x, y);
@@ -45,13 +45,18 @@ export function buildAreaGrid(L) {
     },
     // vei langs punkter, w = bredde i fliser
     road(pts, w = 2, g = GR.DIRT) {
+      out.roads.push({ points: pts.map(p => p.slice()), width: w, ground: g });
       for (let i = 0; i < pts.length - 1; i++) {
         const [ax, ay] = pts[i], [bx, by] = pts[i + 1];
         const len = Math.hypot(bx - ax, by - ay), n = Math.ceil(len * 3);
         for (let s = 0; s <= n; s++) {
           const t = s / n, px = ax + (bx - ax) * t, py = ay + (by - ay) * t;
           for (let y = Math.floor(py - w / 2); y <= py + w / 2; y++) for (let x = Math.floor(px - w / 2); x <= px + w / 2; x++) {
-            if (Math.hypot(x + 0.5 - px, y + 0.5 - py) <= w / 2 + 0.15) set(x, y, FLOOR, g);
+            if (Math.hypot(x + 0.5 - px, y + 0.5 - py) > w / 2 + 0.15) continue;
+            const groundHere = inMap(x, y) ? ground[idx(x, y)] : GR.OUT;
+            // Jordtilkomst skal ikke rive opp et torg eller en hellelagt plass.
+            if (g === GR.DIRT && (groundHere === GR.COBBLE || groundHere === GR.FLAG)) { set(x, y, FLOOR, groundHere); continue; }
+            set(x, y, FLOOR, g);
           }
         }
       }

@@ -108,6 +108,59 @@ try {
     result.checks.blend = await probe('blend');
     assert.ok(result.checks.blend.changed > 100); assert.equal(result.checks.blend.stable, 0); assert.equal(result.checks.blend.negative, 0);
     await view('arno-regn', 'arno', 17, 22, 'regn', 'middels');
+    result.checks.roadJunction = await page.evaluate(async () => {
+      const THREE = await import('three'), D = G.dungeon, mat = D.M.terrain, r = G.renderer;
+      const compile = mat.onBeforeCompile, key = mat.customProgramCacheKey, tone = mat.toneMapped;
+      const oldTarget = r.getRenderTarget(), scene = new THREE.Scene();
+      const target = new THREE.WebGLRenderTarget(1152, 512);
+      const camera = new THREE.OrthographicCamera(-18, 18, 8, -8, 0.1, 120);
+      camera.position.set(46, 100, 46); camera.up.set(0, 0, -1); camera.lookAt(46, 0, 46);
+      // Vis de faktiske shadervektene: rødt = brostein, blått = jord, grønt = vegetasjon.
+      mat.onBeforeCompile = (sh, renderer) => {
+        compile.call(mat, sh, renderer);
+        sh.fragmentShader = sh.fragmentShader.replace('#include <opaque_fragment>',
+          'outgoingLight = vec3(terrainW.z, terrainW.x + terrainW.w, terrainW.y);\n#include <opaque_fragment>');
+      };
+      mat.customProgramCacheKey = () => key.call(mat) + '|road-test';
+      mat.toneMapped = false; mat.needsUpdate = true;
+      D.group.traverse(m => { if (m.material === mat) scene.add(new THREE.Mesh(m.geometry, mat)); });
+      const pixels = new Uint8Array(1152 * 512 * 4);
+      try {
+        r.setRenderTarget(target); r.render(scene, camera); r.readRenderTargetPixels(target, 0, 0, 1152, 512, pixels);
+      } finally {
+        r.setRenderTarget(oldTarget); mat.onBeforeCompile = compile; mat.customProgramCacheKey = key;
+        mat.toneMapped = tone; mat.needsUpdate = true; target.dispose(); scene.clear();
+      }
+      const sample = (x, z) => {
+        const px = Math.floor((x - 28) * 32), py = Math.floor((54 - z) * 32), i = (py * 1152 + px) * 4;
+        return { x, z, stone: pixels[i], vegetation: pixels[i + 1], earth: pixels[i + 2] };
+      };
+      const crossing = [32, 34, 35.8, 36, 36.2, 40, 52, 55.8, 56, 56.2, 58, 60].map(x => sample(x, 45));
+      let tufts = 0, inRoad = 0;
+      const matrix = new THREE.Matrix4();
+      D.group.traverse(m => {
+        if (!m.isInstancedMesh || m.material !== D.M.tuft) return;
+        for (let i = 0; i < m.count; i++) {
+          m.getMatrixAt(i, matrix); const x = matrix.elements[12], z = matrix.elements[14]; tufts++;
+          for (const road of D.roads) {
+            if (road.ground !== 2) continue;
+            for (let j = 1; j < road.points.length; j++) {
+              const [ax, az] = road.points[j - 1].map(n => n * 2), [bx, bz] = road.points[j].map(n => n * 2);
+              const dx = bx - ax, dz = bz - az, t = Math.max(0, Math.min(1, ((x - ax) * dx + (z - az) * dz) / (dx * dx + dz * dz)));
+              if (Math.hypot(x - ax - t * dx, z - az - t * dz) < road.width + 0.65) inRoad++;
+            }
+          }
+        }
+      });
+      const doorThresholds = [[31, 41.55], [55, 41.55], [31, 52.45], [59, 52.45]].map(([x, z]) => sample(x, z));
+      return { crossing, doorThresholds, pavedCore: sample(44, 45), pavedFarSide: sample(54, 45), earthCore: sample(32, 45), grass: sample(62, 49), tufts, inRoad };
+    });
+    const junction = result.checks.roadJunction;
+    assert.ok(junction.crossing.every(p => p.vegetation < 8 && p.stone + p.earth > 240), JSON.stringify(junction));
+    assert.ok(junction.pavedCore.stone > 245 && junction.earthCore.earth > 245);
+    assert.ok(junction.pavedFarSide.stone > 245, 'Adkomsten har revet opp brosteinen på motsatt side av torget');
+    assert.ok(junction.doorThresholds.every(p => p.vegetation < 8 && p.stone + p.earth > 240), JSON.stringify(junction.doorThresholds));
+    assert.ok(junction.grass.vegetation > 245); assert.ok(junction.tufts > 100); assert.equal(junction.inRoad, 0);
     for (const kind of ['surface', 'wetness']) {
       const r = result.checks[kind] = await probe(kind);
       assert.ok(r.changed > 100); assert.equal(r.stable, 0); assert.equal(r.negative, 0);

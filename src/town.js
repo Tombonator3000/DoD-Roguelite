@@ -13,7 +13,7 @@ import { shaftMaterial } from './gfx.js';
 import { addSurfaceDetail } from './surfaces.js';
 import { houseStyle, houseRoof } from './housestyle.js';
 import { terrainMaterial, terrainGeometry } from './terrain.js';
-import { naturalGround } from './terrainfield.js';
+import { naturalGround, vegetationAt } from './terrainfield.js';
 
 export { HOUSE, FENCE, GR, SPOTS };
 
@@ -123,7 +123,7 @@ function materials() {
   MAT.city = stdMat({ map: TX.city.map, normalMap: TX.city.normalMap, roughness: 0.92, vertexColors: true });
   MAT.ground = {
     [GR.COBBLE]: stdMat({ map: TX.cobble.map, normalMap: TX.cobble.normalMap, roughness: 0.85, vertexColors: true }, false),
-    [GR.DIRT]: stdMat({ map: TX.dirt.map, normalMap: TX.dirt.normalMap, roughness: 1, vertexColors: true }, false),
+    [GR.DIRT]: stdMat({ ...TX.roadSoil, roughness: 1, vertexColors: true }, false),
     [GR.GRASS]: stdMat({ map: TX.grass.map, normalMap: TX.grass.normalMap, roughness: 1, vertexColors: true }, false),
     [GR.WOOD]: stdMat({ map: TX.planks.map, normalMap: TX.planks.normalMap, roughness: 0.75, vertexColors: true }, false),
     [GR.FLAG]: stdMat({ map: TX.flag.map, normalMap: TX.flag.normalMap, roughness: 0.7, vertexColors: true }, false),
@@ -254,6 +254,7 @@ export class Town extends Dungeon {
     const L = buildTownLayout();
     this.grid.set(L.grid);
     this.ground = L.ground;
+    this.roads = L.roads;
     this.bmap = L.bmap;
     this.doorMap = L.doorMap;
     this.bridgeMap = L.bridge;
@@ -516,7 +517,6 @@ export class Town extends Dungeon {
     const natural = new Mesher();
     const get = k => ms[k] || (ms[k] = new Mesher());
     const plank = new Mesher();
-    const curb = new Mesher();
     const ao = (x, z) => { const a = this.aoAt(x, z); return [a, a, a]; };
     for (let y = 0; y < TH; y++) for (let x = 0; x < TW; x++) {
       const k = this.idx(x, y);
@@ -534,23 +534,9 @@ export class Town extends Dungeon {
         const target = naturalGround(kind) && !inside ? natural : get(kind);
         target.quadUp(a0, b0, a1, b1, 0, [ao(a0, b0), ao(a1, b0), ao(a1, b1), ao(a0, b1)], s, kind === GR.WOOD && this.woodRot(x, y));
       }
-      // kantstein mellom brostein og gress/jord
-      if (g === GR.COBBLE) {
-        for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
-          const nk = this.idx(x + dx, y + dy);
-          const ng = this.ground[nk], nv = this.grid[nk];
-          if ((ng !== GR.GRASS && ng !== GR.DIRT) || nv !== FLOOR || this.buildingOf(x + dx, y + dy)) continue;
-          const w = 0.09;
-          if (dx === 1) curb.box(x1 - w, 0, z0, x1 + w, 0.07, z1, { uv: 'world', us: 0.6, col: [0.78, 0.74, 0.68] });
-          else if (dx === -1) curb.box(x0 - w, 0, z0, x0 + w, 0.07, z1, { uv: 'world', us: 0.6, col: [0.78, 0.74, 0.68] });
-          else if (dy === 1) curb.box(x0, 0, z1 - w, x1, 0.07, z1 + w, { uv: 'world', us: 0.6, col: [0.78, 0.74, 0.68] });
-          else curb.box(x0, 0, z0 - w, x1, 0.07, z0 + w, { uv: 'world', us: 0.6, col: [0.78, 0.74, 0.68] });
-        }
-      }
     }
     for (const k in ms) this.addMesh(ms[k], M.ground[k], false, true);
     this.addTerrain(natural, M);
-    this.addMesh(curb, M.city, false, true);
     // bruer og brygge
     const rails = new Mesher();
     for (let y = 0; y < TH; y++) for (let x = 0; x < TW; x++) {
@@ -1339,7 +1325,11 @@ export class Town extends Dungeon {
       let edge = 0;
       for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) if (this.ground[this.idx(x + dx, y + dy)] !== GR.GRASS || this.grid[this.idx(x + dx, y + dy)] !== FLOOR) edge++;
       const n = Math.round((2 + edge * 2) * dens);
-      for (let j = 0; j < n; j++) spots.push([(x + R(k, j * 2)) * T, (y + R(k, j * 2 + 1)) * T, R(k, j + 50)]);
+      for (let j = 0; j < n; j++) {
+        const px = (x + R(k, j * 2)) * T, pz = (y + R(k, j * 2 + 1)) * T;
+        if (this.terrainField && !vegetationAt(this.terrainField, px, pz)) continue;
+        spots.push([px, pz, R(k, j + 50)]);
+      }
     }
     const tufts = new THREE.InstancedMesh(tg, M.tuft, spots.length);
     spots.forEach(([x, z, r], i) => {

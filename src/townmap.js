@@ -100,13 +100,21 @@ export function buildTownLayout() {
   const bmap = new Uint8Array(TW * TH); // bygning + 1 for innsiden (og dørene)
   const doorMap = new Uint8Array(TW * TH); // bygning + 1
   const bridge = new Uint8Array(TW * TH);
+  const roads = [];
   const set = (x, y, v, g) => {
     if (x < 0 || y < 0 || x >= TW || y >= TH) return;
     const i = tileIdx(x, y);
     if (v !== undefined && v !== null) grid[i] = v;
     if (g !== undefined && g !== null) ground[i] = g;
   };
-  const rect = (x0, y0, x1, y1, v, g) => { for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) set(x, y, v, g); };
+  const rect = (x0, y0, x1, y1, v, g) => {
+    if (v === FLOOR && g === GR.DIRT) {
+      const horizontal = x1 - x0 >= y1 - y0, cx = (x0 + x1 + 1) / 2, cy = (y0 + y1 + 1) / 2;
+      roads.push({ points: horizontal ? [[x0, cy], [x1 + 1, cy]] : [[cx, y0], [cx, y1 + 1]],
+        width: horizontal ? y1 - y0 + 1 : x1 - x0 + 1, ground: g });
+    }
+    for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) set(x, y, v, g);
+  };
 
   // innenfor muren: gress
   rect(RING.x0 + 1, RING.y0 + 1, RING.x1 - 1, RING.y1 - 1, FLOOR, GR.GRASS);
@@ -165,7 +173,7 @@ export function buildTownLayout() {
   for (const [x, y] of GATES_IN_FENCE) set(x, y, FLOOR);
   rect(6, 33, 10, 33, null, GR.DIRT); // kålåker
 
-  return { grid, ground, bmap, doorMap, bridge };
+  return { grid, ground, bmap, doorMap, bridge, roads };
 }
 
 // For feilsøking i node: tegn kartet som tekst

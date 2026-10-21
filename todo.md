@@ -10,6 +10,7 @@ Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når p
 
 
 
+
 ## Nå
 
 - [x] Ny gjennomgang av alle 172 spillprofiler i prosjektbiblioteket, 15 kode-/lisensundersøkelser og to ekstra lisenskontroller. Prioritert plan og full dekning i docs/gjenbruk.md og docs/gjenbruk-spill.json (21. oktober).
@@ -45,6 +46,7 @@ Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når p
 - [x] Grafikk etter Weatherglass, raske ting (0.7): MSAA i komposeren, bloom etter sted og tid, miljøkart fra himmelen, eksponering etter døgnet, myke trekroner. Se docs/grafikk-weatherglass.md.
 - [x] Rettet utskjæring av instanserte trekroner: verdenshøyden inkluderer nå instanceMatrix, og granene bruker også utskjæringen. Gjenbruker dagens dithring og tegnelag uten nye tegnekall (0.9).
 - [x] Mer levende materialer, faste middelalderhus og blandede terrengkanter (0.10): patina/ruhet, vær på tak, gavlbånd/takoppløft/hjørnekvadre, sammenhengende farge-/normalblanding av gress, jord, brostein og skogbunn. Før-/etterbilder og kontroller i docs/landskap.md.
+- [x] Toms rettelse av veilogikken (0.10.1): faktiske svinger, brosteinskjerne med jordskulder, åpne veimøter, bevart belegning under stikkveier og vegetasjon utenfor veibanen. Shadervektene prøves direkte, se docs/veikanter.md.
 - [ ] Fra docs/gjenbruk.md, raske ting: dør/knirk og havnemiljø med egne synteselyder eller kontrollert CC0-foley fra Morbidium/Loincloth, skriftene bygget inn med FontFace i stedet for Google Fonts, alphaToCoverage på tuster og faner, handler for tapt WebGL-kontekst, test av artifact.html under sandkassens CSP. Fotsteg etter underlag og romklang er allerede løst i PR #9.
 - [ ] Fra docs/gjenbruk.md, middels: skjermeffekter (sjokkbølge, zoom-punch, rød kant ved lav KP), angrepspoletter og tempostyrer (høyst 2 som angriper), automatisk kvalitet med pikselbudsjett, stemmer per släkt med formanter, spilltestmodus bak ?testmodus.
 - [ ] log.md er over 50 KB. Flytt eldre økter til logg/ÅÅÅÅ-MM.md, som Morbidium gjør med tools/rydd_dokumenter.py.
