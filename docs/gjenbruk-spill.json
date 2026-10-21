@@ -1,0 +1,3937 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-10-21",
+  "target": "Tombonator3000/DoD-Roguelite",
+  "target_revision": "ce13d46e51c33b4df0981e14f10d4f2edf11e6e9",
+  "catalogue": {
+    "repository": "Tombonator3000/prosjektbibliotek",
+    "revision": "292a21fe703c83b0c5fc3d2a57982451da5b864a",
+    "path": "data/games.json",
+    "sha256": "646c04c74e62dd32e62bc87b6a2d1c5f30aa83faa36b63e3e36509c5e8d0b2bd",
+    "list_revision": "3a9ab8fc892a2cdadf8989a72ba7624a11e39cec"
+  },
+  "scope": "Alle 172 spillprofiler i bibliotekets spillregister. Tidligere vurdering av Toms egne spill beholdes i docs/gjenbruk.md; øvrige verktøy/skills er bare søkt selektivt.",
+  "method": "Alle profiler vurdert fra katalogens kilde-, lisens-, teknologi- og gjenbruksdata mot dagens spill. Utvalgte kodeutdrag og lisenser lest fra festede revisjoner. Ingen upstream-spill bygget eller kjørt; kodekandidat betyr videre tilpasning og filvis lisenskontroll, ikke bevist kompatibilitet.",
+  "summary": {
+    "profiles": 172,
+    "genres": {
+      "Action": 1,
+      "Bybygging": 8,
+      "Eventyr": 6,
+      "Førsteperson": 37,
+      "Plattformspill": 13,
+      "Puslespill": 3,
+      "Racing og kjøresimulering": 12,
+      "Roguelike": 7,
+      "Rollespill": 28,
+      "Sandkasse": 1,
+      "Sanntidsstrategi": 25,
+      "Shoot 'em up": 2,
+      "Sport": 2,
+      "Tredjeperson": 8,
+      "Turbasert strategi": 13,
+      "Tårnforsvar": 1,
+      "Økonomi og tycoon": 5
+    },
+    "priorities": {
+      "lav": 128,
+      "senere": 34,
+      "nå": 10
+    },
+    "inspection": {
+      "katalog": 155,
+      "kodeutdrag_og_lisens": 15,
+      "lisens": 2
+    }
+  },
+  "games": [
+    {
+      "id": "hypersomnia",
+      "name": "Hypersomnia",
+      "genre": "Action",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Nettverkskamp og kartredigering har lavere nytte enn verdensminne og innhold i dagens enspillerspill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/hypersomnia.md",
+      "catalogue_license_status": "Kildeverten identifiserer AGPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/TeamHypersomnia/Hypersomnia",
+          "revision": "ca177a1a9a73e9e4bf5bb00a00ff1a1905483bee",
+          "pinned_url": "https://github.com/TeamHypersomnia/Hypersomnia/tree/ca177a1a9a73e9e4bf5bb00a00ff1a1905483bee",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "akhenaten",
+      "name": "Akhenaten",
+      "genre": "Bybygging",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Byøkonomi og full innbyggersimulering krever mer enn dagens behov for egne havner og NPC-er.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/akhenaten.md",
+      "catalogue_license_status": "Kildeverten identifiserer AGPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/dalerank/Akhenaten",
+          "revision": "33d518619c9dfbfd662e8b76f3dca21c83368f8c",
+          "pinned_url": "https://github.com/dalerank/Akhenaten/tree/33d518619c9dfbfd662e8b76f3dca21c83368f8c",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "citybound",
+      "name": "Citybound",
+      "genre": "Bybygging",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Byøkonomi og full innbyggersimulering krever mer enn dagens behov for egne havner og NPC-er.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/citybound.md",
+      "catalogue_license_status": "Kildeverten identifiserer AGPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/citybound/citybound",
+          "revision": "817de551d2bc96c90d0b7c74af4872454f42b44c",
+          "pinned_url": "https://github.com/citybound/citybound/tree/817de551d2bc96c90d0b7c74af4872454f42b44c",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "cytopia",
+      "name": "Cytopia",
+      "genre": "Bybygging",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Byøkonomi og full innbyggersimulering krever mer enn dagens behov for egne havner og NPC-er.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/cytopia.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/CytopiaTeam/Cytopia",
+          "revision": "c70bbce3ba8b0ba23b8dcce9ff8bc8df0af971f8",
+          "pinned_url": "https://github.com/CytopiaTeam/Cytopia/tree/c70bbce3ba8b0ba23b8dcce9ff8bc8df0af971f8",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "egregoria",
+      "name": "Egregoria",
+      "genre": "Bybygging",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Byøkonomi og full innbyggersimulering krever mer enn dagens behov for egne havner og NPC-er.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/egregoria.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/Uriopass/Egregoria",
+          "revision": "ae65c857948a905120474cf93b96dd51cec6d5f6",
+          "pinned_url": "https://github.com/Uriopass/Egregoria/tree/ae65c857948a905120474cf93b96dd51cec6d5f6",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "isocity",
+      "name": "IsoCity",
+      "genre": "Bybygging",
+      "priority": "senere",
+      "use": "kodekandidat",
+      "reason": "MIT-worker for serialisering og komprimering. Må tilpasses én HTML, lz-string og CSP; først mål om kampanjelagring faktisk hakker.",
+      "inspection": "kodeutdrag_og_lisens",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/isocity.md",
+      "catalogue_license_status": "Kildeverten identifiserer MIT; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/amilich/isometric-city",
+          "revision": "b774dd7913103e9dd9ec51b2151893c22683886e",
+          "pinned_url": "https://github.com/amilich/isometric-city/tree/b774dd7913103e9dd9ec51b2151893c22683886e",
+          "archived": false
+        }
+      ],
+      "inspected_files": [
+        {
+          "path": "src/lib/saveWorker.ts",
+          "kind": "code",
+          "url": "https://github.com/amilich/isometric-city/blob/b774dd7913103e9dd9ec51b2151893c22683886e/src/lib/saveWorker.ts"
+        },
+        {
+          "path": "src/lib/saveWorkerManager.ts",
+          "kind": "code",
+          "url": "https://github.com/amilich/isometric-city/blob/b774dd7913103e9dd9ec51b2151893c22683886e/src/lib/saveWorkerManager.ts"
+        },
+        {
+          "path": "LICENSE",
+          "kind": "license",
+          "url": "https://github.com/amilich/isometric-city/blob/b774dd7913103e9dd9ec51b2151893c22683886e/LICENSE",
+          "sha256": "1a8373cf1f2f6f1474a0af184fe4627ce6752297731ca77b20c131cd607e8f53"
+        }
+      ]
+    },
+    {
+      "id": "julius",
+      "name": "Julius",
+      "genre": "Bybygging",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Byøkonomi og full innbyggersimulering krever mer enn dagens behov for egne havner og NPC-er.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/julius.md",
+      "catalogue_license_status": "Kildeverten identifiserer AGPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/bvschaik/julius",
+          "revision": "34d1ecd54befb845c0139b371fa8a0438210dac1",
+          "pinned_url": "https://github.com/bvschaik/julius/tree/34d1ecd54befb845c0139b371fa8a0438210dac1",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "micropolisjs",
+      "name": "micropolisJS",
+      "genre": "Bybygging",
+      "priority": "lav",
+      "use": "designreferanse",
+      "reason": "JavaScript betyr ikke enkel MIT-gjenbruk: GPLv3 med tilleggsvilkår. Sone-/budsjettmotoren løser ikke et prioritert behov.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/micropolisjs.md",
+      "catalogue_license_status": "GNU GPLv3 med tilleggsvilkår etter seksjon 7, blant annet om varemerker og opphav. Les den festede LICENSE-filen.",
+      "sources": [
+        {
+          "url": "https://github.com/graememcc/micropolisJS",
+          "revision": "f13a1624d111d235e804bd80f48ba7c9f66a8e0f",
+          "pinned_url": "https://github.com/graememcc/micropolisJS/tree/f13a1624d111d235e804bd80f48ba7c9f66a8e0f",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "unknown-horizons",
+      "name": "Unknown Horizons",
+      "genre": "Bybygging",
+      "priority": "senere",
+      "use": "designreferanse",
+      "reason": "Varekjeder og havneøkonomi kan inspirere handel senere. Både FIFE-originalen og Godot-porten er vurdert som katalogoppføringer.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/unknown-horizons.md",
+      "catalogue_license_status": "Originalen og Godot-porten har separate lisensdokumenter. Originalens doc/LICENSE beskriver komponentvilkår; portens lisens må leses for seg.",
+      "sources": [
+        {
+          "url": "https://github.com/unknown-horizons/unknown-horizons",
+          "revision": "c37c06e5c8624ad20a9bf1fd5d7b14a924235841",
+          "pinned_url": "https://github.com/unknown-horizons/unknown-horizons/tree/c37c06e5c8624ad20a9bf1fd5d7b14a924235841",
+          "archived": false
+        },
+        {
+          "url": "https://github.com/unknown-horizons/godot-port",
+          "revision": "fa0d5146162ae2e0bc8966a0254c6a2c4585dc54",
+          "pinned_url": "https://github.com/unknown-horizons/godot-port/tree/fa0d5146162ae2e0bc8966a0254c6a2c4585dc54",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "dead-ascend",
+      "name": "Dead Ascend",
+      "genre": "Eventyr",
+      "priority": "senere",
+      "use": "kodekandidat",
+      "reason": "MIT-profil gjør gjenstandsbruk og små romgåter verdt en senere kodekontroll; QML/C++ passer ikke direkte i vår motor.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/dead-ascend.md",
+      "catalogue_license_status": "Kildeverten identifiserer MIT; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/larpon/DeadAscend",
+          "revision": "ae0f9bbf608f146a5b86d3450eebdb2aee50144a",
+          "pinned_url": "https://github.com/larpon/DeadAscend/tree/ae0f9bbf608f146a5b86d3450eebdb2aee50144a",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "endless-sky",
+      "name": "Endless Sky",
+      "genre": "Eventyr",
+      "priority": "nå",
+      "use": "designreferanse",
+      "reason": "Betingelser adskilt fra virkninger og oppdragshendelser ved tilbud, ankomst, fullføring og fristbrudd; egen liten implementasjon.",
+      "inspection": "kodeutdrag_og_lisens",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/endless-sky.md",
+      "catalogue_license_status": "GNU GPLv3-dokument funnet. Kildevertens lisensfelt er uavklart; eventuelle kodeunntak og innholdsrettigheter må leses i kilden.",
+      "sources": [
+        {
+          "url": "https://github.com/endless-sky/endless-sky",
+          "revision": "e0334bf5634c502431271def8f3a74c2d88c6ed4",
+          "pinned_url": "https://github.com/endless-sky/endless-sky/tree/e0334bf5634c502431271def8f3a74c2d88c6ed4",
+          "archived": false
+        }
+      ],
+      "inspected_files": [
+        {
+          "path": "source/ConditionSet.cpp",
+          "kind": "code",
+          "url": "https://github.com/endless-sky/endless-sky/blob/e0334bf5634c502431271def8f3a74c2d88c6ed4/source/ConditionSet.cpp"
+        },
+        {
+          "path": "source/Mission.cpp",
+          "kind": "code",
+          "url": "https://github.com/endless-sky/endless-sky/blob/e0334bf5634c502431271def8f3a74c2d88c6ed4/source/Mission.cpp"
+        },
+        {
+          "path": "license.txt",
+          "kind": "code",
+          "url": "https://github.com/endless-sky/endless-sky/blob/e0334bf5634c502431271def8f3a74c2d88c6ed4/license.txt"
+        }
+      ]
+    },
+    {
+      "id": "pioneer",
+      "name": "Pioneer",
+      "genre": "Eventyr",
+      "priority": "senere",
+      "use": "designreferanse",
+      "reason": "Oppdragsgivere og reise-/ankomstbetingelser kan inspirere sjøoppdrag; ingen ny rom- eller terrengmotor.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/pioneer.md",
+      "catalogue_license_status": "GNU GPLv3-dokument funnet. Kildevertens lisensfelt er uavklart; eventuelle kodeunntak og innholdsrettigheter må leses i kilden.",
+      "sources": [
+        {
+          "url": "https://github.com/pioneerspacesim/pioneer",
+          "revision": "48376c6d3ae7877b5152701615f0dff3cd297e38",
+          "pinned_url": "https://github.com/pioneerspacesim/pioneer/tree/48376c6d3ae7877b5152701615f0dff3cd297e38",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "scummvm",
+      "name": "ScummVM",
+      "genre": "Eventyr",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Motoradapter og lesing av andre spillformater gir liten gevinst i vår egen three.js-verden.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/scummvm.md",
+      "catalogue_license_status": "GNU GPLv3-dokument funnet. Kildevertens lisensfelt er uavklart; eventuelle kodeunntak og innholdsrettigheter må leses i kilden.",
+      "sources": [
+        {
+          "url": "https://github.com/scummvm/scummvm",
+          "revision": "ed949213a23440447ea402e263daa871394b6bf9",
+          "pinned_url": "https://github.com/scummvm/scummvm/tree/ed949213a23440447ea402e263daa871394b6bf9",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "the-legend-of-zelda-twilight-princess",
+      "name": "The Legend of Zelda: Twilight Princess",
+      "genre": "Eventyr",
+      "priority": "lav",
+      "use": "avklar_lisens",
+      "reason": "CC0-felt i repoet bekrefter ikke fri Nintendo-kode eller data. Ingen originalmodeller, musikk, kart eller dekompilert spillkode anbefales.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/the-legend-of-zelda-twilight-princess.md",
+      "catalogue_license_status": "Kildeverten identifiserer CC0-1.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/zeldaret/tp",
+          "revision": "c8fa8c9e2aab72cf4e5db0e5d1c84a9ea6ee6eb0",
+          "pinned_url": "https://github.com/zeldaret/tp/tree/c8fa8c9e2aab72cf4e5db0e5d1c84a9ea6ee6eb0",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "zelda-3",
+      "name": "Zelda 3",
+      "genre": "Eventyr",
+      "priority": "lav",
+      "use": "avklar_lisens",
+      "reason": "Rekonstruksjon av originalspill, med separate datakrav og uavklarte rettigheter; ingen direkte kode-/innholdsbruk anbefales.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/zelda-3.md",
+      "catalogue_license_status": "MIT-dokument funnet. Kildevertens lisensfelt er uavklart; eventuelle kodeunntak og innholdsrettigheter må leses i kilden.",
+      "sources": [
+        {
+          "url": "https://github.com/snesrev/zelda3",
+          "revision": "45a149d8b4bb8098f53d1009f76e76e7d8b79bbf",
+          "pinned_url": "https://github.com/snesrev/zelda3/tree/45a149d8b4bb8098f53d1009f76e76e7d8b79bbf",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "kkrieger",
+      "name": ".kkrieger",
+      "genre": "Førsteperson",
+      "priority": "senere",
+      "use": "kodekandidat",
+      "reason": "BSD i werkkzeug3_kkrieger: Perlin, celler, murstein og normaloppskrifter. Avgrens til materialgenerering; x86-assembler og rammeverk kan ikke brukes direkte i nettleseren.",
+      "inspection": "kodeutdrag_og_lisens",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/kkrieger.md",
+      "catalogue_license_status": "BSD med to vilkår i werkkzeug3_kkrieger/LICENSE.txt. Lisensen gjelder den undersøkte undermappen; andre deler av Farbrausch-repoet har egne vilkår.",
+      "sources": [
+        {
+          "url": "https://github.com/farbrausch/fr_public/tree/master/werkkzeug3_kkrieger",
+          "revision": "8c8f82c2ae01133370e649bbc05916e7aceecadd",
+          "pinned_url": "https://github.com/farbrausch/fr_public/tree/8c8f82c2ae01133370e649bbc05916e7aceecadd/werkkzeug3_kkrieger",
+          "archived": false
+        }
+      ],
+      "inspected_files": [
+        {
+          "path": "werkkzeug3_kkrieger/LICENSE.txt",
+          "kind": "license",
+          "url": "https://github.com/farbrausch/fr_public/blob/8c8f82c2ae01133370e649bbc05916e7aceecadd/werkkzeug3_kkrieger/LICENSE.txt",
+          "sha256": "1fb74579785f76397568fe1514209a9236003a0ca5adb193aea3154290d17089"
+        },
+        {
+          "path": "werkkzeug3_kkrieger/genbitmap.cpp",
+          "kind": "code",
+          "url": "https://github.com/farbrausch/fr_public/blob/8c8f82c2ae01133370e649bbc05916e7aceecadd/werkkzeug3_kkrieger/genbitmap.cpp"
+        },
+        {
+          "path": "werkkzeug3_kkrieger/genmesh.cpp",
+          "kind": "code",
+          "url": "https://github.com/farbrausch/fr_public/blob/8c8f82c2ae01133370e649bbc05916e7aceecadd/werkkzeug3_kkrieger/genmesh.cpp"
+        }
+      ]
+    },
+    {
+      "id": "anarch",
+      "name": "Anarch",
+      "genre": "Førsteperson",
+      "priority": "senere",
+      "use": "kodekandidat",
+      "reason": "CC0-bytebeat og små 8 kHz-effekter kan brukes til en særpreget magisk lyd. Dagens lutt og WebAudio-miks passer bedre som hovedlyd.",
+      "inspection": "kodeutdrag_og_lisens",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/anarch.md",
+      "catalogue_license_status": "Kildeverten identifiserer cc0-1.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://gitlab.com/drummyfish/anarch",
+          "revision": "6f90562161200682459e772f1dacb747f23c5f95",
+          "pinned_url": "https://gitlab.com/drummyfish/anarch/-/tree/6f90562161200682459e772f1dacb747f23c5f95",
+          "archived": false
+        }
+      ],
+      "inspected_files": [
+        {
+          "path": "game.h",
+          "kind": "code",
+          "url": "https://gitlab.com/drummyfish/anarch/-/blob/6f90562161200682459e772f1dacb747f23c5f95/game.h"
+        },
+        {
+          "path": "sounds.h",
+          "kind": "code",
+          "url": "https://gitlab.com/drummyfish/anarch/-/blob/6f90562161200682459e772f1dacb747f23c5f95/sounds.h"
+        },
+        {
+          "path": "LICENSE",
+          "kind": "license",
+          "url": "https://gitlab.com/drummyfish/anarch/-/blob/6f90562161200682459e772f1dacb747f23c5f95/LICENSE",
+          "sha256": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499"
+        }
+      ]
+    },
+    {
+      "id": "assaultcube",
+      "name": "AssaultCube",
+      "genre": "Førsteperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "FPS-motor, førstepersonskontroll og gamle dataformater ligger langt fra dagens kamera og nettleserkode.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/assaultcube.md",
+      "catalogue_license_status": "Lisens uavklart: ingen egnet hovedlisens ble funnet i de undersøkte dokumentene. Offentlig tilgjengelig kode gir ikke i seg selv gjenbrukstillatelse.",
+      "sources": [
+        {
+          "url": "https://github.com/assaultcube/AC",
+          "revision": "13f0d8eea4822dee5c976661218d022be74342e3",
+          "pinned_url": "https://github.com/assaultcube/AC/tree/13f0d8eea4822dee5c976661218d022be74342e3",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "avp-forever",
+      "name": "AvP Forever",
+      "genre": "Førsteperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "FPS-motor, førstepersonskontroll og gamle dataformater ligger langt fra dagens kamera og nettleserkode.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/avp-forever.md",
+      "catalogue_license_status": "Begrenset Rebellion-lisens: lisensdokumentet utelukker kommersiell bruk. Ikke registrert som fritt gjenbrukbar kode.",
+      "sources": [
+        {
+          "url": "https://github.com/dreamer/avp-forever",
+          "revision": "08decb12dd87aafe85d3dea3fb4da6e4e3198afd",
+          "pinned_url": "https://github.com/dreamer/avp-forever/tree/08decb12dd87aafe85d3dea3fb4da6e4e3198afd",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "avpmp",
+      "name": "avpmp",
+      "genre": "Førsteperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "FPS-motor, førstepersonskontroll og gamle dataformater ligger langt fra dagens kamera og nettleserkode.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/avpmp.md",
+      "catalogue_license_status": "Begrenset Rebellion-lisens: lisensdokumentet utelukker kommersiell bruk. Ikke registrert som fritt gjenbrukbar kode.",
+      "sources": [
+        {
+          "url": "https://github.com/mbait/avpmp",
+          "revision": "66feb1c3c7aba95f696ea0bfdcfc92608a4a1c8d",
+          "pinned_url": "https://github.com/mbait/avpmp/tree/66feb1c3c7aba95f696ea0bfdcfc92608a4a1c8d",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "buildgdx",
+      "name": "BuildGDX",
+      "genre": "Førsteperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "FPS-motor, førstepersonskontroll og gamle dataformater ligger langt fra dagens kamera og nettleserkode.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/buildgdx.md",
+      "catalogue_license_status": "GNU GPLv3-dokument funnet. Kildevertens lisensfelt er uavklart; eventuelle kodeunntak og innholdsrettigheter må leses i kilden.",
+      "sources": [
+        {
+          "url": "https://github.com/vogonsorg/BuildGDX",
+          "revision": "74f585da4bdad28a6b68b15bc310d24fc71dca50",
+          "pinned_url": "https://github.com/vogonsorg/BuildGDX/tree/74f585da4bdad28a6b68b15bc310d24fc71dca50",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "catacomb-3-d",
+      "name": "Catacomb 3-D",
+      "genre": "Førsteperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "FPS-motor, førstepersonskontroll og gamle dataformater ligger langt fra dagens kamera og nettleserkode.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/catacomb-3-d.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/ArnoAnsems/CatacombGL",
+          "revision": "dd7d337fff89c32285b096190f6419828860bfe0",
+          "pinned_url": "https://github.com/ArnoAnsems/CatacombGL/tree/dd7d337fff89c32285b096190f6419828860bfe0",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "catacombgl",
+      "name": "CatacombGL",
+      "genre": "Førsteperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "FPS-motor, førstepersonskontroll og gamle dataformater ligger langt fra dagens kamera og nettleserkode.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/catacombgl.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/ArnoAnsems/CatacombGL",
+          "revision": "dd7d337fff89c32285b096190f6419828860bfe0",
+          "pinned_url": "https://github.com/ArnoAnsems/CatacombGL/tree/dd7d337fff89c32285b096190f6419828860bfe0",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "chocolate-doom",
+      "name": "Chocolate Doom",
+      "genre": "Førsteperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "FPS-motor, førstepersonskontroll og gamle dataformater ligger langt fra dagens kamera og nettleserkode.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/chocolate-doom.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-2.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/chocolate-doom/chocolate-doom",
+          "revision": "e6f632a4397023b6b17cc312525a16b2aacd64d6",
+          "pinned_url": "https://github.com/chocolate-doom/chocolate-doom/tree/e6f632a4397023b6b17cc312525a16b2aacd64d6",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "chocolate-quake",
+      "name": "Chocolate Quake",
+      "genre": "Førsteperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "FPS-motor, førstepersonskontroll og gamle dataformater ligger langt fra dagens kamera og nettleserkode.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/chocolate-quake.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/Henrique194/chocolate-quake",
+          "revision": "edb820937c31e62acf6a1ef1433fbf3e5fab19ba",
+          "pinned_url": "https://github.com/Henrique194/chocolate-quake/tree/edb820937c31e62acf6a1ef1433fbf3e5fab19ba",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "cube-2-sauerbraten",
+      "name": "Cube 2: Sauerbraten",
+      "genre": "Førsteperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "FPS-motor, førstepersonskontroll og gamle dataformater ligger langt fra dagens kamera og nettleserkode.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/cube-2-sauerbraten.md",
+      "catalogue_license_status": "Prosjektet oppgir zlib/libpng License i SourceForge-metadata. Lisensfilen i valgt kildeutgave er ikke kontrollert.",
+      "sources": [
+        {
+          "url": "https://sourceforge.net/projects/sauerbraten",
+          "revision": null,
+          "pinned_url": null,
+          "archived": null
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "descent-3",
+      "name": "Descent 3",
+      "genre": "Førsteperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "FPS-motor, førstepersonskontroll og gamle dataformater ligger langt fra dagens kamera og nettleserkode.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/descent-3.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/kevinbentley/Descent3",
+          "revision": "a3e82bc292dab95afd2bf3dc0988c065e041b3ef",
+          "pinned_url": "https://github.com/DescentDevelopers/Descent3/tree/a3e82bc292dab95afd2bf3dc0988c065e041b3ef",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "doom",
+      "name": "Doom",
+      "genre": "Førsteperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "FPS-motor, førstepersonskontroll og gamle dataformater ligger langt fra dagens kamera og nettleserkode.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/doom.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-2.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/id-Software/DOOM",
+          "revision": "a77dfb96cb91780ca334d0d4cfd86957558007e0",
+          "pinned_url": "https://github.com/id-Software/DOOM/tree/a77dfb96cb91780ca334d0d4cfd86957558007e0",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "doom-3-bfg-edition",
+      "name": "Doom 3 BFG Edition",
+      "genre": "Førsteperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "FPS-motor, førstepersonskontroll og gamle dataformater ligger langt fra dagens kamera og nettleserkode.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/doom-3-bfg-edition.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/id-Software/DOOM-3-BFG",
+          "revision": "1caba1979589971b5ed44e315d9ead30b278d8b4",
+          "pinned_url": "https://github.com/id-Software/DOOM-3-BFG/tree/1caba1979589971b5ed44e315d9ead30b278d8b4",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "doom64-re",
+      "name": "DOOM64-RE",
+      "genre": "Førsteperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "FPS-motor, førstepersonskontroll og gamle dataformater ligger langt fra dagens kamera og nettleserkode.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/doom64-re.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/Erick194/DOOM64-RE",
+          "revision": "6931e678a0b2958be1b49598f2fe60712c6596e1",
+          "pinned_url": "https://github.com/Erick194/DOOM64-RE/tree/6931e678a0b2958be1b49598f2fe60712c6596e1",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "duke-nukem-3d",
+      "name": "Duke Nukem 3D",
+      "genre": "Førsteperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "FPS-motor, førstepersonskontroll og gamle dataformater ligger langt fra dagens kamera og nettleserkode.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/duke-nukem-3d.md",
+      "catalogue_license_status": "GNU GPLv2-dokument funnet. Kildevertens lisensfelt er uavklart; eventuelle kodeunntak og innholdsrettigheter må leses i kilden.",
+      "sources": [
+        {
+          "url": "https://github.com/videogamepreservation/dukenukem3d",
+          "revision": "ef609159bd352985a0c63734a11241d86c873fe5",
+          "pinned_url": "https://github.com/videogamepreservation/dukenukem3d/tree/ef609159bd352985a0c63734a11241d86c873fe5",
+          "archived": true
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "ecwolf",
+      "name": "ECWolf",
+      "genre": "Førsteperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "FPS-motor, førstepersonskontroll og gamle dataformater ligger langt fra dagens kamera og nettleserkode.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/ecwolf.md",
+      "catalogue_license_status": "GPL som standardalternativ og alternativt opprinnelige ikke-kommersielle vilkår, ifølge prosjektets egen nedlastingsside. docs/copyright avgrenser komponentene.",
+      "sources": [
+        {
+          "url": "https://github.com/ECWolfEngine/ECWolf",
+          "revision": "1bff92d43bc1c1b6e9c4c03f0fd3c7ae9c972f9e",
+          "pinned_url": "https://github.com/ECWolfEngine/ECWolf/tree/1bff92d43bc1c1b6e9c4c03f0fd3c7ae9c972f9e",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "eduke32",
+      "name": "EDuke32",
+      "genre": "Førsteperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "FPS-motor, førstepersonskontroll og gamle dataformater ligger langt fra dagens kamera og nettleserkode.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/eduke32.md",
+      "catalogue_license_status": "Lisens uavklart: ingen egnet hovedlisens ble funnet i de undersøkte dokumentene. Offentlig tilgjengelig kode gir ikke i seg selv gjenbrukstillatelse.",
+      "sources": [
+        {
+          "url": "https://voidpoint.io/terminx/eduke32",
+          "revision": "ec5824db81817866f70da326d3811bb0f52b3517",
+          "pinned_url": "https://voidpoint.io/terminx/eduke32/-/tree/ec5824db81817866f70da326d3811bb0f52b3517",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "fteqw",
+      "name": "FTEQW",
+      "genre": "Førsteperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "FPS-motor, førstepersonskontroll og gamle dataformater ligger langt fra dagens kamera og nettleserkode.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/fteqw.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-2.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/fte-team/fteqw",
+          "revision": "f937b9d88f71fc4429db5fe56c6a98d922711b2e",
+          "pinned_url": "https://github.com/fte-team/fteqw/tree/f937b9d88f71fc4429db5fe56c6a98d922711b2e",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "jfduke3d",
+      "name": "JFDuke3D",
+      "genre": "Førsteperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "FPS-motor, førstepersonskontroll og gamle dataformater ligger langt fra dagens kamera og nettleserkode.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/jfduke3d.md",
+      "catalogue_license_status": "GNU GPLv2-dokument funnet. Kildevertens lisensfelt er uavklart; eventuelle kodeunntak og innholdsrettigheter må leses i kilden.",
+      "sources": [
+        {
+          "url": "https://github.com/jonof/jfduke3d",
+          "revision": "55c5f9592d2a78e427a2bbdb13ce3c4c9ccf6f04",
+          "pinned_url": "https://github.com/jonof/jfduke3d/tree/55c5f9592d2a78e427a2bbdb13ce3c4c9ccf6f04",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "jfshadowwarrior",
+      "name": "JFShadowWarrior",
+      "genre": "Førsteperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "FPS-motor, førstepersonskontroll og gamle dataformater ligger langt fra dagens kamera og nettleserkode.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/jfshadowwarrior.md",
+      "catalogue_license_status": "GNU GPLv2-dokument funnet. Kildevertens lisensfelt er uavklart; eventuelle kodeunntak og innholdsrettigheter må leses i kilden.",
+      "sources": [
+        {
+          "url": "https://github.com/jonof/jfsw",
+          "revision": "befcdd01afe5151cac2f1dabf0a7256c42537284",
+          "pinned_url": "https://github.com/jonof/jfsw/tree/befcdd01afe5151cac2f1dabf0a7256c42537284",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "liblast",
+      "name": "Liblast",
+      "genre": "Førsteperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "FPS-motor, førstepersonskontroll og gamle dataformater ligger langt fra dagens kamera og nettleserkode.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/liblast.md",
+      "catalogue_license_status": "MIT i det undersøkte lisensdokumentet. Tredjepartsinnhold må fortsatt vurderes separat.",
+      "sources": [
+        {
+          "url": "https://codeberg.org/liblast/liblast",
+          "revision": "0576acdba3369d607dbdd5752c25563945218108",
+          "pinned_url": "https://codeberg.org/liblast/liblast/src/commit/0576acdba3369d607dbdd5752c25563945218108",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "nakedavp",
+      "name": "NakedAVP",
+      "genre": "Førsteperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "FPS-motor, førstepersonskontroll og gamle dataformater ligger langt fra dagens kamera og nettleserkode.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/nakedavp.md",
+      "catalogue_license_status": "Begrenset Rebellion-lisens for originalkoden, med egne vilkår for tillegg. Kommersiell bruk kan ikke utledes av SDL-lisensen.",
+      "sources": [
+        {
+          "url": "https://github.com/atsb/NakedAVP",
+          "revision": "d3c8afc44289a7a255a3cc1a317555255e9ae48a",
+          "pinned_url": "https://github.com/atsb/NakedAVP/tree/d3c8afc44289a7a255a3cc1a317555255e9ae48a",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "nblood",
+      "name": "NBlood",
+      "genre": "Førsteperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "FPS-motor, førstepersonskontroll og gamle dataformater ligger langt fra dagens kamera og nettleserkode.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/nblood.md",
+      "catalogue_license_status": "GNU GPLv2-dokument funnet. Kildevertens lisensfelt er uavklart; eventuelle kodeunntak og innholdsrettigheter må leses i kilden.",
+      "sources": [
+        {
+          "url": "https://github.com/NBlood/NBlood",
+          "revision": "497385d64b97f4fd13b6efb3929df0f2ab3adc87",
+          "pinned_url": "https://github.com/NBlood/NBlood/tree/497385d64b97f4fd13b6efb3929df0f2ab3adc87",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "nubuildgdx",
+      "name": "NuBuildGDX",
+      "genre": "Førsteperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "FPS-motor, førstepersonskontroll og gamle dataformater ligger langt fra dagens kamera og nettleserkode.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/nubuildgdx.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/atsb/NuBuildGDX",
+          "revision": "5cbf4d17e41cf0887885925b64259b2fc0592968",
+          "pinned_url": "https://github.com/atsb/NuBuildGDX/tree/5cbf4d17e41cf0887885925b64259b2fc0592968",
+          "archived": true
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "quake",
+      "name": "Quake",
+      "genre": "Førsteperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "FPS-motor, førstepersonskontroll og gamle dataformater ligger langt fra dagens kamera og nettleserkode.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/quake.md",
+      "catalogue_license_status": "GNU GPLv2-dokument funnet. Kildevertens lisensfelt er uavklart; eventuelle kodeunntak og innholdsrettigheter må leses i kilden.",
+      "sources": [
+        {
+          "url": "https://github.com/id-Software/Quake",
+          "revision": "bf4ac424ce754894ac8f1dae6a3981954bc9852d",
+          "pinned_url": "https://github.com/id-Software/Quake/tree/bf4ac424ce754894ac8f1dae6a3981954bc9852d",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "quake-ii",
+      "name": "Quake II",
+      "genre": "Førsteperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "FPS-motor, førstepersonskontroll og gamle dataformater ligger langt fra dagens kamera og nettleserkode.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/quake-ii.md",
+      "catalogue_license_status": "GNU GPLv2-dokument funnet. Kildevertens lisensfelt er uavklart; eventuelle kodeunntak og innholdsrettigheter må leses i kilden.",
+      "sources": [
+        {
+          "url": "https://github.com/id-Software/Quake-2",
+          "revision": "372afde46e7defc9dd2d719a1732b8ace1fa096e",
+          "pinned_url": "https://github.com/id-Software/Quake-2/tree/372afde46e7defc9dd2d719a1732b8ace1fa096e",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "quake-iii-arena",
+      "name": "Quake III Arena",
+      "genre": "Førsteperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "FPS-motor, førstepersonskontroll og gamle dataformater ligger langt fra dagens kamera og nettleserkode.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/quake-iii-arena.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-2.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/id-Software/Quake-III-Arena",
+          "revision": "dbe4ddb10315479fc00086f08e25d968b4b43c49",
+          "pinned_url": "https://github.com/id-Software/Quake-III-Arena/tree/dbe4ddb10315479fc00086f08e25d968b4b43c49",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "raze",
+      "name": "Raze",
+      "genre": "Førsteperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "FPS-motor, førstepersonskontroll og gamle dataformater ligger langt fra dagens kamera og nettleserkode.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/raze.md",
+      "catalogue_license_status": "GNU GPLv2-dokument funnet. Kildevertens lisensfelt er uavklart; eventuelle kodeunntak og innholdsrettigheter må leses i kilden.",
+      "sources": [
+        {
+          "url": "https://github.com/ZDoom/Raze",
+          "revision": "76fe82f5eb318fdeb30ba9fb27093a9a10bc3821",
+          "pinned_url": "https://github.com/ZDoom/Raze/tree/76fe82f5eb318fdeb30ba9fb27093a9a10bc3821",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "red-eclipse",
+      "name": "Red Eclipse",
+      "genre": "Førsteperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "FPS-motor, førstepersonskontroll og gamle dataformater ligger langt fra dagens kamera og nettleserkode.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/red-eclipse.md",
+      "catalogue_license_status": "Zlib for Red Eclipse-, Tesseract- og Cube-motorkoden, med egne opplysninger for innhold og andre komponenter.",
+      "sources": [
+        {
+          "url": "https://github.com/redeclipse/base",
+          "revision": "21bd045fd76e0bf50a4e0205300d599bff182369",
+          "pinned_url": "https://github.com/redeclipse/base/tree/21bd045fd76e0bf50a4e0205300d599bff182369",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "shadow-warrior",
+      "name": "Shadow Warrior",
+      "genre": "Førsteperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "FPS-motor, førstepersonskontroll og gamle dataformater ligger langt fra dagens kamera og nettleserkode.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/shadow-warrior.md",
+      "catalogue_license_status": "GNU GPLv2-dokument funnet. Kildevertens lisensfelt er uavklart; eventuelle kodeunntak og innholdsrettigheter må leses i kilden.",
+      "sources": [
+        {
+          "url": "https://github.com/Azarien/shadow-warrior",
+          "revision": "bf781c586c7e9cda0cfb0b3bc56983f535cb75c4",
+          "pinned_url": "https://github.com/Azarien/shadow-warrior/tree/bf781c586c7e9cda0cfb0b3bc56983f535cb75c4",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "surreal-engine",
+      "name": "Surreal Engine",
+      "genre": "Førsteperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "FPS-motor, førstepersonskontroll og gamle dataformater ligger langt fra dagens kamera og nettleserkode.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/surreal-engine.md",
+      "catalogue_license_status": "Zlib-vilkår for hovedmotoren; SurrealVideo oppgis med LGPL 2.1 eller senere og andre komponenter har egne vilkår.",
+      "sources": [
+        {
+          "url": "https://github.com/dpjudas/SurrealEngine",
+          "revision": "dab009eafb0b1cd514aee0c3c42c8fbc8f9d9fb9",
+          "pinned_url": "https://github.com/dpjudas/SurrealEngine/tree/dab009eafb0b1cd514aee0c3c42c8fbc8f9d9fb9",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "the-dark-mod",
+      "name": "The Dark Mod",
+      "genre": "Førsteperson",
+      "priority": "senere",
+      "use": "designreferanse",
+      "reason": "Vakter, lyd og mistanke passer en tjuv. Kun profil og lisens kontrollert; AI-kode ikke lest. GPL-kode og mye NC-innhold skal ikke kopieres.",
+      "inspection": "lisens",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/the-dark-mod.md",
+      "catalogue_license_status": "GPLv3 eller senere for programvaren med oppgitte tilleggsvilkår. Mye ikke-programvare har CC BY-NC-SA 3.0 og oppdrag kan ha egne vilkår.",
+      "sources": [
+        {
+          "url": "https://svn.thedarkmod.com/publicsvn/darkmod_src/trunk",
+          "revision": "r11364",
+          "pinned_url": "https://svn.thedarkmod.com/publicsvn/darkmod_src/!svn/bc/11364/trunk",
+          "archived": null
+        }
+      ],
+      "inspected_files": [
+        {
+          "path": "LICENSE.txt",
+          "kind": "license",
+          "url": "https://svn.thedarkmod.com/publicsvn/darkmod_src/!svn/bc/11364/trunk/LICENSE.txt",
+          "sha256": "a49c245b45e3e67d2b6f4b4c9057768f0de0b49abdf1cd419d7cc39f4aaa7b00"
+        }
+      ]
+    },
+    {
+      "id": "wolf4sdl",
+      "name": "Wolf4SDL",
+      "genre": "Førsteperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "FPS-motor, førstepersonskontroll og gamle dataformater ligger langt fra dagens kamera og nettleserkode.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/wolf4sdl.md",
+      "catalogue_license_status": "GNU GPLv2-dokument funnet. Kildevertens lisensfelt er uavklart; eventuelle kodeunntak og innholdsrettigheter må leses i kilden.",
+      "sources": [
+        {
+          "url": "https://github.com/lazd/wolf4sdl",
+          "revision": "3d41ccce8f8fecbed83aa9d8d42734c2c7e62374",
+          "pinned_url": "https://github.com/lazd/wolf4sdl/tree/3d41ccce8f8fecbed83aa9d8d42734c2c7e62374",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "wolfenstein-3d",
+      "name": "Wolfenstein 3D",
+      "genre": "Førsteperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "FPS-motor, førstepersonskontroll og gamle dataformater ligger langt fra dagens kamera og nettleserkode.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/wolfenstein-3d.md",
+      "catalogue_license_status": "Særskilt Limited Use Software License Agreement i denne kildeutgaven. Ikke anta at den opprinnelige kildeutgaven har samme vilkår som moderne GPL-porter.",
+      "sources": [
+        {
+          "url": "https://github.com/id-Software/wolf3d",
+          "revision": "05167784ef009d0d0daefe8d012b027f39dc8541",
+          "pinned_url": "https://github.com/id-Software/wolf3d/tree/05167784ef009d0d0daefe8d012b027f39dc8541",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "xonotic",
+      "name": "Xonotic",
+      "genre": "Førsteperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "FPS-motor, førstepersonskontroll og gamle dataformater ligger langt fra dagens kamera og nettleserkode.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/xonotic.md",
+      "catalogue_license_status": "Kildeverten identifiserer gpl-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://gitlab.com/xonotic/xonotic",
+          "revision": "aa02ae2df43a1a57bb4f77322a7776b4ada79ccf",
+          "pinned_url": "https://gitlab.com/xonotic/xonotic/-/tree/aa02ae2df43a1a57bb4f77322a7776b4ada79ccf",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "zdoom",
+      "name": "ZDoom",
+      "genre": "Førsteperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "FPS-motor, førstepersonskontroll og gamle dataformater ligger langt fra dagens kamera og nettleserkode.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/zdoom.md",
+      "catalogue_license_status": "GNU GPLv3-dokument funnet. Kildevertens lisensfelt er uavklart; eventuelle kodeunntak og innholdsrettigheter må leses i kilden.",
+      "sources": [
+        {
+          "url": "https://github.com/UZDoom/UZDoom",
+          "revision": "f49e8bced5cd32ce63b8bebb8291e9be7be6a0a6",
+          "pinned_url": "https://github.com/UZDoom/UZDoom/tree/f49e8bced5cd32ce63b8bebb8291e9be7be6a0a6",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "commander-keen",
+      "name": "Commander Keen",
+      "genre": "Plattformspill",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Plattformbevegelse og motorportering løser ikke et nåværende problem i vårt rollespill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/commander-keen.md",
+      "catalogue_license_status": "Kildeverten identifiserer agpl-1.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://gitlab.com/Dringgstein/Commander-Genius",
+          "revision": "58a3c4fd0782fa2a087e38a039599b2ecf69ccc9",
+          "pinned_url": "https://gitlab.com/Dringgstein/Commander-Genius/-/tree/58a3c4fd0782fa2a087e38a039599b2ecf69ccc9",
+          "archived": false
+        },
+        {
+          "url": "https://github.com/sulix/omnispeak",
+          "revision": "144f21e9891cd3df194df44bb0f2531c5dbc6bcb",
+          "pinned_url": "https://github.com/sulix/omnispeak/tree/144f21e9891cd3df194df44bb0f2531c5dbc6bcb",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "commander-keen-in-keen-dreams",
+      "name": "Commander Keen in Keen Dreams",
+      "genre": "Plattformspill",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Plattformbevegelse og motorportering løser ikke et nåværende problem i vårt rollespill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/commander-keen-in-keen-dreams.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-2.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/keendreams/keen",
+          "revision": "4348b4719be87a0b873f5f4f77b4de82ddf7050c",
+          "pinned_url": "https://github.com/keendreams/keen/tree/4348b4719be87a0b873f5f4f77b4de82ddf7050c",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "commander-genius",
+      "name": "Commander-Genius",
+      "genre": "Plattformspill",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Plattformbevegelse og motorportering løser ikke et nåværende problem i vårt rollespill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/commander-genius.md",
+      "catalogue_license_status": "Kildeverten identifiserer agpl-1.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://gitlab.com/Dringgstein/Commander-Genius",
+          "revision": "58a3c4fd0782fa2a087e38a039599b2ecf69ccc9",
+          "pinned_url": "https://gitlab.com/Dringgstein/Commander-Genius/-/tree/58a3c4fd0782fa2a087e38a039599b2ecf69ccc9",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "ddracenetwork",
+      "name": "DDraceNetwork",
+      "genre": "Plattformspill",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Plattformbevegelse og motorportering løser ikke et nåværende problem i vårt rollespill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/ddracenetwork.md",
+      "catalogue_license_status": "Zlib-vilkår for programvaren. Datainnhold, skrifter, skins og andre ressurser har separate vilkår, blant annet CC BY-SA 3.0.",
+      "sources": [
+        {
+          "url": "https://github.com/ddnet/ddnet",
+          "revision": "3da173e1f30c641252188fcf7d8c2ac993edb7b0",
+          "pinned_url": "https://github.com/ddnet/ddnet/tree/3da173e1f30c641252188fcf7d8c2ac993edb7b0",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "frogatto-friends",
+      "name": "Frogatto & Friends",
+      "genre": "Plattformspill",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Plattformbevegelse og motorportering løser ikke et nåværende problem i vårt rollespill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/frogatto-friends.md",
+      "catalogue_license_status": "Flere vilkår: blant annet CC BY 3.0 og CC BY-NC-SA 4.0 for spillfiler og innhold. Anura-motorens C++-kode omtales separat med Zlib-vilkår.",
+      "sources": [
+        {
+          "url": "https://github.com/frogatto/frogatto",
+          "revision": "a7b725b8db3fad2cf0aee01fc501987e9fa87037",
+          "pinned_url": "https://github.com/frogatto/frogatto/tree/a7b725b8db3fad2cf0aee01fc501987e9fa87037",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "jumpy",
+      "name": "Jumpy",
+      "genre": "Plattformspill",
+      "priority": "senere",
+      "use": "kodekandidat",
+      "reason": "MIT/Apache-kode ifølge profilen. Tilstandsmaskiner og kontroll kan undersøkes senere, men Rust/Lua og 2D-motor er ikke direkte kompatible.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/jumpy.md",
+      "catalogue_license_status": "MIT eller Apache-2.0 for kildekoden. Innhold og tredjepartskomponenter må vurderes fra de separate lisensnotisene.",
+      "sources": [
+        {
+          "url": "https://github.com/fishfolk/jumpy",
+          "revision": "514557dc4b5d596a840d95977e06eae191296a77",
+          "pinned_url": "https://github.com/fishfolk/jumpy/tree/514557dc4b5d596a840d95977e06eae191296a77",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "omnispeak",
+      "name": "Omnispeak",
+      "genre": "Plattformspill",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Plattformbevegelse og motorportering løser ikke et nåværende problem i vårt rollespill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/omnispeak.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-2.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/sulix/omnispeak",
+          "revision": "144f21e9891cd3df194df44bb0f2531c5dbc6bcb",
+          "pinned_url": "https://github.com/sulix/omnispeak/tree/144f21e9891cd3df194df44bb0f2531c5dbc6bcb",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "opengoal",
+      "name": "OpenGOAL",
+      "genre": "Plattformspill",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Plattformbevegelse og motorportering løser ikke et nåværende problem i vårt rollespill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/opengoal.md",
+      "catalogue_license_status": "Kildeverten identifiserer ISC; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/water111/jak-project",
+          "revision": "6076aab5a95955443a9e1ed8f72a25bc0e2fcf9d",
+          "pinned_url": "https://github.com/open-goal/jak-project/tree/6076aab5a95955443a9e1ed8f72a25bc0e2fcf9d",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "punchy",
+      "name": "Punchy",
+      "genre": "Plattformspill",
+      "priority": "senere",
+      "use": "kodekandidat",
+      "reason": "MIT/Apache-kode ifølge profilen. Kamp-/figursystemer kan undersøkes senere uten å ta inn Bevy/ECS eller innholdet.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/punchy.md",
+      "catalogue_license_status": "MIT eller Apache-2.0 for kildekoden. Innhold og tredjepartskomponenter må vurderes fra de separate lisensnotisene.",
+      "sources": [
+        {
+          "url": "https://github.com/fishfolk/punchy",
+          "revision": "ab48fe1545bba2c9bc8d0c971d8d7fc4efd7f74e",
+          "pinned_url": "https://github.com/fishfolk/punchy/tree/ab48fe1545bba2c9bc8d0c971d8d7fc4efd7f74e",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "rigel-engine",
+      "name": "Rigel Engine",
+      "genre": "Plattformspill",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Plattformbevegelse og motorportering løser ikke et nåværende problem i vårt rollespill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/rigel-engine.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-2.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/lethal-guitar/RigelEngine",
+          "revision": "30afeff8f0b105eac77ee0a2fbd54b06e1a49b60",
+          "pinned_url": "https://github.com/lethal-guitar/RigelEngine/tree/30afeff8f0b105eac77ee0a2fbd54b06e1a49b60",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "sonic-robo-blast-2",
+      "name": "Sonic Robo Blast 2",
+      "genre": "Plattformspill",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Plattformbevegelse og motorportering løser ikke et nåværende problem i vårt rollespill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/sonic-robo-blast-2.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-2.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/STJr/SRB2",
+          "revision": "639b58c6d718452ef343a0bc927d043bed9e40d6",
+          "pinned_url": "https://github.com/STJr/SRB2/tree/639b58c6d718452ef343a0bc927d043bed9e40d6",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "super-mario-64",
+      "name": "Super Mario 64",
+      "genre": "Plattformspill",
+      "priority": "lav",
+      "use": "avklar_lisens",
+      "reason": "CC0-felt i repoet bekrefter ikke rettigheter til originalkode og Nintendo-innhold. Ingen gjenbruk begrunnet i vårt spill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/super-mario-64.md",
+      "catalogue_license_status": "Kildeverten identifiserer CC0-1.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/n64decomp/sm64",
+          "revision": "9921382a68bb0c865e5e45eb594d9c64db59b1af",
+          "pinned_url": "https://github.com/n64decomp/sm64/tree/9921382a68bb0c865e5e45eb594d9c64db59b1af",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "vvvvvv",
+      "name": "VVVVVV",
+      "genre": "Plattformspill",
+      "priority": "lav",
+      "use": "ingen_kodegjenbruk",
+      "reason": "Egen lisens for tilgjengelig kilde har særskilte bruks- og distribusjonsvilkår. Ikke en generell kilde for vårt MIT-spill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/vvvvvv.md",
+      "catalogue_license_status": "Egen lisens for tilgjengelig kildekode, med særskilte bruks- og distribusjonsvilkår. Ikke en generell tillatelse til å publisere et avledet spill.",
+      "sources": [
+        {
+          "url": "https://github.com/TerryCavanagh/VVVVVV",
+          "revision": "40e1ec3bbf2a990a5c600564fe312c2121178a50",
+          "pinned_url": "https://github.com/TerryCavanagh/VVVVVV/tree/40e1ec3bbf2a990a5c600564fe312c2121178a50",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "blockout-ii",
+      "name": "BlockOut II",
+      "genre": "Puslespill",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Brikkeregler eller portalmekanikk løser ikke et prioritert behov nå.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/blockout-ii.md",
+      "catalogue_license_status": "Prosjektet oppgir GNU General Public License version 2.0 (GPLv2) i SourceForge-metadata. Lisensfilen i valgt kildeutgave er ikke kontrollert.",
+      "sources": [
+        {
+          "url": "https://sourceforge.net/projects/blockout/files/blockout/BlockOut%202.5",
+          "revision": null,
+          "pinned_url": null,
+          "archived": null
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "portal64",
+      "name": "Portal64",
+      "genre": "Puslespill",
+      "priority": "lav",
+      "use": "designreferanse",
+      "reason": "MIT i profilen frigir ikke Valve-innhold. Portaler og N64-tilpasning er ikke et behov i dagens rollespill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/portal64.md",
+      "catalogue_license_status": "Kildeverten identifiserer MIT; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/mwpenny/portal64-still-alive",
+          "revision": "d1140646344e10957763d92c5615fe6f1d153aad",
+          "pinned_url": "https://github.com/mwpenny/portal64-still-alive/tree/d1140646344e10957763d92c5615fe6f1d153aad",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "whatajong",
+      "name": "Whatajong",
+      "genre": "Puslespill",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Brikkeregler eller portalmekanikk løser ikke et prioritert behov nå.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/whatajong.md",
+      "catalogue_license_status": "Kildeverten identifiserer MIT; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/masylum/whatajong",
+          "revision": "45fe3da7a7d1e87a66ae41b72ee74cc4e0a920d5",
+          "pinned_url": "https://github.com/masylum/whatajong/tree/45fe3da7a7d1e87a66ae41b72ee74cc4e0a920d5",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "dust-racing-2d",
+      "name": "Dust Racing 2D",
+      "genre": "Racing og kjøresimulering",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Kjøretøy, dekk og løpsbaner passer dårlig med dagens reise-, kamp- og verdenssystem.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/dust-racing-2d.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/juzzlin/DustRacing2D",
+          "revision": "06da67229775ddb57fcb7c4d0763e97a70a21f70",
+          "pinned_url": "https://github.com/juzzlin/DustRacing2D/tree/06da67229775ddb57fcb7c4d0763e97a70a21f70",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "maniadrive",
+      "name": "ManiaDrive",
+      "genre": "Racing og kjøresimulering",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Kjøretøy, dekk og løpsbaner passer dårlig med dagens reise-, kamp- og verdenssystem.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/maniadrive.md",
+      "catalogue_license_status": "Kilde-/nedlastingsside er tilgjengelig. Konkret kodelisens er ikke bekreftet fra et festet lisensdokument.",
+      "sources": [
+        {
+          "url": "http://maniadrive.raydium.org/index.php?downloads=yes",
+          "revision": null,
+          "pinned_url": null,
+          "archived": null
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "rigs-of-rods",
+      "name": "Rigs of Rods",
+      "genre": "Racing og kjøresimulering",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Kjøretøy, dekk og løpsbaner passer dårlig med dagens reise-, kamp- og verdenssystem.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/rigs-of-rods.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/RigsOfRods/rigs-of-rods",
+          "revision": "27a47d5e467dca3ddd32bc949d962a40a2cfc664",
+          "pinned_url": "https://github.com/RigsOfRods/rigs-of-rods/tree/27a47d5e467dca3ddd32bc949d962a40a2cfc664",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "rvgl",
+      "name": "RVGL",
+      "genre": "Racing og kjøresimulering",
+      "priority": "lav",
+      "use": "avklar_lisens",
+      "reason": "Offentlig spillkilde og åpen kodelisens er ikke bekreftet. Listen viser en prosjektgruppe; åpne avhengigheter gir ingen lisens til selve spillet.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/rvgl.md",
+      "catalogue_license_status": "Åpen lisens og offentlig kildekode til selve RVGL er ikke bekreftet. Listen peker til en prosjektgruppe; åpne avhengigheter gir ikke lisens til spillkoden.",
+      "sources": [
+        {
+          "url": "https://gitlab.com/re-volt",
+          "revision": null,
+          "pinned_url": null,
+          "archived": null
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "speed-dreams",
+      "name": "Speed Dreams",
+      "genre": "Racing og kjøresimulering",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Kjøretøy, dekk og løpsbaner passer dårlig med dagens reise-, kamp- og verdenssystem.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/speed-dreams.md",
+      "catalogue_license_status": "GNU GPLv2-dokument funnet. Kildevertens lisensfelt er uavklart; eventuelle kodeunntak og innholdsrettigheter må leses i kilden.",
+      "sources": [
+        {
+          "url": "https://forge.a-lec.org/xavi/speed-dreams-code",
+          "revision": "c1cdee61e74a850d5f934dd1aaeb1a8f5569f569",
+          "pinned_url": "https://forge.a-lec.org/xavi/speed-dreams-code/src/commit/c1cdee61e74a850d5f934dd1aaeb1a8f5569f569",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "stunt-rally",
+      "name": "Stunt Rally",
+      "genre": "Racing og kjøresimulering",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Kjøretøy, dekk og løpsbaner passer dårlig med dagens reise-, kamp- og verdenssystem.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/stunt-rally.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/stuntrally/stuntrally3",
+          "revision": "fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8",
+          "pinned_url": "https://github.com/stuntrally/stuntrally3/tree/fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "supertuxkart",
+      "name": "SuperTuxKart",
+      "genre": "Racing og kjøresimulering",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Kjøretøy, dekk og løpsbaner passer dårlig med dagens reise-, kamp- og verdenssystem.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/supertuxkart.md",
+      "catalogue_license_status": "GNU GPLv3-dokument funnet. Kildevertens lisensfelt er uavklart; eventuelle kodeunntak og innholdsrettigheter må leses i kilden.",
+      "sources": [
+        {
+          "url": "https://github.com/supertuxkart/stk-code",
+          "revision": "2997f192e6876047909d909498dbb4810e5dbb8d",
+          "pinned_url": "https://github.com/supertuxkart/stk-code/tree/2997f192e6876047909d909498dbb4810e5dbb8d",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "torcs-the-open-racing-car-simulator",
+      "name": "TORCS - The Open Racing Car Simulator",
+      "genre": "Racing og kjøresimulering",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Kjøretøy, dekk og løpsbaner passer dårlig med dagens reise-, kamp- og verdenssystem.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/torcs-the-open-racing-car-simulator.md",
+      "catalogue_license_status": "Prosjektet oppgir GNU General Public License version 2.0 (GPLv2) i SourceForge-metadata. Lisensfilen i valgt kildeutgave er ikke kontrollert.",
+      "sources": [
+        {
+          "url": "https://sourceforge.net/projects/torcs",
+          "revision": null,
+          "pinned_url": null,
+          "archived": null
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "trigger-rally",
+      "name": "Trigger Rally",
+      "genre": "Racing og kjøresimulering",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Kjøretøy, dekk og løpsbaner passer dårlig med dagens reise-, kamp- og verdenssystem.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/trigger-rally.md",
+      "catalogue_license_status": "Prosjektet oppgir GNU General Public License version 2.0 (GPLv2) i SourceForge-metadata. Lisensfilen i valgt kildeutgave er ikke kontrollert.",
+      "sources": [
+        {
+          "url": "https://sourceforge.net/projects/trigger-rally",
+          "revision": null,
+          "pinned_url": null,
+          "archived": null
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "vdrift",
+      "name": "VDrift",
+      "genre": "Racing og kjøresimulering",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Kjøretøy, dekk og løpsbaner passer dårlig med dagens reise-, kamp- og verdenssystem.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/vdrift.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/VDrift/vdrift",
+          "revision": "f835edaef1abe586b8d5bebeaa8c41f85e6dbea4",
+          "pinned_url": "https://github.com/VDrift/vdrift/tree/f835edaef1abe586b8d5bebeaa8c41f85e6dbea4",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "wipeout",
+      "name": "wipEout",
+      "genre": "Racing og kjøresimulering",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Kjøretøy, dekk og løpsbaner passer dårlig med dagens reise-, kamp- og verdenssystem.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/wipeout.md",
+      "catalogue_license_status": "Ingen åpen lisens bekreftet. README sier at kodebasen ikke har lisens og utelukker kommersiell utgivelse. Kun historisk referanse.",
+      "sources": [
+        {
+          "url": "https://github.com/phoboslab/wipeout-rewrite",
+          "revision": "b425ecb3b3250e4fdcb4462b72c3fb9679a1eb59",
+          "pinned_url": "https://github.com/phoboslab/wipeout-rewrite/tree/b425ecb3b3250e4fdcb4462b72c3fb9679a1eb59",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "yorg",
+      "name": "Yorg",
+      "genre": "Racing og kjøresimulering",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Kjøretøy, dekk og løpsbaner passer dårlig med dagens reise-, kamp- og verdenssystem.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/yorg.md",
+      "catalogue_license_status": "GPLv3 for kode. Lisensfilen viser til egne Creative Commons-vilkår og opphav for assets.",
+      "sources": [
+        {
+          "url": "https://github.com/cflavio/yorg",
+          "revision": "b216482d1acc65a6caf3a1a9f518723c667f87d4",
+          "pinned_url": "https://github.com/cflavio/yorg/tree/b216482d1acc65a6caf3a1a9f518723c667f87d4",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "brogue-ce",
+      "name": "Brogue CE",
+      "genre": "Roguelike",
+      "priority": "nå",
+      "use": "designreferanse",
+      "reason": "Flaskehalser og meningsfulle rom kan forbedre vår generator, som allerede har Prim-forbindelser og løkker. Ikke kopier AGPL-kode.",
+      "inspection": "kodeutdrag_og_lisens",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/brogue-ce.md",
+      "catalogue_license_status": "Kildeverten identifiserer AGPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/tmewett/BrogueCE",
+          "revision": "104a20fedbe7d9360d2dfc8ff665571694212ad8",
+          "pinned_url": "https://github.com/tmewett/BrogueCE/tree/104a20fedbe7d9360d2dfc8ff665571694212ad8",
+          "archived": false
+        }
+      ],
+      "inspected_files": [
+        {
+          "path": "src/brogue/Architect.c",
+          "kind": "code",
+          "url": "https://github.com/tmewett/BrogueCE/blob/104a20fedbe7d9360d2dfc8ff665571694212ad8/src/brogue/Architect.c"
+        },
+        {
+          "path": "LICENSE.txt",
+          "kind": "license",
+          "url": "https://github.com/tmewett/BrogueCE/blob/104a20fedbe7d9360d2dfc8ff665571694212ad8/LICENSE.txt",
+          "sha256": "91b65277959ec273763d28ef002e83a6b3fba57c7a35436c9e5b66536333d720"
+        }
+      ]
+    },
+    {
+      "id": "cataclysm-dark-days-ahead",
+      "name": "Cataclysm: Dark Days Ahead",
+      "genre": "Roguelike",
+      "priority": "nå",
+      "use": "designreferanse",
+      "reason": "Mapbuffer skiller aktive områder fra lagrede områder. Relevant for gjenbesøk og varige endringer uten å simulere hele Ereb Altor. Lisensen er CC BY-SA 3.0.",
+      "inspection": "kodeutdrag_og_lisens",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/cataclysm-dark-days-ahead.md",
+      "catalogue_license_status": "CC BY-SA 3.0-dokument funnet. Kildevertens lisensfelt er uavklart; eventuelle kodeunntak og innholdsrettigheter må leses i kilden.",
+      "sources": [
+        {
+          "url": "https://github.com/CleverRaven/Cataclysm-DDA",
+          "revision": "0723f9285fa0080dfe1876cc9c2845919252528c",
+          "pinned_url": "https://github.com/CleverRaven/Cataclysm-DDA/tree/0723f9285fa0080dfe1876cc9c2845919252528c",
+          "archived": false
+        }
+      ],
+      "inspected_files": [
+        {
+          "path": "src/mapbuffer.cpp",
+          "kind": "code",
+          "url": "https://github.com/CleverRaven/Cataclysm-DDA/blob/0723f9285fa0080dfe1876cc9c2845919252528c/src/mapbuffer.cpp"
+        },
+        {
+          "path": "LICENSE.txt",
+          "kind": "license",
+          "url": "https://github.com/CleverRaven/Cataclysm-DDA/blob/0723f9285fa0080dfe1876cc9c2845919252528c/LICENSE.txt",
+          "sha256": "6e3d17bae7a8f0dee4b0d0c6af5bdf4396a0e685455efa8c2ad4ce52acdd99e2"
+        }
+      ]
+    },
+    {
+      "id": "dungeon-crawl-stone-soup",
+      "name": "Dungeon Crawl Stone Soup",
+      "genre": "Roguelike",
+      "priority": "senere",
+      "use": "designreferanse",
+      "reason": "Tematiske rom, monsterroller og informasjon om fare kan inspirere innhold; DoD91-tall og vår sanntidskamp beholdes.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/dungeon-crawl-stone-soup.md",
+      "catalogue_license_status": "GNU GPLv2-dokument funnet. Kildevertens lisensfelt er uavklart; eventuelle kodeunntak og innholdsrettigheter må leses i kilden.",
+      "sources": [
+        {
+          "url": "https://github.com/crawl/crawl",
+          "revision": "49955dfc25f2376a28fb204d2a7aef61429170d3",
+          "pinned_url": "https://github.com/crawl/crawl/tree/49955dfc25f2376a28fb204d2a7aef61429170d3",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "meritous",
+      "name": "Meritous",
+      "genre": "Roguelike",
+      "priority": "senere",
+      "use": "designreferanse",
+      "reason": "Samspill mellom sanntidsaction og romnett kan inspirere større kloakkområder; GPL-kode porteres ikke.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/meritous.md",
+      "catalogue_license_status": "GNU GPLv3-dokument funnet. Kildevertens lisensfelt er uavklart; eventuelle kodeunntak og innholdsrettigheter må leses i kilden.",
+      "sources": [
+        {
+          "url": "https://github.com/Patashu/Meritous",
+          "revision": "2b86412346ed8cd31e3baf191843a4de720d18bc",
+          "pinned_url": "https://github.com/Patashu/Meritous/tree/2b86412346ed8cd31e3baf191843a4de720d18bc",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "nethack",
+      "name": "NetHack",
+      "genre": "Roguelike",
+      "priority": "senere",
+      "use": "designreferanse",
+      "reason": "Samspill mellom gjenstander kan gi flere løsninger på små hendelser. Ikke importer regelsystem eller anta at Nethack-lisensen er MIT.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/nethack.md",
+      "catalogue_license_status": "NetHack General Public License er dokumentert. Dette er en egen lisens, ikke en forkortet henvisning til dagens GNU GPL.",
+      "sources": [
+        {
+          "url": "https://github.com/NetHack/NetHack",
+          "revision": "9d18b45ffc7d931d63f9593e6d5e326c19527364",
+          "pinned_url": "https://github.com/NetHack/NetHack/tree/9d18b45ffc7d931d63f9593e6d5e326c19527364",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "opennefia",
+      "name": "OpenNefia",
+      "genre": "Roguelike",
+      "priority": "nå",
+      "use": "kodekandidat",
+      "reason": "Oppdrag med egne frister, frø og oppdragsgivere; personlig relasjon ved siden av fraksjonens grunnforhold. Tilpass små MIT-mønstre fra C#.",
+      "inspection": "kodeutdrag_og_lisens",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/opennefia.md",
+      "catalogue_license_status": "Kildeverten identifiserer MIT; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/OpenNefia/OpenNefia",
+          "revision": "d8410b3e59845312d557c321d3752531519e14f6",
+          "pinned_url": "https://github.com/OpenNefia/OpenNefia/tree/d8410b3e59845312d557c321d3752531519e14f6",
+          "archived": false
+        }
+      ],
+      "inspected_files": [
+        {
+          "path": "OpenNefia.Content/Quests/QuestComponent.cs",
+          "kind": "code",
+          "url": "https://github.com/OpenNefia/OpenNefia/blob/d8410b3e59845312d557c321d3752531519e14f6/OpenNefia.Content/Quests/QuestComponent.cs"
+        },
+        {
+          "path": "OpenNefia.Content/Quests/QuestSystem.cs",
+          "kind": "code",
+          "url": "https://github.com/OpenNefia/OpenNefia/blob/d8410b3e59845312d557c321d3752531519e14f6/OpenNefia.Content/Quests/QuestSystem.cs"
+        },
+        {
+          "path": "OpenNefia.Content/Factions/FactionSystem.cs",
+          "kind": "code",
+          "url": "https://github.com/OpenNefia/OpenNefia/blob/d8410b3e59845312d557c321d3752531519e14f6/OpenNefia.Content/Factions/FactionSystem.cs"
+        },
+        {
+          "path": "LICENSE",
+          "kind": "license",
+          "url": "https://github.com/OpenNefia/OpenNefia/blob/d8410b3e59845312d557c321d3752531519e14f6/LICENSE",
+          "sha256": "a876c87fce0e4cbdb5bb9af48f49f614387a873edbda978e7a68c3071af1c181"
+        }
+      ]
+    },
+    {
+      "id": "shattered-pixel-dungeon",
+      "name": "Shattered Pixel Dungeon",
+      "genre": "Roguelike",
+      "priority": "nå",
+      "use": "designreferanse",
+      "reason": "LoopBuilder skiller hovedrute, butikk og grener. Bruk romroller og valgfri utforsking, ikke en redundant ny løkkegenerator eller GPL-port.",
+      "inspection": "kodeutdrag_og_lisens",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/shattered-pixel-dungeon.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/00-Evan/shattered-pixel-dungeon",
+          "revision": "57a4e06a4caf162446d1c28caa7983f0493fecf0",
+          "pinned_url": "https://github.com/00-Evan/shattered-pixel-dungeon/tree/57a4e06a4caf162446d1c28caa7983f0493fecf0",
+          "archived": false
+        }
+      ],
+      "inspected_files": [
+        {
+          "path": "core/src/main/java/com/shatteredpixel/shatteredpixeldungeon/levels/builders/LoopBuilder.java",
+          "kind": "code",
+          "url": "https://github.com/00-Evan/shattered-pixel-dungeon/blob/57a4e06a4caf162446d1c28caa7983f0493fecf0/core/src/main/java/com/shatteredpixel/shatteredpixeldungeon/levels/builders/LoopBuilder.java"
+        },
+        {
+          "path": "LICENSE.txt",
+          "kind": "license",
+          "url": "https://github.com/00-Evan/shattered-pixel-dungeon/blob/57a4e06a4caf162446d1c28caa7983f0493fecf0/LICENSE.txt",
+          "sha256": "d0495053051967ebe76fb1facd287d79d1ed800da1be75cf501a556bc39a0472"
+        }
+      ]
+    },
+    {
+      "id": "abyss-engine",
+      "name": "Abyss Engine",
+      "genre": "Rollespill",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Relevant sjanger, men motor/dataimport er omfattende; prioriter de nærmere oppdrags- og verdensreferansene.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/abyss-engine.md",
+      "catalogue_license_status": "Kildeverten identifiserer MIT; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/AbyssEngine/AbyssEngine",
+          "revision": "885eea067f0d41a4fb75de2e88b3704215859a58",
+          "pinned_url": "https://github.com/AbyssEngine/AbyssEngine/tree/885eea067f0d41a4fb75de2e88b3704215859a58",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "ambermoon-net",
+      "name": "Ambermoon.net",
+      "genre": "Rollespill",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Relevant sjanger, men motor/dataimport er omfattende; prioriter de nærmere oppdrags- og verdensreferansene.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/ambermoon-net.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/Pyrdacor/Ambermoon.net",
+          "revision": "f54c50ec961c158ef6b29059d43f1aaef771c2b8",
+          "pinned_url": "https://github.com/Pyrdacor/Ambermoon.net/tree/f54c50ec961c158ef6b29059d43f1aaef771c2b8",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "baldur-s-gate-ii-shadows-of-amn",
+      "name": "Baldur's Gate II: Shadows of Amn",
+      "genre": "Rollespill",
+      "priority": "senere",
+      "use": "designreferanse",
+      "reason": "Dublerer GemRB som kodekilde. Oppdragsreaksjoner kan inspirere egen tekst, men originaldata er ikke frigitt.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/baldur-s-gate-ii-shadows-of-amn.md",
+      "catalogue_license_status": "GemRB-motoren har egen åpen lisens. Ingen fri lisens for originalspillets kode, grafikk, lyd eller data er bekreftet.",
+      "sources": [
+        {
+          "url": "https://github.com/gemrb/gemrb",
+          "revision": "bcb5cfaa9f19ffbe8a51f25a3c014fa344173351",
+          "pinned_url": "https://github.com/gemrb/gemrb/tree/bcb5cfaa9f19ffbe8a51f25a3c014fa344173351",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "baldur-s-gate",
+      "name": "Baldur’s Gate",
+      "genre": "Rollespill",
+      "priority": "senere",
+      "use": "designreferanse",
+      "reason": "Samme GemRB-motor som egen profil. Dialog og gruppegrensesnitt er inspirasjon; originalspillet er ikke en fri innholdsbank.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/baldur-s-gate.md",
+      "catalogue_license_status": "GemRB-motoren har egen åpen lisens. Ingen fri lisens for originalspillets kode, grafikk, lyd eller data er bekreftet.",
+      "sources": [
+        {
+          "url": "https://github.com/gemrb/gemrb",
+          "revision": "bcb5cfaa9f19ffbe8a51f25a3c014fa344173351",
+          "pinned_url": "https://github.com/gemrb/gemrb/tree/bcb5cfaa9f19ffbe8a51f25a3c014fa344173351",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "daggerfall-unity",
+      "name": "Daggerfall Unity",
+      "genre": "Rollespill",
+      "priority": "nå",
+      "use": "kodekandidat",
+      "reason": "Navngitte oppgaver og ressurser for person, sted og klokke; MIT-kode kan tilpasses til vårt oppdragsformat uten Unity og originaldata.",
+      "inspection": "kodeutdrag_og_lisens",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/daggerfall-unity.md",
+      "catalogue_license_status": "Kildeverten identifiserer MIT; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/Interkarma/daggerfall-unity",
+          "revision": "b15ae9ed4ad5b1d14e75f1a0244c603bd700b854",
+          "pinned_url": "https://github.com/Interkarma/daggerfall-unity/tree/b15ae9ed4ad5b1d14e75f1a0244c603bd700b854",
+          "archived": false
+        }
+      ],
+      "inspected_files": [
+        {
+          "path": "Assets/Scripts/Game/Questing/Quest.cs",
+          "kind": "code",
+          "url": "https://github.com/Interkarma/daggerfall-unity/blob/b15ae9ed4ad5b1d14e75f1a0244c603bd700b854/Assets/Scripts/Game/Questing/Quest.cs"
+        },
+        {
+          "path": "LICENSE",
+          "kind": "license",
+          "url": "https://github.com/Interkarma/daggerfall-unity/blob/b15ae9ed4ad5b1d14e75f1a0244c603bd700b854/LICENSE",
+          "sha256": "6e5e22fa760938ab398743150787896bd20fcf4936aad0122704700bad1e669a"
+        }
+      ]
+    },
+    {
+      "id": "devilutionx",
+      "name": "DevilutionX",
+      "genre": "Rollespill",
+      "priority": "lav",
+      "use": "ingen_kodegjenbruk",
+      "reason": "LICENSE.md ved katalogens pin er Sustainable Use License 1.0 med bruks-/distribusjonsbegrensninger. Ikke en generell åpen kildekodelisens; ingen kode anbefales.",
+      "inspection": "lisens",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/devilutionx.md",
+      "catalogue_license_status": "Sustainable Use License 1.0 ved den undersøkte revisjonen. Bruk og distribusjon har særskilte begrensninger; ikke anta eldre lisensvilkår.",
+      "sources": [
+        {
+          "url": "https://github.com/diasurgical/devilutionX",
+          "revision": "0706e014d6a12ec8178a81fba549a68bd559f247",
+          "pinned_url": "https://github.com/diasurgical/DevilutionX/tree/0706e014d6a12ec8178a81fba549a68bd559f247",
+          "archived": false
+        }
+      ],
+      "inspected_files": [
+        {
+          "path": "LICENSE.md",
+          "kind": "license",
+          "url": "https://github.com/diasurgical/DevilutionX/blob/0706e014d6a12ec8178a81fba549a68bd559f247/LICENSE.md",
+          "sha256": "049382c17367e384c622369abbeda0cab1d65658c28611717e18afead341e586"
+        }
+      ]
+    },
+    {
+      "id": "exult",
+      "name": "Exult",
+      "genre": "Rollespill",
+      "priority": "nå",
+      "use": "designreferanse",
+      "reason": "NPC-gjøremål, avbrudd og blokkert framkomst kan utvide døgnrytmen vi allerede har. Egen kode på grunn av GPL og motoravhengighet.",
+      "inspection": "kodeutdrag_og_lisens",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/exult.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-2.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/exult/exult",
+          "revision": "31792fa4296c1c4ff40101eaa7f547bd4bc41736",
+          "pinned_url": "https://github.com/exult/exult/tree/31792fa4296c1c4ff40101eaa7f547bd4bc41736",
+          "archived": false
+        }
+      ],
+      "inspected_files": [
+        {
+          "path": "schedule.cc",
+          "kind": "code",
+          "url": "https://github.com/exult/exult/blob/31792fa4296c1c4ff40101eaa7f547bd4bc41736/schedule.cc"
+        },
+        {
+          "path": "COPYING",
+          "kind": "license",
+          "url": "https://github.com/exult/exult/blob/31792fa4296c1c4ff40101eaa7f547bd4bc41736/COPYING",
+          "sha256": "32b1062f7da84967e7019d01ab805935caa7ab7321a7ced0e30ebe75e5df1670"
+        }
+      ]
+    },
+    {
+      "id": "fallout-2-community-edition",
+      "name": "Fallout 2 Community Edition",
+      "genre": "Rollespill",
+      "priority": "senere",
+      "use": "designreferanse",
+      "reason": "Dialogbetingelser og kartlag kan inspirere egen videreutvikling, men vi har allerede et reisekart og skal ikke importere Fallout-data.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/fallout-2-community-edition.md",
+      "catalogue_license_status": "Sustainable Use License 1.0 med begrensninger på bruk og distribusjon. Ikke behandlet som en ordinær fri kildekodelisens.",
+      "sources": [
+        {
+          "url": "https://github.com/alexbatalov/fallout2-ce",
+          "revision": "e97087b9582f37075db347a89898887320753f8b",
+          "pinned_url": "https://github.com/alexbatalov/fallout2-ce/tree/e97087b9582f37075db347a89898887320753f8b",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "fallout-community-edition",
+      "name": "Fallout Community Edition",
+      "genre": "Rollespill",
+      "priority": "senere",
+      "use": "designreferanse",
+      "reason": "Dialog og verdensinteraksjoner kan inspirere egen kode. Verdenskart i Fallout-stil finnes allerede; ingen originalgrafikk eller data tas inn.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/fallout-community-edition.md",
+      "catalogue_license_status": "Sustainable Use License 1.0 med begrensninger på bruk og distribusjon. Ikke behandlet som en ordinær fri kildekodelisens.",
+      "sources": [
+        {
+          "url": "https://github.com/alexbatalov/fallout1-ce",
+          "revision": "0609bcfd0ec40ff0571d0f57fab2821eb461dc8b",
+          "pinned_url": "https://github.com/alexbatalov/fallout1-ce/tree/0609bcfd0ec40ff0571d0f57fab2821eb461dc8b",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "freeablo",
+      "name": "Freeablo",
+      "genre": "Rollespill",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Relevant sjanger, men motor/dataimport er omfattende; prioriter de nærmere oppdrags- og verdensreferansene.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/freeablo.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/wheybags/freeablo",
+          "revision": "7e0844e0887634cb7f0d61eed8a9a573e8806f2d",
+          "pinned_url": "https://github.com/wheybags/freeablo/tree/7e0844e0887634cb7f0d61eed8a9a573e8806f2d",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "gemrb",
+      "name": "GemRB",
+      "genre": "Rollespill",
+      "priority": "senere",
+      "use": "designreferanse",
+      "reason": "Dialogbetingelser og skriptet oppdragstilstand er relevante. GPL-motor; originale spilltekster og data er separate.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/gemrb.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-2.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/gemrb/gemrb",
+          "revision": "bcb5cfaa9f19ffbe8a51f25a3c014fa344173351",
+          "pinned_url": "https://github.com/gemrb/gemrb/tree/bcb5cfaa9f19ffbe8a51f25a3c014fa344173351",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "icewind-dale",
+      "name": "Icewind Dale",
+      "genre": "Rollespill",
+      "priority": "senere",
+      "use": "designreferanse",
+      "reason": "Dublerer GemRB som kodekilde. Gruppestyring kan være relevant når følgesvenner prioriteres, ikke nå.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/icewind-dale.md",
+      "catalogue_license_status": "GemRB-motoren har egen åpen lisens. Ingen fri lisens for originalspillets kode, grafikk, lyd eller data er bekreftet.",
+      "sources": [
+        {
+          "url": "https://github.com/gemrb/gemrb",
+          "revision": "bcb5cfaa9f19ffbe8a51f25a3c014fa344173351",
+          "pinned_url": "https://github.com/gemrb/gemrb/tree/bcb5cfaa9f19ffbe8a51f25a3c014fa344173351",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "icewind-dale-ii",
+      "name": "Icewind Dale II",
+      "genre": "Rollespill",
+      "priority": "senere",
+      "use": "designreferanse",
+      "reason": "Dublerer GemRB som kodekilde. Faktisk støttegrad må avklares før en senere undersøkelse; ingen originaldata anbefales.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/icewind-dale-ii.md",
+      "catalogue_license_status": "GemRB-motoren har egen åpen lisens. Ingen fri lisens for originalspillets kode, grafikk, lyd eller data er bekreftet.",
+      "sources": [
+        {
+          "url": "https://github.com/gemrb/gemrb",
+          "revision": "bcb5cfaa9f19ffbe8a51f25a3c014fa344173351",
+          "pinned_url": "https://github.com/gemrb/gemrb/tree/bcb5cfaa9f19ffbe8a51f25a3c014fa344173351",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "kandria",
+      "name": "Kandria",
+      "genre": "Rollespill",
+      "priority": "senere",
+      "use": "designreferanse",
+      "reason": "Zlib for programvaren ifølge profilen. Innholdsverktøy og bevegelsestilstander er interessante, men Common Lisp/Trial krever stor ombygging.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/kandria.md",
+      "catalogue_license_status": "Zlib-vilkår i lisensdokumentet for programvaren. Spillinnhold og eksterne komponenter må vurderes separat.",
+      "sources": [
+        {
+          "url": "https://codeberg.org/shirakumo/kandria",
+          "revision": "94911dc6a70649b9ebf8f42227bc48421e273a5c",
+          "pinned_url": "https://codeberg.org/shirakumo/kandria/src/commit/94911dc6a70649b9ebf8f42227bc48421e273a5c",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "naev",
+      "name": "Naev",
+      "genre": "Rollespill",
+      "priority": "senere",
+      "use": "designreferanse",
+      "reason": "Fraksjoner, havneoppdrag og handel er gode designreferanser etter verdensminne. Profil vurdert; oppdragskoden er ikke undersøkt her.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/naev.md",
+      "catalogue_license_status": "GPLv3 med oppgitte vilkår for senere versjoner og kodeunntak; grafikk, lyd og andre data har separate lisenser.",
+      "sources": [
+        {
+          "url": "https://codeberg.org/naev/naev",
+          "revision": "ded19409e9a10cc8ad62ef43cfe79ec4bf9f5a06",
+          "pinned_url": "https://codeberg.org/naev/naev/src/commit/ded19409e9a10cc8ad62ef43cfe79ec4bf9f5a06",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "oolite",
+      "name": "Oolite",
+      "genre": "Rollespill",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Relevant sjanger, men motor/dataimport er omfattende; prioriter de nærmere oppdrags- og verdensreferansene.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/oolite.md",
+      "catalogue_license_status": "GNU GPLv2-dokument funnet. Kildevertens lisensfelt er uavklart; eventuelle kodeunntak og innholdsrettigheter må leses i kilden.",
+      "sources": [
+        {
+          "url": "https://github.com/OoliteProject/oolite",
+          "revision": "7d4409054d06e9f51432c167eeeab41443cfdd77",
+          "pinned_url": "https://github.com/OoliteProject/oolite/tree/7d4409054d06e9f51432c167eeeab41443cfdd77",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "open-diablo-ii",
+      "name": "Open Diablo II",
+      "genre": "Rollespill",
+      "priority": "lav",
+      "use": "designreferanse",
+      "reason": "GPL og originaldata, samt prosjektstatus, gjør en port lite egnet. Dagens three.js-kamp trenger små forbedringer, ikke en ny Diablo-motor.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/open-diablo-ii.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/OpenDiablo2/OpenDiablo2",
+          "revision": "7f92c571bf04057a7fbdfb5d25a486f7d775e3c3",
+          "pinned_url": "https://github.com/OpenDiablo2/OpenDiablo2/tree/7f92c571bf04057a7fbdfb5d25a486f7d775e3c3",
+          "archived": true
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "openenroth",
+      "name": "OpenEnroth",
+      "genre": "Rollespill",
+      "priority": "senere",
+      "use": "designreferanse",
+      "reason": "Overland, hendelser og gruppesystemer kan inspirere senere kampanje; LGPL og originaldata må vurderes filvis før mulig kodebruk.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/openenroth.md",
+      "catalogue_license_status": "Kildeverten identifiserer LGPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/OpenEnroth/OpenEnroth",
+          "revision": "e355c999ca1351a8ee58ad094a70ffa2312bc16b",
+          "pinned_url": "https://github.com/OpenEnroth/OpenEnroth/tree/e355c999ca1351a8ee58ad094a70ffa2312bc16b",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "openko",
+      "name": "OpenKO",
+      "genre": "Rollespill",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Relevant sjanger, men motor/dataimport er omfattende; prioriter de nærmere oppdrags- og verdensreferansene.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/openko.md",
+      "catalogue_license_status": "Kildeverten identifiserer MIT; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/Open-KO/KnightOnline",
+          "revision": "7d6cf81093e142c928c2ac9510512b2b182178b5",
+          "pinned_url": "https://github.com/Open-KO/KnightOnline/tree/7d6cf81093e142c928c2ac9510512b2b182178b5",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "openkore",
+      "name": "OpenKore",
+      "genre": "Rollespill",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Relevant sjanger, men motor/dataimport er omfattende; prioriter de nærmere oppdrags- og verdensreferansene.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/openkore.md",
+      "catalogue_license_status": "GNU GPLv2-dokument funnet. Kildevertens lisensfelt er uavklart; eventuelle kodeunntak og innholdsrettigheter må leses i kilden.",
+      "sources": [
+        {
+          "url": "https://github.com/OpenKore/openkore",
+          "revision": "24456169c532584f6192b7a47506b64f8974f942",
+          "pinned_url": "https://github.com/OpenKore/openkore/tree/24456169c532584f6192b7a47506b64f8974f942",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "openmw",
+      "name": "OpenMW",
+      "genre": "Rollespill",
+      "priority": "senere",
+      "use": "designreferanse",
+      "reason": "Verdensminne, NPC-/skriptarkitektur og lagring er relevante, men mye større enn behovet; ikke bytt motor eller hent Morrowind-data.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/openmw.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/OpenMW/openmw",
+          "revision": "33184cd19434203e408ecedf135b2094706b38d7",
+          "pinned_url": "https://github.com/OpenMW/openmw/tree/33184cd19434203e408ecedf135b2094706b38d7",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "opennox",
+      "name": "OpenNox",
+      "genre": "Rollespill",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Relevant sjanger, men motor/dataimport er omfattende; prioriter de nærmere oppdrags- og verdensreferansene.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/opennox.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/noxworld-dev/opennox",
+          "revision": "0e78e4cd5be47c9ab34d85110f1ae21bafbfb217",
+          "pinned_url": "https://github.com/noxworld-dev/opennox/tree/0e78e4cd5be47c9ab34d85110f1ae21bafbfb217",
+          "archived": true
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "planescape-torment",
+      "name": "Planescape: Torment",
+      "genre": "Rollespill",
+      "priority": "senere",
+      "use": "designreferanse",
+      "reason": "Dialog med valg og følger er inspirerende, men profilen peker til GemRB; originaltekst skal ikke hentes.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/planescape-torment.md",
+      "catalogue_license_status": "GemRB-motoren har egen åpen lisens. Ingen fri lisens for originalspillets kode, grafikk, lyd eller data er bekreftet.",
+      "sources": [
+        {
+          "url": "https://github.com/gemrb/gemrb",
+          "revision": "bcb5cfaa9f19ffbe8a51f25a3c014fa344173351",
+          "pinned_url": "https://github.com/gemrb/gemrb/tree/bcb5cfaa9f19ffbe8a51f25a3c014fa344173351",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "reone",
+      "name": "reone",
+      "genre": "Rollespill",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Relevant sjanger, men motor/dataimport er omfattende; prioriter de nærmere oppdrags- og verdensreferansene.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/reone.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/seedhartha/reone",
+          "revision": "9417f636f2d13c7b2f359308525009f286d765c0",
+          "pinned_url": "https://github.com/seedhartha/reone/tree/9417f636f2d13c7b2f359308525009f286d765c0",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "severed-chains",
+      "name": "Severed Chains",
+      "genre": "Rollespill",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Relevant sjanger, men motor/dataimport er omfattende; prioriter de nærmere oppdrags- og verdensreferansene.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/severed-chains.md",
+      "catalogue_license_status": "GNU AGPLv3-dokument funnet. Kildevertens lisensfelt er uavklart; eventuelle kodeunntak og innholdsrettigheter må leses i kilden.",
+      "sources": [
+        {
+          "url": "https://github.com/Legend-of-Dragoon-Modding/Severed-Chains",
+          "revision": "ab5dfe5ba6d4c07464a2f0e67985b9e77e2f7bdb",
+          "pinned_url": "https://github.com/Legend-of-Dragoon-Modding/Severed-Chains/tree/ab5dfe5ba6d4c07464a2f0e67985b9e77e2f7bdb",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "space-station-14",
+      "name": "Space Station 14",
+      "genre": "Rollespill",
+      "priority": "nå",
+      "use": "kodekandidat",
+      "reason": "Felles avstands-, hindrings-, tilgangs- og beholdersjekk før bruk av hånd eller gjenstand. MIT-mønster, ikke hele ECS-/nettverksmotoren.",
+      "inspection": "kodeutdrag_og_lisens",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/space-station-14.md",
+      "catalogue_license_status": "Kildeverten identifiserer MIT; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/space-wizards/space-station-14",
+          "revision": "6a9a8abe96f2c68646c73b3cd63d797e86842eba",
+          "pinned_url": "https://github.com/space-wizards/space-station-14/tree/6a9a8abe96f2c68646c73b3cd63d797e86842eba",
+          "archived": false
+        }
+      ],
+      "inspected_files": [
+        {
+          "path": "LICENSE.TXT",
+          "kind": "license",
+          "url": "https://github.com/space-wizards/space-station-14/blob/6a9a8abe96f2c68646c73b3cd63d797e86842eba/LICENSE.TXT",
+          "sha256": "0ac4d87483582bfec5500d39df7889a513730deeaf434c64f44a7975c3b82381"
+        },
+        {
+          "path": "Content.Shared/Interaction/SharedInteractionSystem.cs",
+          "kind": "code",
+          "url": "https://github.com/space-wizards/space-station-14/blob/6a9a8abe96f2c68646c73b3cd63d797e86842eba/Content.Shared/Interaction/SharedInteractionSystem.cs"
+        }
+      ]
+    },
+    {
+      "id": "ultima-vii-revisited",
+      "name": "Ultima VII: Revisited",
+      "genre": "Rollespill",
+      "priority": "nå",
+      "use": "designreferanse",
+      "reason": "Samlet lagring av tid, skriptflagg og objekter er relevant for verdensminne. BSD i roten, men originale Ultima-data og filvis Exult-opphav må skilles ut.",
+      "inspection": "kodeutdrag_og_lisens",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/ultima-vii-revisited.md",
+      "catalogue_license_status": "Kildeverten identifiserer BSD-2-Clause; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/ViridianGames/U7Revisited",
+          "revision": "38a96bc8076ed74706f49c82196f749587e5cb08",
+          "pinned_url": "https://github.com/ViridianGames/U7Revisited/tree/38a96bc8076ed74706f49c82196f749587e5cb08",
+          "archived": false
+        }
+      ],
+      "inspected_files": [
+        {
+          "path": "Source/NpcAnimation.cpp",
+          "kind": "code",
+          "url": "https://github.com/ViridianGames/U7Revisited/blob/38a96bc8076ed74706f49c82196f749587e5cb08/Source/NpcAnimation.cpp"
+        },
+        {
+          "path": "Source/LoadSaveState.cpp",
+          "kind": "code",
+          "url": "https://github.com/ViridianGames/U7Revisited/blob/38a96bc8076ed74706f49c82196f749587e5cb08/Source/LoadSaveState.cpp"
+        },
+        {
+          "path": "LICENSE",
+          "kind": "license",
+          "url": "https://github.com/ViridianGames/U7Revisited/blob/38a96bc8076ed74706f49c82196f749587e5cb08/LICENSE",
+          "sha256": "0e2d56f0db4b0340b7aefcbcd4fb4ab522f8026746fa7c40158d63750bd0f5b2"
+        },
+        {
+          "path": "Source/GameSerializer.cpp",
+          "kind": "code",
+          "url": "https://github.com/ViridianGames/U7Revisited/blob/38a96bc8076ed74706f49c82196f749587e5cb08/Source/GameSerializer.cpp"
+        },
+        {
+          "path": "Source/U7Object.cpp",
+          "kind": "code",
+          "url": "https://github.com/ViridianGames/U7Revisited/blob/38a96bc8076ed74706f49c82196f749587e5cb08/Source/U7Object.cpp"
+        },
+        {
+          "path": "README.md",
+          "kind": "readme",
+          "url": "https://github.com/ViridianGames/U7Revisited/blob/38a96bc8076ed74706f49c82196f749587e5cb08/README.md"
+        }
+      ]
+    },
+    {
+      "id": "veloren",
+      "name": "Veloren",
+      "genre": "Rollespill",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Relevant sjanger, men motor/dataimport er omfattende; prioriter de nærmere oppdrags- og verdensreferansene.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/veloren.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/veloren/veloren",
+          "revision": "091a4c6fd421223266ff1c04744f3aa9a14af8b9",
+          "pinned_url": "https://github.com/veloren/veloren/tree/091a4c6fd421223266ff1c04744f3aa9a14af8b9",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "minosoft",
+      "name": "Minosoft",
+      "genre": "Sandkasse",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Blokkverden og nettverksprotokoll løser ikke dagens behov for egne Ereb Altor-steder.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/minosoft.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/bixilon/minosoft",
+          "revision": "18a17f311c8a0f52185a9065d096416b9bf2885d",
+          "pinned_url": "https://github.com/Bixilon/Minosoft/tree/18a17f311c8a0f52185a9065d096416b9bf2885d",
+          "archived": false
+        },
+        {
+          "url": "https://gitlab.bixilon.de/bixilon/minosoft",
+          "revision": "18a17f311c8a0f52185a9065d096416b9bf2885d",
+          "pinned_url": "https://gitlab.bixilon.de/bixilon/minosoft/-/tree/18a17f311c8a0f52185a9065d096416b9bf2885d",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "0-a-d",
+      "name": "0 A.D.",
+      "genre": "Sanntidsstrategi",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Enhetsstyring, baser og nettverksmotor er for omfattende for dagens enspillerrollespill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/0-a-d.md",
+      "catalogue_license_status": "Flere komponentvilkår. LICENSE.md oppgir blant annet GPLv2 eller senere for kode, CC BY-SA for deler av innholdet og egne tredjepartsunntak.",
+      "sources": [
+        {
+          "url": "https://gitea.wildfiregames.com/0ad/0ad",
+          "revision": "61534d63a1a5988b837425b2ac48b1e956c07e7d",
+          "pinned_url": "https://gitea.wildfiregames.com/0ad/0ad/src/commit/61534d63a1a5988b837425b2ac48b1e956c07e7d",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "bar",
+      "name": "BAR",
+      "genre": "Sanntidsstrategi",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Enhetsstyring, baser og nettverksmotor er for omfattende for dagens enspillerrollespill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/bar.md",
+      "catalogue_license_status": "GPLv2 for spillkoden med filspesifikke unntak. Recoil-motoren og spillressursene har egne lisensopplysninger.",
+      "sources": [
+        {
+          "url": "https://github.com/beyond-all-reason/Beyond-All-Reason",
+          "revision": "5428820660cc76f5826bf7135a3d4715059dec7a",
+          "pinned_url": "https://github.com/beyond-all-reason/Beyond-All-Reason/tree/5428820660cc76f5826bf7135a3d4715059dec7a",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "command-conquer-remastered-collection",
+      "name": "Command & Conquer Remastered Collection",
+      "genre": "Sanntidsstrategi",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Enhetsstyring, baser og nettverksmotor er for omfattende for dagens enspillerrollespill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/command-conquer-remastered-collection.md",
+      "catalogue_license_status": "GPLv3 med Electronic Arts sine tilleggsvilkår i lisensdokumentet. Tilhørende kommersielle spilldata og tredjepartsdeler omfattes ikke automatisk.",
+      "sources": [
+        {
+          "url": "https://github.com/electronicarts/CnC_Remastered_Collection",
+          "revision": "f1f0d42bc2dcd06d5d1df943c6150ab34bf307ae",
+          "pinned_url": "https://github.com/electronicarts/CnC_Remastered_Collection/tree/f1f0d42bc2dcd06d5d1df943c6150ab34bf307ae",
+          "archived": true
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "dune-ii-the-maker",
+      "name": "Dune II The Maker",
+      "genre": "Sanntidsstrategi",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Enhetsstyring, baser og nettverksmotor er for omfattende for dagens enspillerrollespill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/dune-ii-the-maker.md",
+      "catalogue_license_status": "MIT-dokument funnet. Kildevertens lisensfelt er uavklart; eventuelle kodeunntak og innholdsrettigheter må leses i kilden.",
+      "sources": [
+        {
+          "url": "https://github.com/stefanhendriks/Dune-II---The-Maker",
+          "revision": "be1f175438368f3825854986cd2ee25d858f7bcc",
+          "pinned_url": "https://github.com/stefanhendriks/Dune-II---The-Maker/tree/be1f175438368f3825854986cd2ee25d858f7bcc",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "freeserf-net",
+      "name": "Freeserf.net",
+      "genre": "Sanntidsstrategi",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Enhetsstyring, baser og nettverksmotor er for omfattende for dagens enspillerrollespill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/freeserf-net.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/Pyrdacor/freeserf.net",
+          "revision": "25e3a90b4d2e2940ba54a35644d0bbe0ea5d0fcb",
+          "pinned_url": "https://github.com/Pyrdacor/freeserf.net/tree/25e3a90b4d2e2940ba54a35644d0bbe0ea5d0fcb",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "generals",
+      "name": "Generals",
+      "genre": "Sanntidsstrategi",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Enhetsstyring, baser og nettverksmotor er for omfattende for dagens enspillerrollespill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/generals.md",
+      "catalogue_license_status": "GPLv3 med Electronic Arts sine tilleggsvilkår i lisensdokumentet. Tilhørende kommersielle spilldata og tredjepartsdeler omfattes ikke automatisk.",
+      "sources": [
+        {
+          "url": "https://github.com/electronicarts/CnC_Generals_Zero_Hour",
+          "revision": "0a05454d8574207440a5fb15241b98ad0b435590",
+          "pinned_url": "https://github.com/electronicarts/CnC_Generals_Zero_Hour/tree/0a05454d8574207440a5fb15241b98ad0b435590",
+          "archived": true
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "keeper-fx",
+      "name": "Keeper FX",
+      "genre": "Sanntidsstrategi",
+      "priority": "senere",
+      "use": "designreferanse",
+      "reason": "Skapninger med arbeid og behov kan inspirere tematiske rom og befolkning i dvergehallene; originale Dungeon Keeper-data tas ikke inn.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/keeper-fx.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-2.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/dkfans/keeperfx",
+          "revision": "f5bcdf10e46822d2653f54c0d50935abbf266365",
+          "pinned_url": "https://github.com/dkfans/keeperfx/tree/f5bcdf10e46822d2653f54c0d50935abbf266365",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "mindustry",
+      "name": "Mindustry",
+      "genre": "Sanntidsstrategi",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Enhetsstyring, baser og nettverksmotor er for omfattende for dagens enspillerrollespill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/mindustry.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/Anuken/Mindustry",
+          "revision": "84fd6bf8f42128bbdaa4799670694a83b6c61adb",
+          "pinned_url": "https://github.com/Anuken/Mindustry/tree/84fd6bf8f42128bbdaa4799670694a83b6c61adb",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "openage",
+      "name": "OpenAge",
+      "genre": "Sanntidsstrategi",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Enhetsstyring, baser og nettverksmotor er for omfattende for dagens enspillerrollespill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/openage.md",
+      "catalogue_license_status": "GNU GPLv3-dokument funnet. Kildevertens lisensfelt er uavklart; eventuelle kodeunntak og innholdsrettigheter må leses i kilden.",
+      "sources": [
+        {
+          "url": "https://github.com/SFTtech/openage",
+          "revision": "6d147f488b1f19669e7e113c594a0c09a8dbb63a",
+          "pinned_url": "https://github.com/SFTtech/openage/tree/6d147f488b1f19669e7e113c594a0c09a8dbb63a",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "openbw",
+      "name": "OpenBW",
+      "genre": "Sanntidsstrategi",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Enhetsstyring, baser og nettverksmotor er for omfattende for dagens enspillerrollespill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/openbw.md",
+      "catalogue_license_status": "Kodelisens uavklart i det undersøkte repoet. README viser til BWAPI, men lisensen til en avhengighet overføres ikke automatisk til hovedkoden.",
+      "sources": [
+        {
+          "url": "https://github.com/OpenBW/openbw",
+          "revision": "4b046d5f65302b10cb0a745f0fecd37ec85b20a8",
+          "pinned_url": "https://github.com/OpenBW/openbw/tree/4b046d5f65302b10cb0a745f0fecd37ec85b20a8",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "openhv",
+      "name": "OpenHV",
+      "genre": "Sanntidsstrategi",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Enhetsstyring, baser og nettverksmotor er for omfattende for dagens enspillerrollespill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/openhv.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/OpenHV/OpenHV",
+          "revision": "089365a241d9e7e6bf73467c15e1adae28d3c1ad",
+          "pinned_url": "https://github.com/OpenHV/OpenHV/tree/089365a241d9e7e6bf73467c15e1adae28d3c1ad",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "openra",
+      "name": "OpenRA",
+      "genre": "Sanntidsstrategi",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Enhetsstyring, baser og nettverksmotor er for omfattende for dagens enspillerrollespill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/openra.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/OpenRA/OpenRA",
+          "revision": "1f594e32065615ed1847962c80ecfe6e868a11c3",
+          "pinned_url": "https://github.com/OpenRA/OpenRA/tree/1f594e32065615ed1847962c80ecfe6e868a11c3",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "permafrost-engine",
+      "name": "Permafrost Engine",
+      "genre": "Sanntidsstrategi",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Enhetsstyring, baser og nettverksmotor er for omfattende for dagens enspillerrollespill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/permafrost-engine.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/eduard-permyakov/permafrost-engine",
+          "revision": "083a99cace3eb047e7a3ccb7dc6b22eb78e3967f",
+          "pinned_url": "https://github.com/eduard-permyakov/permafrost-engine/tree/083a99cace3eb047e7a3ccb7dc6b22eb78e3967f",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "red-alert",
+      "name": "Red Alert",
+      "genre": "Sanntidsstrategi",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Enhetsstyring, baser og nettverksmotor er for omfattende for dagens enspillerrollespill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/red-alert.md",
+      "catalogue_license_status": "GPLv3 med Electronic Arts sine tilleggsvilkår i lisensdokumentet. Tilhørende kommersielle spilldata og tredjepartsdeler omfattes ikke automatisk.",
+      "sources": [
+        {
+          "url": "https://github.com/electronicarts/CnC_Red_Alert",
+          "revision": "0dc09bb1d6188d1ec79ab4765b22a48b75ffee32",
+          "pinned_url": "https://github.com/electronicarts/CnC_Red_Alert/tree/0dc09bb1d6188d1ec79ab4765b22a48b75ffee32",
+          "archived": true
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "standard-of-iron",
+      "name": "Standard Of Iron",
+      "genre": "Sanntidsstrategi",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Enhetsstyring, baser og nettverksmotor er for omfattende for dagens enspillerrollespill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/standard-of-iron.md",
+      "catalogue_license_status": "MIT-dokument funnet. Kildevertens lisensfelt er uavklart; eventuelle kodeunntak og innholdsrettigheter må leses i kilden.",
+      "sources": [
+        {
+          "url": "https://github.com/djeada/Standard-of-Iron",
+          "revision": "5f3dd61c22812f042463ca388ae1d4752d8ca581",
+          "pinned_url": "https://github.com/djeada/Standard-of-Iron/tree/5f3dd61c22812f042463ca388ae1d4752d8ca581",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "stargus",
+      "name": "Stargus",
+      "genre": "Sanntidsstrategi",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Enhetsstyring, baser og nettverksmotor er for omfattende for dagens enspillerrollespill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/stargus.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-2.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/Wargus/stargus",
+          "revision": "2a4d54604949e4772f6638a8412c8ebd62444044",
+          "pinned_url": "https://github.com/Wargus/stargus/tree/2a4d54604949e4772f6638a8412c8ebd62444044",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "strategus",
+      "name": "Strategus",
+      "genre": "Sanntidsstrategi",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Enhetsstyring, baser og nettverksmotor er for omfattende for dagens enspillerrollespill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/strategus.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-2.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/Wargus/stratagus",
+          "revision": "b29126a22dc109a03eecbeeaae1b8df6de46b91e",
+          "pinned_url": "https://github.com/Wargus/stratagus/tree/b29126a22dc109a03eecbeeaae1b8df6de46b91e",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "tiberian-dawn",
+      "name": "Tiberian Dawn",
+      "genre": "Sanntidsstrategi",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Enhetsstyring, baser og nettverksmotor er for omfattende for dagens enspillerrollespill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/tiberian-dawn.md",
+      "catalogue_license_status": "GPLv3 med Electronic Arts sine tilleggsvilkår i lisensdokumentet. Tilhørende kommersielle spilldata og tredjepartsdeler omfattes ikke automatisk.",
+      "sources": [
+        {
+          "url": "https://github.com/electronicarts/CnC_Tiberian_Dawn",
+          "revision": "e0d372dc582c053a699114942b984dad0457f9b3",
+          "pinned_url": "https://github.com/electronicarts/CnC_Tiberian_Dawn/tree/e0d372dc582c053a699114942b984dad0457f9b3",
+          "archived": true
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "war1gus",
+      "name": "War1gus",
+      "genre": "Sanntidsstrategi",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Enhetsstyring, baser og nettverksmotor er for omfattende for dagens enspillerrollespill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/war1gus.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-2.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/Wargus/war1gus",
+          "revision": "8ec75764c7b4706a4405004438e810c050228b94",
+          "pinned_url": "https://github.com/Wargus/war1gus/tree/8ec75764c7b4706a4405004438e810c050228b94",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "wargus",
+      "name": "Wargus",
+      "genre": "Sanntidsstrategi",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Enhetsstyring, baser og nettverksmotor er for omfattende for dagens enspillerrollespill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/wargus.md",
+      "catalogue_license_status": "GNU GPLv2-dokument funnet. Kildevertens lisensfelt er uavklart; eventuelle kodeunntak og innholdsrettigheter må leses i kilden.",
+      "sources": [
+        {
+          "url": "https://github.com/Wargus/wargus",
+          "revision": "57f9d4d2ee557c9d725cb830752e394f4fb00c51",
+          "pinned_url": "https://github.com/Wargus/wargus/tree/57f9d4d2ee557c9d725cb830752e394f4fb00c51",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "warsmash-mod-engine",
+      "name": "Warsmash Mod Engine",
+      "genre": "Sanntidsstrategi",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Enhetsstyring, baser og nettverksmotor er for omfattende for dagens enspillerrollespill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/warsmash-mod-engine.md",
+      "catalogue_license_status": "Kildeverten identifiserer AGPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/Retera/WarsmashModEngine",
+          "revision": "f9e0aeed4be372d6016519d0e97b384aa873f374",
+          "pinned_url": "https://github.com/Retera/WarsmashModEngine/tree/f9e0aeed4be372d6016519d0e97b384aa873f374",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "warzone-2100",
+      "name": "Warzone 2100",
+      "genre": "Sanntidsstrategi",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Enhetsstyring, baser og nettverksmotor er for omfattende for dagens enspillerrollespill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/warzone-2100.md",
+      "catalogue_license_status": "GNU GPLv2-dokument funnet. Kildevertens lisensfelt er uavklart; eventuelle kodeunntak og innholdsrettigheter må leses i kilden.",
+      "sources": [
+        {
+          "url": "https://github.com/Warzone2100/warzone2100",
+          "revision": "68516c567a0bd2ce39cc75b63e3c26a3d77f1351",
+          "pinned_url": "https://github.com/Warzone2100/warzone2100/tree/68516c567a0bd2ce39cc75b63e3c26a3d77f1351",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "widelands",
+      "name": "Widelands",
+      "genre": "Sanntidsstrategi",
+      "priority": "senere",
+      "use": "designreferanse",
+      "reason": "Vareflyt og produksjonsbehov er relevante ved senere havneøkonomi; for stor simulering nå.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/widelands.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-2.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/widelands/widelands",
+          "revision": "599c33c9901c8ee71c83d6bd13c8b547e7547870",
+          "pinned_url": "https://github.com/widelands/widelands/tree/599c33c9901c8ee71c83d6bd13c8b547e7547870",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "wyrmsun",
+      "name": "Wyrmsun",
+      "genre": "Sanntidsstrategi",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Enhetsstyring, baser og nettverksmotor er for omfattende for dagens enspillerrollespill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/wyrmsun.md",
+      "catalogue_license_status": "GNU GPLv2-dokument funnet. Kildevertens lisensfelt er uavklart; eventuelle kodeunntak og innholdsrettigheter må leses i kilden.",
+      "sources": [
+        {
+          "url": "https://github.com/Andrettin/Wyrmsun",
+          "revision": "f0330d2a747f6746ea8c067e65cf6c944a4653f3",
+          "pinned_url": "https://github.com/Andrettin/Wyrmsun/tree/f0330d2a747f6746ea8c067e65cf6c944a4653f3",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "zero-k",
+      "name": "Zero-K",
+      "genre": "Sanntidsstrategi",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Enhetsstyring, baser og nettverksmotor er for omfattende for dagens enspillerrollespill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/zero-k.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-2.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/ZeroK-RTS/Zero-K",
+          "revision": "19325a4637c5d0120f33ca5ccfbf1555597eebe3",
+          "pinned_url": "https://github.com/ZeroK-RTS/Zero-K/tree/19325a4637c5d0120f33ca5ccfbf1555597eebe3",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "sdl-sopwith",
+      "name": "SDL Sopwith",
+      "genre": "Shoot 'em up",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Fly-/skytemotor ligger langt fra dagens behov.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/sdl-sopwith.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-2.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/fragglet/sdl-sopwith",
+          "revision": "c4e034109e28a5bd1727645fe77b27430219e8b5",
+          "pinned_url": "https://github.com/fragglet/sdl-sopwith/tree/c4e034109e28a5bd1727645fe77b27430219e8b5",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "taisei-project",
+      "name": "Taisei Project",
+      "genre": "Shoot 'em up",
+      "priority": "senere",
+      "use": "designreferanse",
+      "reason": "Lesbare treffsoner og prosjektilmønstre kan inspirere sjefsanfall uten å overta bullet-hell-kamp.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/taisei-project.md",
+      "catalogue_license_status": "MIT-vilkår for programvaren. Lydspor, portretter og annet innhold har egne notiser, blant annet CC BY 4.0.",
+      "sources": [
+        {
+          "url": "https://github.com/taisei-project/taisei",
+          "revision": "5668c41b41f7227d21fc80cf56997d4d30356ce7",
+          "pinned_url": "https://github.com/taisei-project/taisei/tree/5668c41b41f7227d21fc80cf56997d4d30356ce7",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "open-golf",
+      "name": "Open Golf",
+      "genre": "Sport",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Sportsfysikk og slagkontroll gir liten gevinst i dagens rollespill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/open-golf.md",
+      "catalogue_license_status": "Kildeverten identifiserer MIT; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/mgerdes/Open-Golf",
+          "revision": "b9029f1e80c3110ae3d4fc9300854bdaeef96508",
+          "pinned_url": "https://github.com/mgerdes/Open-Golf/tree/b9029f1e80c3110ae3d4fc9300854bdaeef96508",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "pooltool",
+      "name": "Pooltool",
+      "genre": "Sport",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Sportsfysikk og slagkontroll gir liten gevinst i dagens rollespill.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/pooltool.md",
+      "catalogue_license_status": "Kildeverten identifiserer Apache-2.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/ekiefl/pooltool",
+          "revision": "7632b1c66f19159741a4cfe48b23d18f079d9a87",
+          "pinned_url": "https://github.com/ekiefl/pooltool/tree/7632b1c66f19159741a4cfe48b23d18f079d9a87",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "command-conquer-renegade",
+      "name": "Command & Conquer Renegade",
+      "genre": "Tredjeperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Motor/dataimport krever mye ombygging; ingen direkte gjenbruk anbefales nå.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/command-conquer-renegade.md",
+      "catalogue_license_status": "GPLv3 med Electronic Arts sine tilleggsvilkår i lisensdokumentet. Tilhørende kommersielle spilldata og tredjepartsdeler omfattes ikke automatisk.",
+      "sources": [
+        {
+          "url": "https://github.com/electronicarts/CnC_Renegade",
+          "revision": "3e00c3a1b97381bb28be89a35b856375e0629a08",
+          "pinned_url": "https://github.com/electronicarts/CnC_Renegade/tree/3e00c3a1b97381bb28be89a35b856375e0629a08",
+          "archived": true
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "croftengine",
+      "name": "CroftEngine",
+      "genre": "Tredjeperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Motor/dataimport krever mye ombygging; ingen direkte gjenbruk anbefales nå.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/croftengine.md",
+      "catalogue_license_status": "GNU LGPLv3-dokument funnet. Kildevertens lisensfelt er uavklart; eventuelle kodeunntak og innholdsrettigheter må leses i kilden.",
+      "sources": [
+        {
+          "url": "https://github.com/stohrendorf/CroftEngine",
+          "revision": "f2f2d708ee116bc82515bd223d3df0c5ed10ade6",
+          "pinned_url": "https://github.com/stohrendorf/CroftEngine/tree/f2f2d708ee116bc82515bd223d3df0c5ed10ade6",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "lugaru-the-rabbit-s-foot",
+      "name": "Lugaru: The Rabbit's Foot",
+      "genre": "Tredjeperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Motor/dataimport krever mye ombygging; ingen direkte gjenbruk anbefales nå.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/lugaru-the-rabbit-s-foot.md",
+      "catalogue_license_status": "GNU GPLv2-dokument funnet. Kildevertens lisensfelt er uavklart; eventuelle kodeunntak og innholdsrettigheter må leses i kilden.",
+      "sources": [
+        {
+          "url": "https://github.com/WolfireGames/lugaru",
+          "revision": "6a58b62858d9c3c3630abf00bf43075f65a09d38",
+          "pinned_url": "https://github.com/WolfireGames/lugaru/tree/6a58b62858d9c3c3630abf00bf43075f65a09d38",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "openlara",
+      "name": "OpenLara",
+      "genre": "Tredjeperson",
+      "priority": "senere",
+      "use": "kodekandidat",
+      "reason": "BSD-kode for animasjonstilstander, overgangsvinduer og frame-hendelser. Rigging av anda kommer først; originaldata/animasjoner er ikke frigitt.",
+      "inspection": "kodeutdrag_og_lisens",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/openlara.md",
+      "catalogue_license_status": "Kildeverten identifiserer BSD-2-Clause; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/XProger/OpenLara",
+          "revision": "3b268ca4bf986c380f44a26ffd9218bf6d376249",
+          "pinned_url": "https://github.com/XProger/OpenLara/tree/3b268ca4bf986c380f44a26ffd9218bf6d376249",
+          "archived": false
+        }
+      ],
+      "inspected_files": [
+        {
+          "path": "src/animation.h",
+          "kind": "code",
+          "url": "https://github.com/XProger/OpenLara/blob/3b268ca4bf986c380f44a26ffd9218bf6d376249/src/animation.h"
+        },
+        {
+          "path": "LICENSE",
+          "kind": "license",
+          "url": "https://github.com/XProger/OpenLara/blob/3b268ca4bf986c380f44a26ffd9218bf6d376249/LICENSE",
+          "sha256": "76efb6dce59e7de6f0de06ed1459177ca921826b3e5c6da014cfa1e79c911d39"
+        }
+      ]
+    },
+    {
+      "id": "openrw",
+      "name": "OpenRW",
+      "genre": "Tredjeperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Motor/dataimport krever mye ombygging; ingen direkte gjenbruk anbefales nå.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/openrw.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/rwengine/openrw",
+          "revision": "5c5f266b71aa55aeec8cb4d823f19e7c4348f3bd",
+          "pinned_url": "https://github.com/rwengine/openrw/tree/5c5f266b71aa55aeec8cb4d823f19e7c4348f3bd",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "overgrowth",
+      "name": "Overgrowth",
+      "genre": "Tredjeperson",
+      "priority": "senere",
+      "use": "kodekandidat",
+      "reason": "Apache-2.0-kode for skjelett og IK-mål er relevant etter rigging. Stor motoravhengighet; originale figurer og nivåer er kommersielle.",
+      "inspection": "kodeutdrag_og_lisens",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/overgrowth.md",
+      "catalogue_license_status": "Kildeverten identifiserer Apache-2.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/WolfireGames/overgrowth",
+          "revision": "245fe4828631c84c0023d29d1525f5716ccb6106",
+          "pinned_url": "https://github.com/WolfireGames/overgrowth/tree/245fe4828631c84c0023d29d1525f5716ccb6106",
+          "archived": false
+        }
+      ],
+      "inspected_files": [
+        {
+          "path": "README.md",
+          "kind": "readme",
+          "url": "https://github.com/WolfireGames/overgrowth/blob/245fe4828631c84c0023d29d1525f5716ccb6106/README.md"
+        },
+        {
+          "path": "LICENSE",
+          "kind": "license",
+          "url": "https://github.com/WolfireGames/overgrowth/blob/245fe4828631c84c0023d29d1525f5716ccb6106/LICENSE",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+        },
+        {
+          "path": "Source/Objects/riggedobject.cpp",
+          "kind": "code",
+          "url": "https://github.com/WolfireGames/overgrowth/blob/245fe4828631c84c0023d29d1525f5716ccb6106/Source/Objects/riggedobject.cpp"
+        }
+      ]
+    },
+    {
+      "id": "re3",
+      "name": "RE3",
+      "genre": "Tredjeperson",
+      "priority": "lav",
+      "use": "avklar_lisens",
+      "reason": "Rekonstruksjon/dekompilering med uavklart opphav; offentlig GitHub-tilgang er ikke nok til å anbefale kode eller originaldata.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/re3.md",
+      "catalogue_license_status": "Kodelisens uavklart. Ingen hovedlisens ble funnet; tredjepartsbibliotekenes lisenser gir ikke rettigheter til den reverserte GTA-koden.",
+      "sources": [
+        {
+          "url": "https://github.com/VideogameSources/gta3-decomp-alt",
+          "revision": "6661efc007e728fc1c5e29b017ba00e553bf0b4f",
+          "pinned_url": "https://github.com/VideogameSources/gta3-decomp-alt/tree/6661efc007e728fc1c5e29b017ba00e553bf0b4f",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "tomb-engine",
+      "name": "Tomb Engine",
+      "genre": "Tredjeperson",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Motor/dataimport krever mye ombygging; ingen direkte gjenbruk anbefales nå.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/tomb-engine.md",
+      "catalogue_license_status": "Modifisert MIT-lisens som bare tillater ikke-kommersiell bruk. Dette er ikke vanlig MIT.",
+      "sources": [
+        {
+          "url": "https://github.com/TombEngine/TombEngine",
+          "revision": "cd29462dbde01c15a1797e3029ad362747d22fc4",
+          "pinned_url": "https://github.com/TombEngine/TombEngine/tree/cd29462dbde01c15a1797e3029ad362747d22fc4",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "ancient-beast",
+      "name": "Ancient Beast",
+      "genre": "Turbasert strategi",
+      "priority": "lav",
+      "use": "designreferanse",
+      "reason": "Nettleserteknologi er nær, men AGPL og turbasert hex-kamp gir liten gevinst i vår sanntidskamp.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/ancient-beast.md",
+      "catalogue_license_status": "Kildeverten identifiserer AGPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/FreezingMoon/AncientBeast",
+          "revision": "d37961462eb91f97e81710ede456346148cd2522",
+          "pinned_url": "https://github.com/FreezingMoon/AncientBeast/tree/d37961462eb91f97e81710ede456346148cd2522",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "athena-crisis",
+      "name": "Athena Crisis",
+      "genre": "Turbasert strategi",
+      "priority": "nå",
+      "use": "kodekandidat",
+      "reason": "Testbar rekkefølge fra handling til virkning og mål. MIT-kode med mange interne avhengigheter; ikke hent grafikk, lyd eller kampanje.",
+      "inspection": "kodeutdrag_og_lisens",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/athena-crisis.md",
+      "catalogue_license_status": "MIT for kildekoden. Merkevare, grafikk, lyd, kampanje og annet spillinnhold har egne vilkår; repoet beskriver en åpen kjerne.",
+      "sources": [
+        {
+          "url": "https://github.com/nkzw-tech/athena-crisis",
+          "revision": "1d7033db46ebf0e5435368673faf05764f66f256",
+          "pinned_url": "https://github.com/nkzw-tech/athena-crisis/tree/1d7033db46ebf0e5435368673faf05764f66f256",
+          "archived": false
+        }
+      ],
+      "inspected_files": [
+        {
+          "path": "athena/generator/MapGenerator.tsx",
+          "kind": "code",
+          "url": "https://github.com/nkzw-tech/athena-crisis/blob/1d7033db46ebf0e5435368673faf05764f66f256/athena/generator/MapGenerator.tsx"
+        },
+        {
+          "path": "apollo/lib/applyConditions.tsx",
+          "kind": "code",
+          "url": "https://github.com/nkzw-tech/athena-crisis/blob/1d7033db46ebf0e5435368673faf05764f66f256/apollo/lib/applyConditions.tsx"
+        },
+        {
+          "path": "ui/AudioPlayer.tsx",
+          "kind": "code",
+          "url": "https://github.com/nkzw-tech/athena-crisis/blob/1d7033db46ebf0e5435368673faf05764f66f256/ui/AudioPlayer.tsx"
+        },
+        {
+          "path": "LICENSE.md",
+          "kind": "license",
+          "url": "https://github.com/nkzw-tech/athena-crisis/blob/1d7033db46ebf0e5435368673faf05764f66f256/LICENSE.md",
+          "sha256": "e25f08d9782baa7b8dba836146f3e7593cac862346f49990e12b1bfa2ae5f2c7"
+        }
+      ]
+    },
+    {
+      "id": "c-evo",
+      "name": "C-evo",
+      "genre": "Turbasert strategi",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Hær-, 4X- og turregler skal ikke erstatte DoD91 i sanntid.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/c-evo.md",
+      "catalogue_license_status": "Kildearkiv tilbys på den offisielle siden, men konkrete lisensvilkår er ikke bekreftet i denne innhentingen.",
+      "sources": [
+        {
+          "url": "http://c-evo.org/files/files.php",
+          "revision": null,
+          "pinned_url": null,
+          "archived": null
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "fheroes2",
+      "name": "fheroes2",
+      "genre": "Turbasert strategi",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Hær-, 4X- og turregler skal ikke erstatte DoD91 i sanntid.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/fheroes2.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-2.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/ihhub/fheroes2",
+          "revision": "e397b1faa52ccd10be2641ef435af8ce0e7b9080",
+          "pinned_url": "https://github.com/ihhub/fheroes2/tree/e397b1faa52ccd10be2641ef435af8ce0e7b9080",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "freeciv",
+      "name": "Freeciv",
+      "genre": "Turbasert strategi",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Hær-, 4X- og turregler skal ikke erstatte DoD91 i sanntid.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/freeciv.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-2.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/freeciv/freeciv",
+          "revision": "b5b8c6e521bf0b38e8a9a06d8c673075d0f33f51",
+          "pinned_url": "https://github.com/freeciv/freeciv/tree/b5b8c6e521bf0b38e8a9a06d8c673075d0f33f51",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "freecol",
+      "name": "FreeCol",
+      "genre": "Turbasert strategi",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Hær-, 4X- og turregler skal ikke erstatte DoD91 i sanntid.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/freecol.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-2.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/FreeCol/freecol",
+          "revision": "3166887ba6014c31ff761cca50b1e520a27e37c5",
+          "pinned_url": "https://github.com/FreeCol/freecol/tree/3166887ba6014c31ff761cca50b1e520a27e37c5",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "freeorion",
+      "name": "FreeOrion",
+      "genre": "Turbasert strategi",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Hær-, 4X- og turregler skal ikke erstatte DoD91 i sanntid.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/freeorion.md",
+      "catalogue_license_status": "README oppgir GPLv2 for kode, CC BY-SA 3.0 for assets og en kombinasjon for innholdsskript. Komponentunntak må leses separat.",
+      "sources": [
+        {
+          "url": "https://github.com/freeorion/freeorion",
+          "revision": "10c0d79c5a7bc4b5253471dd28aacb31143fe372",
+          "pinned_url": "https://github.com/freeorion/freeorion/tree/10c0d79c5a7bc4b5253471dd28aacb31143fe372",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "hnefatafl",
+      "name": "Hnefatafl",
+      "genre": "Turbasert strategi",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Hær-, 4X- og turregler skal ikke erstatte DoD91 i sanntid.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/hnefatafl.md",
+      "catalogue_license_status": "Kildeverten identifiserer AGPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/dcampbell24/hnefatafl",
+          "revision": "91815e3aab2223b033a38f57296bd671e8913770",
+          "pinned_url": "https://github.com/dcampbell24/hnefatafl/tree/91815e3aab2223b033a38f57296bd671e8913770",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "openpanzer",
+      "name": "OpenPanzer",
+      "genre": "Turbasert strategi",
+      "priority": "lav",
+      "use": "avklar_lisens",
+      "reason": "Nettleserkode alene er ikke nok; lisens og en hel turbasert krigsmotor er ikke en begrunnet kodekandidat.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/openpanzer.md",
+      "catalogue_license_status": "README oppgir GPLv2 eller senere for kode. Grafiske ressurser har separat opphav og må kontrolleres.",
+      "sources": [
+        {
+          "url": "https://github.com/nicupavel/openpanzer",
+          "revision": "65dcb0f54cf5f21a986f2be1a487e8b742b2c213",
+          "pinned_url": "https://github.com/nicupavel/openpanzer/tree/65dcb0f54cf5f21a986f2be1a487e8b742b2c213",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "openxcom",
+      "name": "OpenXcom",
+      "genre": "Turbasert strategi",
+      "priority": "senere",
+      "use": "designreferanse",
+      "reason": "Utstyr og oppdrag ved siden av et strategilag kan inspirere senere følgesvenner og reisehendelser; ingen ny turmotor.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/openxcom.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/OpenXcom/OpenXcom",
+          "revision": "4a4bae5fa2e5a09282928e84943fc84b093e34ff",
+          "pinned_url": "https://github.com/OpenXcom/OpenXcom/tree/4a4bae5fa2e5a09282928e84943fc84b093e34ff",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "the-battle-for-wesnoth",
+      "name": "The Battle for Wesnoth",
+      "genre": "Turbasert strategi",
+      "priority": "senere",
+      "use": "designreferanse",
+      "reason": "Kampanjehendelser og scenariooppbygging kan inspirere bokeventyr; ikke bruk turkamp eller tall i stedet for DoD91.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/the-battle-for-wesnoth.md",
+      "catalogue_license_status": "GNU GPLv2-dokument funnet. Kildevertens lisensfelt er uavklart; eventuelle kodeunntak og innholdsrettigheter må leses i kilden.",
+      "sources": [
+        {
+          "url": "https://github.com/wesnoth/wesnoth",
+          "revision": "f8be731a7cbcd44c12127a3473f804f04b8c265a",
+          "pinned_url": "https://github.com/wesnoth/wesnoth/tree/f8be731a7cbcd44c12127a3473f804f04b8c265a",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "unciv",
+      "name": "Unciv",
+      "genre": "Turbasert strategi",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Hær-, 4X- og turregler skal ikke erstatte DoD91 i sanntid.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/unciv.md",
+      "catalogue_license_status": "MPL-2.0-dokument funnet. Kildevertens lisensfelt er uavklart; eventuelle kodeunntak og innholdsrettigheter må leses i kilden.",
+      "sources": [
+        {
+          "url": "https://github.com/yairm210/Unciv",
+          "revision": "5b6cafdc9eb2ac666b72689e091d1cad28e99f35",
+          "pinned_url": "https://github.com/yairm210/Unciv/tree/5b6cafdc9eb2ac666b72689e091d1cad28e99f35",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "vcmi-project",
+      "name": "VCMI Project",
+      "genre": "Turbasert strategi",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Hær-, 4X- og turregler skal ikke erstatte DoD91 i sanntid.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/vcmi-project.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-2.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/vcmi/vcmi",
+          "revision": "725ae80c42929ebbf6ccd620b38bd45ac32644c2",
+          "pinned_url": "https://github.com/vcmi/vcmi/tree/725ae80c42929ebbf6ccd620b38bd45ac32644c2",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "server-survival",
+      "name": "Server Survival",
+      "genre": "Tårnforsvar",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Bølgeforsvar og serverpedagogikk passer dårlig med dagens kampanje.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/server-survival.md",
+      "catalogue_license_status": "Kildeverten identifiserer MIT; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/pshenok/server-survival",
+          "revision": "3b39bff88999a2b460e4948673d23d82af4bc450",
+          "pinned_url": "https://github.com/pshenok/server-survival/tree/3b39bff88999a2b460e4948673d23d82af4bc450",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "corsixth",
+      "name": "CorsixTH",
+      "genre": "Økonomi og tycoon",
+      "priority": "senere",
+      "use": "designreferanse",
+      "reason": "Oppgavefordeling og køer kan inspirere NPC-arbeid; driftssimulering og Theme Hospital-data tas ikke inn.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/corsixth.md",
+      "catalogue_license_status": "MIT-vilkår for hovedkoden, med egne notiser for medfølgende tredjepartsbiblioteker og skrifter.",
+      "sources": [
+        {
+          "url": "https://github.com/CorsixTH/CorsixTH",
+          "revision": "42c2cb1b606f6ab18560eaae45d7fdf5db35296c",
+          "pinned_url": "https://github.com/CorsixTH/CorsixTH/tree/42c2cb1b606f6ab18560eaae45d7fdf5db35296c",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "hurry-curry",
+      "name": "Hurry Curry!",
+      "genre": "Økonomi og tycoon",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Full transportsimulering eller driftssimulering er for omfattende nå.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/hurry-curry.md",
+      "catalogue_license_status": "AGPL-3.0-only oppgis eksplisitt i README og COPYING.",
+      "sources": [
+        {
+          "url": "https://codeberg.org/hurrycurry/hurrycurry",
+          "revision": "bae9a9e419b60e37a4efb52bfcac7df44e61412c",
+          "pinned_url": "https://codeberg.org/hurrycurry/hurrycurry/src/commit/bae9a9e419b60e37a4efb52bfcac7df44e61412c",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "openloco",
+      "name": "OpenLoco",
+      "genre": "Økonomi og tycoon",
+      "priority": "senere",
+      "use": "kodekandidat",
+      "reason": "MIT-profil gjør rute-/vareflytlogikk aktuell ved senere sjøhandel. Ingen grunn til å ta inn full transportsimulering nå.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/openloco.md",
+      "catalogue_license_status": "Kildeverten identifiserer MIT; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/OpenLoco/OpenLoco",
+          "revision": "6d7f5b1bfb4abd5ae2f1a2ade628a2b0d46f861e",
+          "pinned_url": "https://github.com/OpenLoco/OpenLoco/tree/6d7f5b1bfb4abd5ae2f1a2ade628a2b0d46f861e",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "openrct2",
+      "name": "OpenRCT2",
+      "genre": "Økonomi og tycoon",
+      "priority": "lav",
+      "use": "ingen_tiltak",
+      "reason": "Full transportsimulering eller driftssimulering er for omfattende nå.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/openrct2.md",
+      "catalogue_license_status": "Kildeverten identifiserer GPL-3.0; lisensdokument er lenket der det finnes. Kontroller komponent- og innholdsnotiser før gjenbruk.",
+      "sources": [
+        {
+          "url": "https://github.com/OpenRCT2/OpenRCT2",
+          "revision": "53bbc400e28be44d3c2e56fa514d5f65b61a64d4",
+          "pinned_url": "https://github.com/OpenRCT2/OpenRCT2/tree/53bbc400e28be44d3c2e56fa514d5f65b61a64d4",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    },
+    {
+      "id": "openttd",
+      "name": "OpenTTD",
+      "genre": "Økonomi og tycoon",
+      "priority": "senere",
+      "use": "designreferanse",
+      "reason": "Transportnett og vareflyt kan inspirere handelsruter etter at kampanje og lokal handel er på plass.",
+      "inspection": "katalog",
+      "runtime_tested": false,
+      "profile": "https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/repoer/spill/openttd.md",
+      "catalogue_license_status": "GNU GPLv2-dokument funnet. Kildevertens lisensfelt er uavklart; eventuelle kodeunntak og innholdsrettigheter må leses i kilden.",
+      "sources": [
+        {
+          "url": "https://github.com/OpenTTD/OpenTTD",
+          "revision": "379de7bc92a38311e0ecc959787f73ebeeb5e256",
+          "pinned_url": "https://github.com/OpenTTD/OpenTTD/tree/379de7bc92a38311e0ecc959787f73ebeeb5e256",
+          "archived": false
+        }
+      ],
+      "inspected_files": []
+    }
+  ]
+}

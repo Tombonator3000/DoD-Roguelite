@@ -1,10 +1,91 @@
-# Gjenbruk fra Toms andre repoer
+# Gjenbruk fra prosjektbiblioteket og andre spill
+
+## Oppdatert 21. oktober 2026: alle 172 spillprofiler
+
+Tom ba om en ny gjennomgang av prosjektbiblioteket og spillene der. Jeg har vurdert alle **172 profiler i 17 sjangre** i [SPILL.md](https://github.com/Tombonator3000/prosjektbibliotek/blob/292a21fe703c83b0c5fc3d2a57982451da5b864a/SPILL.md), sammenholdt dem med Svart Nebb på `ce13d46` og undersøkt kodeutdrag og lisensfiler i **15 prosjekter** nærmere. DevilutionX og The Dark Mod fikk i tillegg kontroll av selve lisensdokumentet. Dette er statisk kildevurdering; ingen av disse spillene er bygget, kjørt eller integrasjonstestet hos oss i denne økta.
+
+[Hele gjennomgangen som JSON](gjenbruk-spill.json) har én vurdering per profil, prioritet, begrunnelse, oppgitt lisensstatus, festede kilderevisjoner og hvilke filer som faktisk er undersøkt. GemRB og enkelte andre motorer forekommer under flere spillnavn. 172 profiler betyr derfor ikke 172 forskjellige motorer. Kildelisten er `bobeff/open-source-games` ved `3a9ab8f`; bibliotekets oversikt er fra 20. oktober.
+
+Fordelingen er 10 profiler som er aktuelle nå, 34 for senere og 128 med lav relevans. Alle 17 undersøkte lisensfiler er kontrollert mot bibliotekets SHA-256. Merket kodekandidat betyr at en liten del kan undersøkes for tilpasning; kompatibilitet i spillet er ikke bevist.
+
+**Anbefaling:** bygg først verdensminne, oppdragsdata og lokale reaksjoner i Arno/Gringul. Behold three.js r170, WebGL 2 og én HTML-fil. Det nyttige her er avgrensede systemer, ikke et motorbytte. For rask grafisk gevinst er Toms eksisterende `fadeFronts` og kvalitetstilpasning fortsatt nærmere vår teknologi enn de store motorene nedenfor.
+
+### Det som er mest nyttig hos oss
+
+| Prioritet | Opphav og undersøkt kode | Konkret bruk i Svart Nebb | Vilkår og arbeid |
+| --- | --- | --- | --- |
+| 1 | [Daggerfall Unity: Quest.cs](https://github.com/Interkarma/daggerfall-unity/blob/b15ae9ed4ad5b1d14e75f1a0244c603bd700b854/Assets/Scripts/Game/Questing/Quest.cs) | Felles oppdragsressurser for person, sted og klokke, navngitte deloppgaver og lagret framdrift. Bruk dette til Edsbrytarna og oppdrag som kan vinnes, tapes eller avbrytes under lange reiser. | MIT for koden. C#/Unity må tilpasses JavaScript. Middels til stort; hent ikke originale Daggerfall-data. |
+| 2 | [OpenNefia: QuestComponent.cs](https://github.com/OpenNefia/OpenNefia/blob/d8410b3e59845312d557c321d3752531519e14f6/OpenNefia.Content/Quests/QuestComponent.cs), [FactionSystem.cs](https://github.com/OpenNefia/OpenNefia/blob/d8410b3e59845312d557c321d3752531519e14f6/OpenNefia.Content/Factions/FactionSystem.cs) | Skill oppdragstilstand, frist, oppdragsgiver, opprinnelsessted og frø. Skill personlig forhold fra fraksjonens grunnforhold. En smugler i Arno kan hjelpe deg selv om vaktene misliker deg. | MIT for undersøkt kode. C# og en omfattende komponentmotor; ta små datamønstre, ikke hele arkitekturen. Middels til stort. |
+| 3 | [Exult: schedule.cc](https://github.com/exult/exult/blob/31792fa4296c1c4ff40101eaa7f547bd4bc41736/schedule.cc) | Utvid døgnrytmen vi allerede har med faktiske gjøremål, avbrudd og reaksjoner når vei eller arbeidsplass er blokkert. Verksted, vertshus og havn bør ha egne handlinger. | GPL-2.0-or-later i filhodet. Bruk designet som referanse og skriv vår egen kode. Middels. |
+| 4 | [Ultima VII: Revisited: GameSerializer.cpp](https://github.com/ViridianGames/U7Revisited/blob/38a96bc8076ed74706f49c82196f749587e5cb08/Source/GameSerializer.cpp), U7Object.cpp | Lagre klokke, skriptflagg og objektendringer i en samlet verdenstilstand. Se også hvordan interaksjoner og en redigerbar verden kan leve sammen i 3D. | Rotlisens BSD-2-Clause. Originale Ultima-filer kreves av motoren. NpcAnimation.cpp nevner Exult som opphav for en tabell; filvis opphav må avklares før eventuell kopiering. Her anbefales egen implementasjon. Stort. |
+| 5 | [Endless Sky: ConditionSet.cpp](https://github.com/endless-sky/endless-sky/blob/e0334bf5634c502431271def8f3a74c2d88c6ed4/source/ConditionSet.cpp), [Mission.cpp](https://github.com/endless-sky/endless-sky/blob/e0334bf5634c502431271def8f3a74c2d88c6ed4/source/Mission.cpp) | Skill betingelser fra virkninger: tilby oppdrag hvis vilkår er oppfylt, og behandle ankomst, fullføring og fristbrudd én gang. Passer frakt, passasjerer og følger av sjøhendelser. | GPL-3.0-or-later i filhodene. Egen liten betingelsesmotor, ikke portering av deres kode eller kampanjetekst. Middels. |
+| 6 | [Brogue CE: Architect.c](https://github.com/tmewett/BrogueCE/blob/104a20fedbe7d9360d2dfc8ff665571694212ad8/src/brogue/Architect.c), [Shattered Pixel Dungeon: LoopBuilder.java](https://github.com/00-Evan/shattered-pixel-dungeon/blob/57a4e06a4caf162446d1c28caa7983f0493fecf0/core/src/main/java/com/shatteredpixel/shatteredpixeldungeon/levels/builders/LoopBuilder.java) | Bedre plassering av rom, flaskehalser, valgfrie avstikkere og tematiske rom. Vi har allerede Prim-forbindelser og ekstra løkker i dungeon.js; gevinsten er meningsfulle rom og kontroll av framkommelighet. | AGPL-3.0 / GPL-3.0-or-later. Designreferanser, egen generatorutvidelse. Middels. |
+| 7 | [Athena Crisis: applyConditions.tsx](https://github.com/nkzw-tech/athena-crisis/blob/1d7033db46ebf0e5435368673faf05764f66f256/apollo/lib/applyConditions.tsx), MapGenerator.tsx | Tydelig rekkefølge for handling, virkning og mål, med før-/ettertilstand som kan testes. Nyttig når et bevis både endrer et oppdrag, en NPC og journalen. | Koden er MIT, men grafikk, lyd og kampanje har egne vilkår. Mange interne avhengigheter; tilpass mønsteret uten React-motoren. Middels. |
+| 8 | [Space Station 14: SharedInteractionSystem.cs](https://github.com/space-wizards/space-station-14/blob/6a9a8abe96f2c68646c73b3cd63d797e86842eba/Content.Shared/Interaction/SharedInteractionSystem.cs) | En felles sjekk av rekkevidde, fri vei, tilgang til beholder og hva spilleren holder, før interaksjonen skjer. Passer låste dører, nøkler, kister og å bruke en ting på en annen. | MIT for undersøkt kode. Ikke hent nettverksmotor eller innhold; lag et lite samspill-API rundt E og inventaret. Middels. |
+| 9 | [Cataclysm: DDA: mapbuffer.cpp](https://github.com/CleverRaven/Cataclysm-DDA/blob/0723f9285fa0080dfe1876cc9c2845919252528c/src/mapbuffer.cpp) | Bare aktive områder simuleres fullt; endringer lagres og hentes ved retur. Bruk prinsippet når havner og byer skal huske åpne kister, folk og lokale hendelser. Ikke kjør hele Ereb Altor hvert bilde. | Prosjektets LICENSE.txt er CC BY-SA 3.0; ikke anta GPL. Her bare arkitekturreferanse. Stort hvis hele områdetilstanden innføres. |
+| 10 | [.kkrieger: genbitmap.cpp](https://github.com/farbrausch/fr_public/blob/8c8f82c2ae01133370e649bbc05916e7aceecadd/werkkzeug3_kkrieger/genbitmap.cpp), genmesh.cpp | `Bitmap_Perlin`, `Bitmap_Cell`, `Bitmap_Bricks` og `Bitmap_Normals` viser hvordan små oppskrifter gir flere materialer. Aktuelt for mur, puss, tre og ruhet som supplement til våre malte materialer. | BSD med to vilkår i akkurat denne undermappen. Gammel C++ med x86-assembler og eget rammeverk. Avgrens til én ny oppskrift i reserve-/byggeverktøy; ikke port motor eller synth. Middels til stort. |
+
+### Grafikk, animasjon og lyd
+
+- **OpenLara**, [src/animation.h](https://github.com/XProger/OpenLara/blob/3b268ca4bf986c380f44a26ffd9218bf6d376249/src/animation.h), BSD-2-Clause: animasjonstilstander, overgangsvinduer og frame-hendelser er nyttige for treff og fotkontakt. Systemet leser Tomb Raider-format og er ikke en automatisk rigg til anda. Middels etter at modellen er rigget; originalanimasjoner og figurer følger ikke med lisensen.
+- **Overgrowth**, [riggedobject.cpp](https://github.com/WolfireGames/overgrowth/blob/245fe4828631c84c0023d29d1525f5716ccb6106/Source/Objects/riggedobject.cpp), Apache-2.0: skjelett og IK-mål er en referanse for senere fotplassering, våpenfeste og reaksjoner. Stor, motorkoblet kode. Rigging av anda og enkle positurer kommer først. README sier uttrykkelig at grafikk og nivåer krever kjøpt spill og egen tillatelse til videredistribusjon.
+- **Anarch**, [sounds.h](https://gitlab.com/drummyfish/anarch/-/blob/6f90562161200682459e772f1dacb747f23c5f95/sounds.h), CC0: seks bytebeat-formler og små 8 kHz-effekter viser svært kompakt lyd. Kan brukes til rare magiske gjenstander eller en bevisst grov lydprøve. De passer dårligere som hovedmusikk enn lutten vi allerede har. Forhåndsrendre og cache, og kontroller DC-offset, nivå og aliasing før bruk.
+- **IsoCity**, [saveWorker.ts](https://github.com/amilich/isometric-city/blob/b774dd7913103e9dd9ec51b2151893c22683886e/src/lib/saveWorker.ts) og saveWorkerManager.ts, MIT: serialisering/komprimering utenfor hovedtråden kan hjelpe hvis store kampanjelagringer måles å hakke. Løsningen trenger `lz-string`, Next-bygg av worker og støtte i CSP; den passer ikke rett inn i vår ene HTML-fil. Senere, etter måling og formatvalg.
+- **The Dark Mod** er den tydeligste designreferansen for vakter som hører noe, undersøker og gradvis blir mistenksomme. Profil og festet LICENSE.txt er lest; AI-koden er ikke undersøkt her. Programvare er GPLv3 med tillegg, mye innhold CC BY-NC-SA 3.0. Bruk egne tilstander og lyder ved en senere snikeutvidelse.
+
+For oss er de nærmeste lydoppgavene nå **dør/knirk, havnemiljø og korte stemmer per släkt**. The Ninth Vigil er allerede brukt i PR #9 til fem underlag, romklang og taktbaserte overganger. Vi trenger ikke en ny lydmotor. Morbidiums CC0-foley og egne WebAudio-formanter fra den tidligere gjennomgangen er bedre første kandidater enn å hente hele lydsystemet fra et av de store spillene. Athena Crisis bruker Howler og lydfiler, ikke prosedyrisk syntese; det løser ikke et udekket behov hos oss nå.
+
+På grafikksiden bør vi først gjøre spilleren synlig bak trekroner, kontrollere kvalitet og deretter variere lokal arkitektur/materialer. Prosedyriske detaljer må følge eksisterende takfading, dele materialer og ha fast frø. En ny PBR-/ruhetsoppskrift må holde materialbudsjettet; .kkriegers lille programfil er ikke et bevis for billig generering eller god mobil-FPS i vårt spill.
+
+### Hva resten av katalogen gir
+
+Alle radene er vurdert i JSON-fila. Tabellen under viser dekningen, ikke antall anbefalte porter.
+
+| Gruppe | Profiler | Vurdering for dette spillet |
+| --- | ---: | --- |
+| Action | 1 | Hypersomnias nettverkskamp og redigerer er mindre nært dagens enspillerspill. |
+| Bybygging | 8 | Små service-/vareflytmønstre kan brukes senere; IsoCity er undersøkt for lagring. Full bysimulering er for stor. |
+| Eventyr | 6 | Endless Sky er prioritert. Dead Ascend for gjenstandsgåter, Pioneer for oppdrag/reise senere. ScummVM og dekompileringer er ikke innholdsbanker. |
+| Førsteperson | 37 | .kkrieger, Anarch og The Dark Mod er skilt ut. De øvrige motorportene har liten gevinst for kameraet og teknologien vår. |
+| Plattformspill | 13 | Jumpy/Punchy for kontroll/tilstander senere; resten krever mye ombygging og ofte originaldata. |
+| Puslespill | 3 | Dead Ascend er under eventyr. Portal64, Whatajong og BlockOut II løser ikke et nåværende behov. |
+| Racing og kjøresimulering | 12 | Lav prioritet; bil-/dekkfysikk og banemotorer hjelper lite med Ereb Altor. RVGLs kilde og lisens er uavklart. |
+| Roguelike | 7 | Kartstruktur, gjenstandsinteraksjoner og lagring er relevante. NetHack/DCSS/Meritous er designreferanser; prioriter de undersøkte generator-/verdensprosjektene og OpenNefia. |
+| Rollespill | 28 | Størst relevans for oppdrag, NPC-er og verdensminne. Flere profiler peker til samme GemRB-motor; kommersielle data er separate. |
+| Sandkasse | 1 | Minosofts blokk-/nettverksmotor gir liten kortsiktig gevinst. |
+| Sanntidsstrategi | 25 | Widelands/Unknown Horizons-lignende vareflyt kan inspirere handel senere. De store motorene og flerspillerløkkene er for omfattende nå. |
+| Shoot 'em up | 2 | Taisei for lesbare prosjektilmønstre senere; SDL Sopwith har lav relevans. |
+| Sport | 2 | Open Golf og Pooltool løser andre fysikk-/styringsbehov. |
+| Tredjeperson | 8 | OpenLara og Overgrowth er undersøkt for animasjon. Andre porter er lite nært vår teknologi eller har uavklart opphav. |
+| Turbasert strategi | 13 | Athena Crisis er undersøkt. Wesnoth for kampanjeforløp og OpenXcom for utstyr senere; ikke nye kampregler hos oss. |
+| Tårnforsvar | 1 | Server Survival er webkode, men bølger og serverpedagogikk har lav relevans. |
+| Økonomi og tycoon | 5 | OpenLoco, OpenTTD og CorsixTH kan inspirere ruter, vareflyt og oppgavekøer senere. Ingen ny økonomimotor nå. |
+
+### Lisensfunn som endrer valgene
+
+- **DevilutionX ved `0706e014` har Sustainable Use License 1.0.** Den begrenser bruk og distribusjon til angitte personlige/ikke-kommersielle formål. Dette er ikke en generell åpen kildekodelisens. Ingen kode eller data anbefales hentet derfra til vårt MIT-prosjekt.
+- **RVGL og VVVVVV er ikke generelt frie kodekilder.** RVGLs konkrete kilde/lisens er ikke bekreftet i biblioteket; VVVVVV har egne bruksbegrensninger.
+- **Dekompilering og motorporter frigir ikke originalspillet.** Det gjelder blant annet Nintendo-/Zelda-/Mario-prosjektene, Fallout CE, GemRB-spillene, Ultima og Tomb Raider. Et CC0-/MIT-/BSD-felt på et repo bekrefter ikke rettigheter til originalkode, musikk, kart eller figurer.
+- **GPL/AGPL/CC BY-SA behandles som designreferanser i denne planen.** Å skrive om kode til JavaScript fjerner ikke lisensplikter. Direkte kodegjenbruk ville kreve en separat vurdering av fil og distribusjon; denne gjennomgangen endrer ikke prosjektets lisensvalg.
+- **MIT/BSD/Apache gjelder undersøkte kodefiler med deres opphavsnotiser.** Kontroller også tredjepartsmapper og innhold. Athena Crisis er et konkret eksempel på MIT-kode med separat lisensiert spillinnhold.
+
+### Anbefalt rekkefølge og krav til ferdig arbeid
+
+1. **Verdensminne:** definer en versjonert kampanjetilstand ved siden av `G.run`, med faste ID-er for steder, personer, oppdrag og objektendringer. Ikke flytt alle gamle løpsdata over automatisk. Kontroller lagring/lasting, Fristaden–Arno–Fristaden, områdeskifte og uttrykkelig hva nederlag/nullstilling skal bevare. Ta hensyn til den delte localStorage-kvoten på GitHub Pages.
+2. **Felles oppdragsformat:** bruk små tillatte betingelser og virkninger, uten `eval`. Knytt frister til den eksisterende spillklokka og reisetida. Prøv først ett lite oppdrag i Arno, med belønning som bare kan gis én gang, fristbrudd under reise og lasting før/etter innlevering. Deretter Edsbrytarna. DoD91-slag og tall kommer fortsatt fra egne regelmoduler og bøkene.
+3. **Byfolk og reaksjoner:** egne folk, arbeidsplasser og interesser i Arno/Gringul. Minne om valg og vitner, og personlige forhold ved siden av lokalt rykte. Kontroller rutene gjennom døgnet og gjenbesøk etter lang reise før flere byer får samme løsning.
+4. **Lesbar grafikk og meningsfulle rom:** trekroner viker for kameraet, lokale bygningsvarianter og noen nye romtyper. Kontroller tak/dører og framkommelighet for faste frø; mål tegnekall og bildefrekvens på vanlig maskin. Rigging kommer før OpenLara-/Overgrowth-inspirert animasjon.
+5. **Lyd som fyller hull:** dør/knirk, havn og stemmer i dagens WebAudio-system. Test brukeraktivering, pause/mute, maks antall stemmer, nivå og opprydding. Anarch er en valgfri effektprøve, ikke erstatning for musikken.
+
+Ingen nye spillfunksjoner eller tredjepartsfiler er integrert i denne gjennomgangen. Konkrete kildeutdrag ligger bare i arbeidsmappens undersøkelse, ikke i spillet. Bibliotekets åpne PR #4 om natteskift er lest som bakgrunn og gjelder en annen arbeidsflyt; den er ikke startet eller flettet her.
+
+## Tidligere gjennomgang: 9. oktober 2026
 
 Gjennomgang 9. oktober 2026, bestilt av Tom: hva i prosjektbiblioteket og de andre spillrepoene kan gjøre grafikk, gameplay, lyd, musikk og brukerflate bedre i Svart Nebb, og hvordan vi slipper å finne de samme løsningene på nytt i hvert spill.
 
 Tre av repoene er private. Dette repoet er offentlig, så de heter privat repo A, B og C her. Tom vet hvilke det er.
 
-Dette er en vurdering, ikke en endring. Ingenting er flyttet inn i spillet ennå, og ingenting er runtime-testet hos oss. Hver rad sier hvor det ligger, hva det gir, hva det koster og hvilken lisens det har. Fem hjelpeagenter leste repoene (bare lesing), og jeg sjekket de viktigste påstandene mot vår egen kode.
+Det følgende er historikken fra 9. oktober. Prioriteter og status nedenfor gjelder den datoen, med mindre en nyere oppdatering over sier noe annet. Blant annet er fotsteg/romklang/takt senere løst i PR #9, værbasert reisetid i PR #8, og prosjektbiblioteket har nå både egne løsningskort og 172 spillprofiler. Den opprinnelige gjennomgangen brukte fem hjelpeagenter til lesing; gjennomgangen 21. oktober er gjort av ChatGPT uten nye hjelpeagenter.
 
 ## WebGL eller WebGPU?
 

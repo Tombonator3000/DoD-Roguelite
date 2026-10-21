@@ -7,8 +7,10 @@ Sortert etter hva som gir mest spill for minst jobb.
 Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når pull requesten er inne. Se AGENTS.md.
 
 
+
 ## Nå
 
+- [x] Ny gjennomgang av alle 172 spillprofiler i prosjektbiblioteket, 15 kode-/lisensundersøkelser og to ekstra lisenskontroller. Prioritert plan og full dekning i docs/gjenbruk.md og docs/gjenbruk-spill.json (21. oktober).
 - [x] Inventar med sekk, belte, 3D-ikoner og dra og slipp (0.5)
 - [x] Lagre og laste med autolagring og tre plasser (0.5)
 - [x] DoD91-regler (4.0) med Expert og Gigant: sju grundegenskaper, FV per ferdighet, träffområden med egne KP og rustning, parering per SR, magi med PSY, yrker og raser fra Bok I, Skräcktabellen, stridsmoral, fummeltabeller, EP og hjältepoäng (0.5). Lagrede spill fra 2023-reglene kan ikke lastes.
@@ -38,7 +40,7 @@ Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når p
 - [ ] Spilltest grafikken på ekte maskin og mobil: er regnet for tett, tilt-shift for sterk, natta for mørk i uvær?
 - [x] Grafikk etter Weatherglass, raske ting (0.7): MSAA i komposeren, bloom etter sted og tid, miljøkart fra himmelen, eksponering etter døgnet, myke trekroner. Se docs/grafikk-weatherglass.md.
 - [ ] Trær nær kameraet skjuler spilleren i Ekeskogen. La kronene mellom kameraet og spilleren bli gjennomsiktige, som takene i byen. Mal: fadeFronts i Loincloth Legends (docs/gjenbruk.md).
-- [ ] Fra docs/gjenbruk.md, raske ting: CC0-lyder fra Morbidium og Loincloth (fotsteg etter underlag, dører, gulvknirk, regn, vind, natt, bål, sverdklang), skriftene bygget inn med FontFace i stedet for Google Fonts, alphaToCoverage på tuster og faner, handler for tapt WebGL-kontekst, test av artifact.html under sandkassens CSP.
+- [ ] Fra docs/gjenbruk.md, raske ting: dør/knirk og havnemiljø med egne synteselyder eller kontrollert CC0-foley fra Morbidium/Loincloth, skriftene bygget inn med FontFace i stedet for Google Fonts, alphaToCoverage på tuster og faner, handler for tapt WebGL-kontekst, test av artifact.html under sandkassens CSP. Fotsteg etter underlag og romklang er allerede løst i PR #9.
 - [ ] Fra docs/gjenbruk.md, middels: skjermeffekter (sjokkbølge, zoom-punch, rød kant ved lav KP), angrepspoletter og tempostyrer (høyst 2 som angriper), automatisk kvalitet med pikselbudsjett, stemmer per släkt med formanter, spilltestmodus bak ?testmodus.
 - [ ] log.md er over 50 KB. Flytt eldre økter til logg/ÅÅÅÅ-MM.md, som Morbidium gjør med tools/rydd_dokumenter.py.
 - [ ] Grafikk etter Weatherglass, middels: sol som retningslys ute med skyggekamera snappet til texler, lys gjennom bladene, bakkeshader som bryter opp flisene, enkel AO nederst på vegger og steiner, skyskygger på alle materialer.
