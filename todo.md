@@ -6,8 +6,6 @@ Sortert etter hva som gir mest spill for minst jobb.
 
 Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når pull requesten er inne. Se AGENTS.md.
 
-- ChatGPT (`chatgpt/ereb-altor`, PR #8): retter atlaset etter Toms bestilling: originalkart med zoom og panorering, målte avstander, bokas seildøgn, dagsmarsj/hvile/proviant og kontroller av frister og lagring.
-- ChatGPT (`chatgpt/lyd-og-arno`, bygger på PR #8): fotsteg etter underlag, stedstilpasset romklang, musikkoverganger i takt og en avgrenset prøve på faste bygningsvarianter i Arno, inspirert av The Ninth Vigil.
 
 ## Nå
 
@@ -56,7 +54,7 @@ Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når p
 - [x] Parera og undvika som slag, pressa slag, drakvalg, missöden, vila, dödsslag med Samla sig, skräck, magi (0.3)
 - [x] Fristaden over bakken med folk, døgnrytme, nøkkelordsamtaler, tjenester, oppdrag og tyveri (0.4)
 - [ ] Spilltest byen: er prisene riktige mot det du finner i kloakken? Er natta mørk nok, eller for mørk? Er det for lett å stjele?
-- [x] Prosedyriske fotsteg etter underlag, stedstilpasset romklang og musikkoverganger i takt (ChatGPT, chatgpt/lyd-og-arno).
+- [x] Prosedyriske fotsteg etter underlag, stedstilpasset romklang og musikkoverganger i takt (ChatGPT, PR #9).
 - [ ] Egne stemmer for hver släkt (nå er det grynt for alle unntatt anka).
 - [ ] Ytelsestest på svakere bærbar og mobil.
 
@@ -75,7 +73,7 @@ Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når p
 - [ ] Flere oppdrag i byen, gjerne med valg: Gaspard som smugler, Hvass som skylder penger, Pimpa som forsvinner i kloakken.
 - [ ] Låste dører om natta (Fingerfärdighet eller dyrkar), og at folk reagerer hvis du står inne hos dem mens de sover.
 - [x] Lagre byens tilstand (oppdrag, rykte, klokke) sammen med resten av løpet (0.5). Butikkenes lager i byen lagres ikke ennå.
-- [ ] Lyd for dører og stemmer for byfolk (korte grynt og hmm som i Ultima VII). Fotsteg på planker og stein er implementert på chatgpt/lyd-og-arno.
+- [ ] Lyd for dører og stemmer for byfolk (korte grynt og hmm som i Ultima VII). Fotsteg på planker og stein er implementert i PR #9.
 - [ ] Flere romtyper: fellerom (Upptäcka fara, Hoppa & klättra), skattekammer, rom med fanger å befri (Övertala).
 - [ ] Følgesvenner du kan leie på Den feite gåsen, så evner som Livvakt og Tonkonst får noe å gjøre.
 - [x] Lagre løp midt i (etasje, utstyr, gaver) slik at man kan fortsette senere (0.5).

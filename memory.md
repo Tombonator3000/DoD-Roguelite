@@ -270,3 +270,9 @@ Detaljene står i docs/regler/IMPLEMENTERING.md. Det viktigste:
 - Arno er fremdeles en områdeprøve, ikke en ferdig kildeført byplan eller et nytt scenario. Neste innhold er havnekvarter, egne folk og interesser. PBR-fabrikken og den omfattende renderkjeden fra The Ninth Vigil er ikke portert; r170 og én HTML-fil beholdes.
 
 - Lydkontrollen har egen CI-jobb `lyd` og kjøres også før Pages-publisering. `audio-browser.mjs` bruker vanlig brukeraktivering, den ekte lydklokka, alle fem rom/underlag, maks tolv stemmer, pause/mute og frigjorte kilder, stabile tak etter nytt besøk og åpne dører. OfflineAudioContext kontrollerer endelige samples og avtagende romhaler og skriver en tørr fotstegprøve. JS-stans testes uten rendering, fordi SwiftShader ellers kan blokkere hovedtråden i sekunder. Reell lytting og fysisk mobil gjenstår.
+
+
+## Fletting etter ferdig arbeid
+
+- Tom sa 21. oktober 2026: «Flett alt du gjør». ChatGPT/Codex har stående beskjed om å flette egne ferdige PR-er etter relevante kontroller, og følge Pages-publiseringen. Ny flettegodkjenning trengs ikke for bestilt arbeid. Arbeidsgrener og PR-er beholdes som arbeidsflyt.
+- PR #8 (originalkart og reisedøgn) og #9 (fotsteg, romklang, takt og Arno) er flettet med vanlige flettecommits, i den rekkefølgen. Begge hadde grønne kontroller på de aktuelle grenhodene før fletting.
