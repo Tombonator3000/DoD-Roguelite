@@ -141,6 +141,11 @@ test('verdensminne er isolert per rollperson, og blokkert eller fullt lager gir 
   assert.equal(readCampaign('a', storage).areas.arno.objects.havnekiste, 'tom');
   const bad = { getItem() { throw Error('blokkert'); }, setItem() { throw Error('fullt'); } };
   assert.equal(readCampaign('a', bad).character, 'a'); assert.equal(writeCampaign(a, bad), false);
+  const future = JSON.stringify({ a: { v: 2, clock: 999, quests: { framtid: true } } });
+  storage.setItem(CAMPAIGN_KEY, future);
+  assert.equal(readCampaign('a', storage).unsupported, true);
+  assert.equal(writeCampaign(a, storage), false);
+  assert.equal(storage.getItem(CAMPAIGN_KEY), future);
 });
 
 test('DoD91 v2 migreres fra sitt eget øyeblikk, uten å endre originalen eller hente framtidig verdensminne', () => {

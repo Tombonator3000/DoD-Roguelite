@@ -57,7 +57,9 @@ export function readCampaign(character, storage) {
   try {
     storage ||= globalThis.localStorage;
     const all = JSON.parse(storage.getItem(CAMPAIGN_KEY) || '{}');
-    return normalizeCampaign(all?.[character], character);
+    const value = all?.[character];
+    if (object(value) && value.v !== CAMPAIGN_VERSION) return { ...newCampaign(character), unsupported: true };
+    return normalizeCampaign(value, character);
   } catch { return newCampaign(character); }
 }
 
@@ -67,6 +69,7 @@ export function writeCampaign(c, storage) {
     let all;
     try { all = JSON.parse(storage.getItem(CAMPAIGN_KEY) || '{}'); } catch { all = {}; }
     if (!object(all)) all = {};
+    if (object(all[c.character]) && all[c.character].v !== CAMPAIGN_VERSION) return false;
     // defineProperty behandler også uvanlige navn som vanlige nøkler.
     Object.defineProperty(all, c.character, { value: c, enumerable: true, configurable: true, writable: true });
     storage.setItem(CAMPAIGN_KEY, JSON.stringify(all));

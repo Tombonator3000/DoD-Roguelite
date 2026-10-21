@@ -712,12 +712,19 @@ class Game {
 
   startRun() {
     document.activeElement?.blur?.();
+    const campaign = readCampaign(G.player.sheet.id || 'svartnebb');
+    if (campaign.unsupported) {
+      this.title.leaving = false;
+      this.enterTitle(true);
+      $('#title-stats').textContent = 'Verdensminnet er fra en annen versjon. Oppdater spillet før du fortsetter med denne rollpersonen.';
+      return;
+    }
     G.audio.init();
     G.audio.ui();
     G.meta.runs++;
     saveMeta(G.meta);
     G.run = this.freshRun();
-    G.campaign = readCampaign(G.player.sheet.id || 'svartnebb');
+    G.campaign = campaign;
     restoreCampaign(G.campaign, G.run);
     worldState();
     restoreExploration(G.campaign, worldState());
