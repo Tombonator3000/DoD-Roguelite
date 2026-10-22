@@ -4,6 +4,7 @@ Sortert etter hva som gir mest spill for minst jobb.
 
 ## Hvem jobber med hva
 
+
 Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når pull requesten er inne. Se AGENTS.md.
 
 
@@ -12,6 +13,9 @@ Skriv navnet ditt og grenen bak oppgaven før du begynner, og fjern linja når p
 
 
 ## Nå
+
+- [x] Handelsvarer og lokale markeder (0.11): seks varer, kjøp/salg med antall, sekkvekt, innkjøp og resultat, datert prisbok, begrenset lager/etterspørsel og ukentlig påfyll. Autolagring av penger/last/marked sammen, se docs/handel.md.
+- [ ] Spilltest handelsøkonomien over flere reiser og rollpersoner. Kjerre/skipslast, ruteoppdrag og hendelsesstyrte varebehov kan bygges videre på markedslaget.
 
 - [x] Ny gjennomgang av alle 172 spillprofiler i prosjektbiblioteket, 15 kode-/lisensundersøkelser og to ekstra lisenskontroller. Prioritert plan og full dekning i docs/gjenbruk.md og docs/gjenbruk-spill.json (21. oktober).
 - [x] Inventar med sekk, belte, 3D-ikoner og dra og slipp (0.5)

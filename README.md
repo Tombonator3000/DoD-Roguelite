@@ -6,6 +6,14 @@ Laget med three.js r170. Musikk, lyd, fiendemodeller og effekter genereres i net
 
 [Gjennomgang av prosjektbibliotekets 172 spillprofiler](docs/gjenbruk.md): konkrete kandidater for verdensminne, oppdrag, NPC-er, grafikk og lyd, med kildefiler, lisenser og anbefalt rekkefølge.
 
+## Nytt i 0.11: handelsvarer og lokale markeder
+
+Kjøp og selg jern, salt, ull, lerret, vin og krydder hos Nansen/Hvass i Fristaden og kjøpmennene i regionenes handelsboder. Velg **HANDELSVARER**, antall pakker og Kjøp eller Selg. Lasten bruker sekkens vekt, og salg viser gevinst eller tap mot innkjøpet. Markedet har begrenset lager og etterspørsel, med ukentlig påfyll på spillklokka. Gjenbesøk fyller ikke opp lageret.
+
+Prøv jern fra Fristaden til Pendon med ull tilbake, eller lerret fra Arno til Gringul med salt tilbake. Prisboka husker tilbud fra besøkte markeder, med dato. Regn med reisetid, billett og proviant. Hver handel autolagrer penger, last og marked sammen, og gamle lagringer virker videre. Varer og priser er spillets egne, med egne regionale profiler.
+
+[Spilleveiledning, priseksempel og lagringsformat](docs/handel.md). 47 data-/regresjonstester, egen nettleserprøve av handel, Fortsett, fire døgns sjøreise og mobil, samt vanlig femnivå-stress.
+
 ## Rettet i 0.10.1: veier som møter terrenget naturlig
 
 Veibanen følger nå de faktiske veipunktene gjennom svinger. Brostein har en fast kjerne med slitt jordkant mot vegetasjonen, og jordveier går åpent inn på belegningen. Små adkomststier river ikke lenger opp ferdig brostein eller heller. De generiske kantsteinene over veimøtene er fjernet. Veijorden har småstein uten faste parallelle striper, og gresstuster holdes utenfor veibane og skulder.
