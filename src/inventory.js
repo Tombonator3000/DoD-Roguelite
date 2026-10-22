@@ -49,7 +49,7 @@ export function makeCons(cid, qty = 1) {
 }
 
 export const isGear = e => !!e?.slot;
-export const stackKey = e => (e.type === 'cons' ? 'c:' + e.cid : e.type === 'val' ? 'v:' + e.vid : null);
+export const stackKey = e => (e.type === 'cons' ? 'c:' + e.cid : e.type === 'val' ? 'v:' + e.vid : e.type === 'trade' ? 't:' + e.tid : null);
 
 // Vekt for én ting i sekken (gamle lagrede ting uten kg får en standardvekt)
 export function kgOf(e) {
@@ -87,7 +87,7 @@ export function addToBag(P, e, quiet = false) {
   const k = stackKey(e);
   if (k) {
     const ex = P.bag.find(x => stackKey(x) === k);
-    if (ex) { ex.qty += e.qty || 1; afterChange(P); return true; }
+    if (ex) { if (e.type === 'trade') ex.basis = (ex.basis || 0) + (e.basis || 0); ex.qty += e.qty || 1; afterChange(P); return true; }
   }
   if (!e.uid) e.uid = 'i' + Math.random().toString(36).slice(2, 9);
   P.bag.push(e);
@@ -101,9 +101,11 @@ export function removeFromBag(P, e, n = null) {
   const i = P.bag.indexOf(e);
   if (i < 0) return null;
   if (stackKey(e) && n != null && e.qty > n) {
+    const basis = e.type === 'trade' ? Math.round((e.basis || 0) * n / e.qty) : undefined;
     e.qty -= n;
+    if (basis !== undefined) e.basis = (e.basis || 0) - basis;
     afterChange(P);
-    return { ...e, qty: n, uid: undefined };
+    return { ...e, qty: n, ...(basis !== undefined ? { basis } : {}), uid: undefined };
   }
   P.bag.splice(i, 1);
   afterChange(P);
@@ -240,6 +242,7 @@ export function useEntry(P, e) {
 
 // Pris når du selger. Herr Nansen tar alt, Bataar bare utstyr.
 export function sellPrice(e, merchant) {
+  if (e.type === 'trade') return 0; // Handelsvarer har egne lokale markeder.
   const base = isGear(e) ? e.value : e.value * (e.qty || 1);
   if (merchant === 'bataar') return isGear(e) ? Math.max(1, Math.round(base * 0.5)) : 0;
   if (e.type === 'val') return Math.max(1, Math.round(base * 0.85));
@@ -260,11 +263,16 @@ export function renderSellList(el, merchant, o = {}) {
   head.className = 'purse';
   head.innerHTML = `Du har <b>${P.silver}</b> sm <span>(du selger${merchant === 'bataar' ? ', bare våpen og rustning' : ''})</span>`;
   el.appendChild(head);
-  const rows = P.bag.filter(e => merchant !== 'bataar' || isGear(e));
+  const rows = P.bag.filter(e => e.type !== 'trade' && (merchant !== 'bataar' || isGear(e)));
+  if (P.bag.some(e => e.type === 'trade')) {
+    const note = document.createElement('p');
+    note.textContent = 'Handelsvarer kjøpes og selges under HANDELSVARER hos kjøpmannen.';
+    el.appendChild(note);
+  }
   if (!rows.length) {
     const r = document.createElement('div');
     r.className = 'ware empty';
-    r.textContent = merchant === 'bataar' ? 'Du har ikke noe utstyr i sekken.' : 'Sekken er tom.';
+    r.textContent = merchant === 'bataar' ? 'Du har ikke noe utstyr i sekken.' : P.bag.length ? 'Bruk HANDELSVARER for å selge lasten.' : 'Sekken er tom.';
     el.appendChild(r);
   }
   for (const e of rows) {

@@ -168,8 +168,9 @@ export class InvUI {
       kind = `${r.name} ${SLOT_NAME[e.slot] || ''}`;
       lines = e.lines || [];
     } else {
-      kind = e.type === 'val' ? 'Verdisak' : KIND_NAME[e.type] || '';
+      kind = e.type === 'trade' ? 'Handelsvare' : e.type === 'val' ? 'Verdisak' : KIND_NAME[e.type] || '';
       lines = [e.desc];
+      if (e.type === 'trade') lines.push('Selges under HANDELSVARER hos kjøpmenn. Salgsprisen avhenger av markedet.');
     }
     const cmp = ref.kind === 'bag' && isGear(e) ? this.compare(e) : '';
     const acts = this.actions(ref).map((a, i) => `<button class="btn small ${i === 0 ? 'primary' : ''}" data-act="${i}">${a.label}</button>`).join('');
@@ -180,7 +181,7 @@ export class InvUI {
         <div class="rar">${esc(kind)}${ref.kind === 'eq' ? ' <em>har på</em>' : ref.kind === 'belt' ? ' <em>i beltet</em>' : ''}</div>
         ${lines.map(l => `<div class="ln">${esc(l)}</div>`).join('')}
         ${flavor ? `<div class="fl">${esc(flavor)}</div>` : ''}
-        <div class="val">Verdi omtrent ${value} sm${!isGear(e) ? ` · ${fmtKg(kgOf(e))} kg` : ''}</div></div></div>
+        <div class="val">${e.type === 'trade' ? `Innkjøp ${e.basis || 0}` : `Verdi omtrent ${value}`} sm${!isGear(e) ? ` · ${fmtKg(kgOf(e))} kg` : ''}</div></div></div>
       ${cmp}
       <div class="acts">${acts}</div>`;
     const list = this.actions(ref);

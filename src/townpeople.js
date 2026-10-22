@@ -63,7 +63,8 @@ export const PEOPLE = [
     },
     topics: {
       NAVN: 'Krystof Hvass. Kjøpmann. Laugsmester i [kjøpmannslauget|LAUGET]. Eier av Hvass handel, Hvass gård og en del av gjelda til alle andre.',
-      JOBB: 'Jeg kjøper billig og selger dyrt. Det er hele kunsten. [Nansen] står i butikken for meg, så jeg slipper å se kundene.',
+      HANDELSVARER: { act: 'trade_goods', always: true },
+      JOBB: 'Jeg kjøper billig og selger dyrt. Spør om [handelsvarer]. Det er hele kunsten. [Nansen] står i butikken for meg, så jeg slipper å se kundene.',
       NANSEN: c => c.isNebb ? 'Faren din er en god betjent. Ikke si det til ham, så slipper jeg å gi ham lønnsøkning.' : 'Betjenten min. En and. Han er treg, ærlig og billig. To av tre er bra.',
       SAFRAN: c => {
         const r = c.run.depthReached;

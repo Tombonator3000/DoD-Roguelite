@@ -27,6 +27,7 @@ import { Town, skyAt } from './town.js';
 import { hourOf, QUEST_TITLES } from './townfolk.js';
 import * as INV from './inventory.js';
 import { giveItem, makeCons, renderSellList, canCarry, bagCap } from './inventory.js';
+import { renderTrading } from './tradeui.js';
 import { Icons } from './icons.js';
 import { InvUI } from './invui.js';
 import { saveGame, readSave, latestSave, deleteSave, describe as describeSave } from './save.js';
@@ -1691,6 +1692,7 @@ class Game {
     const kw = $('#dlg-kw');
     kw.innerHTML = '';
     const words = ['NAVN', 'JOBB', 'HANDEL', 'SELGE', 'SAFRAN', 'FLANSEN', 'KARAD'];
+    if (D.isTown) words.splice(3, 0, 'HANDELSVARER');
     if (G.depth >= 2 || G.run.depthReached >= 2) words.push('REVEN');
     if (!D.advance) words.push('FORSKUDD');
     words.push('FARVEL');
@@ -1701,6 +1703,7 @@ class Game {
       b.onclick = () => {
         G.audio.ui();
         if (w === 'HANDEL') { this.startBarter(); return; }
+        if (w === 'HANDELSVARER') { renderTrading(t => this.dadSay(t)); return; }
         if (w === 'SELGE') { this.renderSell(); return; }
         if (w === 'FORSKUDD') { this.askAdvance(); return; }
         if (w === 'FARVEL') { this.dadSay(lines.FARVEL); setTimeout(() => this.closeShop(), 700); return; }

@@ -4,6 +4,9 @@
 // uv: true betyr at verdien er spillets egen tolkning eller tilpasning til sanntid, ikke tatt rett fra boka.
 // Ereb Altor-data (Aidne-bakgrunn, navn) er fra "Hjältar från Kopparhavet" og gir bare smak i byen.
 
+// Egen handelsøkonomi. Priser, marginer og ukentlig påfyll er ikke hentet fra DoD-bøkene.
+export const HANDEL = { uv: true, weekHours: 168, buyMarkup: 1.12, sellMargin: 0.75, stock: 12, demand: 24 };
+
 export const ATTRS = ['STY', 'STO', 'FYS', 'SMI', 'INT', 'PSY', 'KAR'];
 export const ATTR_NAME = { STY: 'Styrka', STO: 'Storlek', FYS: 'Fysik', SMI: 'Smidighet', INT: 'Intelligens', PSY: 'Psyke', KAR: 'Karisma' };
 
