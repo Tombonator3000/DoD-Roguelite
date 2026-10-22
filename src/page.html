@@ -258,7 +258,7 @@ input[type=range]:focus-visible { box-shadow: 0 0 0 2px rgba(201,163,90,.5); }
 #end-feathers { font-family: var(--ui); font-weight: 800; color: var(--gild); letter-spacing: .06em; margin-top: 16px; }
 
 #dialog { place-items: end center; background: linear-gradient(0deg, rgba(5,4,6,.85), rgba(5,4,6,.15) 60%); backdrop-filter: none; -webkit-backdrop-filter: none; }
-#dialog .panel { width: min(780px, 100%); margin-bottom: 12px; }
+#dialog .panel { width: min(780px, 100%); margin-bottom: 12px; max-height: calc(100dvh - 60px); overflow-y: auto; }
 .speaker { font-family: var(--display); font-weight: 700; font-size: 26px; color: var(--gild); }
 .speaker span { font-family: var(--body); font-style: italic; font-weight: 400; font-size: 16px; color: var(--dim); margin-left: 6px; }
 #dlg-text { font-size: 18px; line-height: 1.5; margin: 8px 0 14px; max-width: 64ch; min-height: 3em; }
@@ -320,6 +320,14 @@ input[type=range]:focus-visible { box-shadow: 0 0 0 2px rgba(201,163,90,.5); }
 body.in-town .tbtn[data-tbtn="TAtk"], body.in-town .tbtn[data-tbtn="TThrow"], body.in-town .tbtn[data-tbtn="TParry"], body.in-town #tbtns-dyn { display: none; }
 .kw { font-family: var(--ui); font-weight: 800; font-size: 13px; letter-spacing: .12em; color: var(--parch); background: rgba(0,0,0,.35); border: 1px solid var(--gild-dim); padding: 6px 10px; cursor: pointer; }
 .kw:hover, .kw:focus-visible { border-color: var(--gild); color: var(--gild); outline: none; }
+.trade-quantity { display:flex; align-items:center; gap:12px; }
+.trade-quantity select { min-width:64px; min-height:40px; font:inherit; }
+.trade-note, .trade-book { font-family:var(--ui); font-size:14px; line-height:1.5; }
+.trade-book summary { cursor:pointer; padding:10px 0; }
+.trade-buttons { display:flex; flex-wrap:wrap; gap:6px; justify-content:flex-end; }
+.trade-buttons button { min-height:40px; white-space:normal; }
+#trade-rows { display:flex; flex-direction:column; gap:8px; }
+@media(max-width:600px) { #dlg-wares .trade-row { flex-wrap:wrap; } .trade-row .txt { flex-basis:100%; } .trade-buttons { width:100%; justify-content:flex-start; } }
 #dlg-wares { margin-top: 14px; display: flex; flex-direction: column; gap: 6px; }
 #dlg-wares .purse { font-family: var(--ui); font-weight: 700; color: #d6dce8; }
 #dlg-wares .purse span { color: var(--dim); font-weight: 500; }
@@ -1086,7 +1094,7 @@ body:not(.touch) #dlg-kw .kw:nth-child(-n+9)::before { content: counter(kw); mar
       <p>Et roguelite i stil med Diablo og Hades, med regler fra Drakar och Demoner og dialog som i Ultima. Svart Nebb er en rollefigur fra en kampanje i Ereb Altor.</p>
       <p>Musikk, lyd, teksturer, fiender og effekter lages i nettleseren mens du spiller. Anda er en 3D-modell fra Magnific, krympet fra 1,15 millioner til 24 000 trekanter.</p>
       <p>Reglene følger Drakar och Demoner 4.0 (1991) med Expert og Gigant, så langt sanntid tillater. Verden er Ereb Altor, og bakgrunnen fra Aidne kommer fra «Ereb Altor: Hjältar från Kopparhavet».</p>
-      <p>Laget av Tom's Happy Happy Funtimes Emporium med three.js r170. Prototype, versjon 0.10.1.</p>
+      <p>Laget av Tom's Happy Happy Funtimes Emporium med three.js r170. Prototype, versjon 0.11.0.</p>
       <button class="btn small back">Tilbake</button>
     </div>
   </div>

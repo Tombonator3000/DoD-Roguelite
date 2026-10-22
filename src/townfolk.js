@@ -8,6 +8,7 @@ import { rollDice, d, clRoll } from './rules.js';
 import { SPELLS, SKILL, HJALTEFORMAGOR, ATTR_NAME } from './dod.js';
 import { SPOTS } from './townmap.js';
 import { PEOPLE, BOARD, RUMORS } from './townpeople.js';
+import { renderTrading } from './tradeui.js';
 import { Talk } from './talk.js';
 import { giveItem, makeCons, renderSellList } from './inventory.js';
 import { hungerLevel, ate } from './worldtravel.js';
@@ -555,7 +556,9 @@ export class TownLife {
       return;
     }
     const id = def?.id;
-    if (act === 'train') {
+    if (act === 'trade_goods') {
+      renderTrading(t => talk.say(t));
+    } else if (act === 'train') {
       const refresh = () => {
         const rows = G.game.upgrades.map(u => {
           const lv = G.meta.levels[u.id] || 0;

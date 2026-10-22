@@ -1,0 +1,210 @@
+{
+  "errors": [],
+  "steps": [
+    {
+      "name": "Kjøp og Fortsett bevarer penger, last og lager",
+      "silver": 630,
+      "bag": [
+        {
+          "name": "Lerret",
+          "kg": 0.8,
+          "value": 110,
+          "icon": "ration",
+          "desc": "En rull vevd lerret til klær og seil.",
+          "type": "trade",
+          "tid": "lerret",
+          "qty": 5,
+          "basis": 370,
+          "rarity": "vanlig",
+          "uid": "ixa247gp"
+        }
+      ],
+      "market": {
+        "v": 1,
+        "week": 0,
+        "stock": {
+          "jern": 12,
+          "salt": 12,
+          "ull": 24,
+          "lerret": 19,
+          "vin": 12,
+          "krydder": 12
+        },
+        "demand": {
+          "jern": 24,
+          "salt": 24,
+          "ull": 24,
+          "lerret": 24,
+          "vin": 24,
+          "krydder": 24
+        },
+        "observed": {
+          "clock": 12.004166666666654,
+          "prices": {
+            "jern": {
+              "buy": 100,
+              "sell": 66
+            },
+            "salt": {
+              "buy": 105,
+              "sell": 69
+            },
+            "ull": {
+              "buy": 48,
+              "sell": 31
+            },
+            "lerret": {
+              "buy": 74,
+              "sell": 49
+            },
+            "vin": {
+              "buy": 175,
+              "sell": 117
+            },
+            "krydder": {
+              "buy": 187,
+              "sell": 124
+            }
+          }
+        }
+      },
+      "clock": 12.004166666666654
+    },
+    {
+      "name": "Fire døgns betalt reise, fortjeneste og salt til returen",
+      "silver": 1097,
+      "bag": [
+        {
+          "name": "Salt",
+          "kg": 1,
+          "value": 60,
+          "icon": "ration",
+          "desc": "Tørt salt i en forseglet pose.",
+          "type": "trade",
+          "tid": "salt",
+          "qty": 5,
+          "basis": 205,
+          "rarity": "vanlig",
+          "uid": "ipfnz2i5"
+        }
+      ],
+      "market": {
+        "v": 1,
+        "week": 0,
+        "stock": {
+          "jern": 12,
+          "salt": 19,
+          "ull": 12,
+          "lerret": 17,
+          "vin": 12,
+          "krydder": 24
+        },
+        "demand": {
+          "jern": 24,
+          "salt": 24,
+          "ull": 24,
+          "lerret": 19,
+          "vin": 24,
+          "krydder": 24
+        },
+        "observed": {
+          "clock": 108.00416666666673,
+          "prices": {
+            "jern": {
+              "buy": 101,
+              "sell": 67
+            },
+            "salt": {
+              "buy": 41,
+              "sell": 27
+            },
+            "ull": {
+              "buy": 77,
+              "sell": 50
+            },
+            "lerret": {
+              "buy": 204,
+              "sell": 136
+            },
+            "vin": {
+              "buy": 110,
+              "sell": 73
+            },
+            "krydder": {
+              "buy": 119,
+              "sell": 79
+            }
+          }
+        }
+      },
+      "clock": 108.00416666666673
+    },
+    {
+      "name": "Handelsknapper og prisbok på 390 px",
+      "width": 390,
+      "scroll": 390,
+      "buttons": [
+        {
+          "left": 44,
+          "right": 183.453125,
+          "height": 40
+        },
+        {
+          "left": 189.453125,
+          "right": 328.390625,
+          "height": 40
+        },
+        {
+          "left": 44,
+          "right": 183.453125,
+          "height": 40
+        },
+        {
+          "left": 189.453125,
+          "right": 328.390625,
+          "height": 40
+        },
+        {
+          "left": 44,
+          "right": 183.453125,
+          "height": 40
+        },
+        {
+          "left": 189.453125,
+          "right": 328.390625,
+          "height": 40
+        },
+        {
+          "left": 44,
+          "right": 191.921875,
+          "height": 40
+        },
+        {
+          "left": 197.921875,
+          "right": 336.859375,
+          "height": 40
+        },
+        {
+          "left": 44,
+          "right": 183.453125,
+          "height": 40
+        },
+        {
+          "left": 189.453125,
+          "right": 328.390625,
+          "height": 40
+        },
+        {
+          "left": 44,
+          "right": 183.453125,
+          "height": 40
+        },
+        {
+          "left": 189.453125,
+          "right": 328.390625,
+          "height": 40
+        }
+      ]
+    }
+  ]
+}
